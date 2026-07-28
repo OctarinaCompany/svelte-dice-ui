@@ -1,0 +1,34 @@
+node_modules
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Build output
+build
+dist
+.svelte-kit
+.output
+.vercel
+.netlify
+
+# Package manager
+.pnpm-store
+.yarn
+package-lock.json.bak
+
+# Editors
+.idea
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# Test / coverage
+coverage
+.nyc_output
+test-results
+playwright-report
