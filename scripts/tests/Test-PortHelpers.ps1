@@ -403,6 +403,33 @@ foreach ($f in @('headless-settings.json', 'port-permissions.json')) {
     }
 }
 
+# --- orchestrator locals must not shadow script parameters -------------------
+# PowerShell variable names are case-insensitive, so `$model = ...` inside the phase loop assigns
+# the script's own -Model parameter. Get-PhaseModel returns $Model before consulting any map, so
+# one such assignment makes the first phase's choice sticky for every later phase and silently
+# disables -Economy. The same trap applies to -Effort. This is invisible at runtime: every phase
+# still runs and still succeeds, just on the wrong model.
+$orchSrc = [System.IO.File]::ReadAllText((Join-Path $RepoRoot 'scripts/port-components.ps1'))
+# Only the parameters a helper reads as an implicit fallback are dangerous. $Only/$Skip/$Phases are
+# deliberately normalised in place by Split-ListArg, which is idempotent and read-only afterwards.
+$shadowParams = @('Model', 'Effort')
+foreach ($p in $shadowParams) {
+    # An assignment at the start of a line (after indentation) to a variable of that exact name.
+    $assigns = [regex]::Matches($orchSrc, "(?im)^\s*\`$$p\s*=[^=]")
+    Assert-True "orchestrator never assigns to `$$p (would shadow the -$p parameter)" ($assigns.Count -eq 0)
+}
+
+# The phase loop must hand the per-phase resolution, not the raw parameter, to the runner.
+Assert-True 'phase loop passes $phaseModel to Invoke-ClaudePhase'  ($orchSrc -match '-Model\s+\$phaseModel')
+Assert-True 'phase loop passes $phaseEffort to Invoke-ClaudePhase' ($orchSrc -match '-Effort\s+\$phaseEffort')
+
+# --- git output parsing must survive the trailing blank line -----------------
+# `git diff --name-only` ends with a newline, so splitting on newlines always yields a trailing
+# empty entry. Split-Path throws on an empty string, which aborted the whole run at the exact
+# moment the fix loop was meant to rescue it.
+$suppressFn = [regex]::Match($orchSrc, '(?s)function Get-SuppressionViolations.*?\n\}').Value
+Assert-True 'suppression scan skips empty git-diff entries' ($suppressFn -match 'if \(-not \$trimmed\) \{ continue \}')
+
 }
 finally {
     Remove-Item -LiteralPath $Scratch -Recurse -Force -ErrorAction SilentlyContinue

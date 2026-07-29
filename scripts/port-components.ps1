@@ -440,8 +440,13 @@ function Get-SuppressionViolations {
     $changedConfigs = @()
     $names = (Invoke-Git -RepoRoot $RepoRoot diff --name-only).Output -split "`r?`n"
     foreach ($n in $names) {
-        $leaf = Split-Path -Leaf $n.Trim()
-        if ($leaf -and ($ProtectedConfigFiles -contains $leaf)) { $changedConfigs += $n.Trim() }
+        # `git diff --name-only` output ends with a newline, so splitting always yields a trailing
+        # empty entry. Split-Path throws on an empty string, which would abort the whole run at the
+        # exact moment the fix loop is meant to rescue it.
+        $trimmed = $n.Trim()
+        if (-not $trimmed) { continue }
+        $leaf = Split-Path -Leaf $trimmed
+        if ($leaf -and ($ProtectedConfigFiles -contains $leaf)) { $changedConfigs += $trimmed }
     }
 
     return @{ Lines = $cheats; Configs = $changedConfigs }
@@ -890,8 +895,11 @@ try {
 
             $timeout = Get-PhaseTimeout $phase $complexity
             $budget = Get-PhaseBudget $phase $complexity
-            $model = Get-PhaseModel -Phase $phase -Complexity $complexity
-            $effort = Get-PhaseEffort -Phase $phase -Complexity $complexity
+            # NOT $model / $effort: PowerShell variable names are case-insensitive, so those would
+            # be the script's own -Model / -Effort parameters. Assigning them would make the first
+            # phase's resolution sticky for every later phase (Get-PhaseModel returns $Model first).
+            $phaseModel = Get-PhaseModel -Phase $phase -Complexity $complexity
+            $phaseEffort = Get-PhaseEffort -Phase $phase -Complexity $complexity
             $basePrompt = Expand-PromptTemplate -Path (Join-Path $PromptDir $cfg.Template) -Tokens $tokens
 
             $ok = $false
@@ -900,7 +908,7 @@ try {
                 $rec.attempts = $attempt
                 $rec.status = 'running'
                 $rec.startedAt = (Get-Date).ToString('o')
-                $rec.model = $model
+                $rec.model = $phaseModel
                 Save-PortState -State $State -Path $StateFull
 
                 $prompt = $basePrompt
@@ -919,11 +927,11 @@ try {
                 }
 
                 $logPath = Join-Path $logDir ("{0}-{1}{2}.log" -f $cfg.Order, $phase, $(if ($attempt -gt 1) { ".retry$attempt" } else { '' }))
-                Write-PortLog Step "phase $($cfg.Order) $phase  (attempt $attempt, model $model, timeout $(Format-Duration $timeout), cap `$$budget)"
+                Write-PortLog Step "phase $($cfg.Order) $phase  (attempt $attempt, model $phaseModel, timeout $(Format-Duration $timeout), cap `$$budget)"
 
                 $run = Invoke-ClaudePhase -RepoRoot $RepoRoot -Prompt $prompt -LogPath $logPath `
                     -SystemPrompt $systemPrompt -SettingsPath $SettingsPath -TimeoutSeconds $timeout `
-                    -EnvVars $phaseEnv -Model $model -FallbackModel $FallbackModel -Effort $effort `
+                    -EnvVars $phaseEnv -Model $phaseModel -FallbackModel $FallbackModel -Effort $phaseEffort `
                     -BudgetUsd $budget -Format $cfg.Format `
                     -JsonSchema $(if ($cfg.ContainsKey('Schema') -and $cfg.Schema) { $AnalyzeSchema } else { $null }) `
                     -PermissionProfile $PermissionProfile `

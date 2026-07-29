@@ -20,3 +20,11 @@ static/r
 # Orchestrator-owned
 .port-logs
 .port-state.json
+
+# Spec Kit's machine-written feature pointer, rewritten on every component
+.specify/feature.json
+
+# Spec Kit artefacts: generated prose, not source. Requiring them to be prettier-clean makes the
+# lint gate fail on document formatting rather than on code, which no amount of fixing the
+# component would resolve.
+specs

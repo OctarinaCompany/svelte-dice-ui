@@ -1,0 +1,16 @@
+# Keep LF in the working tree on every platform.
+#
+# Without this, a global `core.autocrlf=true` rewrites checked-out files to CRLF, and Prettier —
+# whose default `endOfLine` is "lf" — then fails `pnpm run lint` on files nobody edited. That turns
+# every `git checkout` into a broken quality gate, which the porting pipeline hits constantly.
+* text=auto eol=lf
+
+# Binary assets must never be line-ending normalised.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
