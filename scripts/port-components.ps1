@@ -73,6 +73,11 @@ param(
     # A usage limit is a WAIT, not a failure: it does not consume a retry.
     [double]$RateLimitWaitMinutes = 20,
     [int]$MaxRateLimitWaits = 36,
+    # Pause before a usage window is exhausted, leaving headroom for interactive work.
+    # 85 means "stop with 15% left". 0 disables the pre-emptive guard entirely.
+    [int]$UsageStopPercent = 85,
+    [int]$UsageSnapshotMaxAgeMinutes = 15,
+    [string]$UsageSnapshotPath = (Join-Path $HOME '.claude/usage-snapshot.json'),
 
     # ---- safety ----------------------------------------------------------
     [ValidateSet('bypass', 'allowlist')][string]$PermissionProfile = 'bypass',
@@ -472,6 +477,16 @@ function Wait-RateLimit {
     $until = $null
     if ($RateLimit -and $RateLimit.ResetAt) {
         $until = $RateLimit.ResetAt.AddMinutes(1)
+    } else {
+        # The error text usually carries no reset time, which used to mean sleeping blind in
+        # 20-minute increments - seven of them in one observed stall. The status-line snapshot
+        # knows the exact reset, so prefer it before falling back to the fixed interval.
+        $snap = Get-UsageSnapshot -Path $UsageSnapshotPath -MaxAgeMinutes $UsageSnapshotMaxAgeMinutes
+        if ($snap.Available -and $snap.FiveHourResetsAt -and $snap.FiveHourResetsAt -gt (Get-Date)) {
+            $until = $snap.FiveHourResetsAt.AddMinutes(1)
+        }
+    }
+    if ($until) {
         $delta = [int]($until - (Get-Date)).TotalSeconds
         if ($delta -gt 0) { $waitSec = $delta }
     }
@@ -498,6 +513,76 @@ function Wait-RateLimit {
 Runs a Claude invocation, transparently waiting out any plan usage limit.
 Used by the phases that do not go through the main retry loop (fix, converge).
 #>
+function Wait-UsageHeadroom {
+    <#
+    .SYNOPSIS
+        Pause between phases while a usage window is above -UsageStopPercent.
+    .DESCRIPTION
+        The reactive waiter only fires once a limit has already been hit, which leaves nothing for
+        the user's own interactive work. This stops earlier, at a configurable percentage, and
+        sleeps until the window's exact reset time rather than guessing in fixed increments.
+
+        Called only BETWEEN phases, so the state file always describes a valid boundary.
+
+        Both windows are checked: exhausting the seven-day allowance would stall the run far longer
+        than the five-hour one, and it is the window a multi-day port is most likely to burn.
+    #>
+    param([string]$Context = '')
+
+    if ($UsageStopPercent -le 0) { return }
+
+    $waits = 0
+    while ($true) {
+        $snap = Get-UsageSnapshot -Path $UsageSnapshotPath -MaxAgeMinutes $UsageSnapshotMaxAgeMinutes
+        if (-not $snap.Available) {
+            if (-not $script:UsageGuardWarned) {
+                Write-PortLog Warn ("Usage guard inactive ({0}). It needs an interactive Claude Code session open to refresh the snapshot; the run still stops reactively when a limit is hit." -f $snap.Reason)
+                $script:UsageGuardWarned = $true
+            }
+            return
+        }
+        $script:UsageGuardWarned = $false
+
+        $over = @()
+        if ($snap.FiveHourPercent -ge $UsageStopPercent) {
+            $over += @{ Name = '5-hour'; Pct = $snap.FiveHourPercent; ResetsAt = $snap.FiveHourResetsAt }
+        }
+        if ($snap.SevenDayPercent -ge $UsageStopPercent) {
+            $over += @{ Name = '7-day'; Pct = $snap.SevenDayPercent; ResetsAt = $snap.SevenDayResetsAt }
+        }
+        if ($over.Count -eq 0) { return }
+
+        # Wait out whichever breached window resets last, so one sleep clears them all.
+        $worst = $over | Sort-Object { $_.ResetsAt } | Select-Object -Last 1
+        $waits++
+        if ($waits -gt $MaxRateLimitWaits) {
+            Write-PortLog Warn "Usage guard exhausted its $MaxRateLimitWaits waits - continuing and letting the reactive waiter take over."
+            return
+        }
+
+        $desc = ($over | ForEach-Object { "$($_.Name) at $($_.Pct)%" }) -join ', '
+        if (-not $worst.ResetsAt) {
+            Write-PortLog Warn "Usage guard: $desc but no reset time in the snapshot. Sleeping $(Format-Duration ([int]($RateLimitWaitMinutes * 60)))."
+            $waitSec = [int]($RateLimitWaitMinutes * 60)
+        } else {
+            $waitSec = [int]($worst.ResetsAt.AddMinutes(1) - (Get-Date)).TotalSeconds
+            Write-PortLog Warn ("Usage guard{0}: $desc (threshold $UsageStopPercent%). Sleeping until $($worst.ResetsAt.ToString('yyyy-MM-dd HH:mm')) to leave you headroom." -f $(if ($Context) { " before $Context" } else { '' }))
+        }
+        $waitSec = [Math]::Max(60, [Math]::Min($waitSec, 8 * 3600))
+
+        $remaining = $waitSec
+        while ($remaining -gt 0) {
+            $slice = [Math]::Min(60, $remaining)
+            Start-Sleep -Seconds $slice
+            $remaining -= $slice
+            if ($remaining -gt 0 -and ($remaining % 900) -lt 60) {
+                Write-PortLog Debug "usage guard: $(Format-Duration $remaining) left"
+            }
+        }
+        # Loop round and re-read: the window may have reset late, or the other one may now breach.
+    }
+}
+
 function Invoke-WithLimitWait {
     param([Parameter(Mandatory)][scriptblock]$Invoke)
     $waits = 0
@@ -935,6 +1020,10 @@ try {
                 }
 
                 $logPath = Join-Path $logDir ("{0}-{1}{2}.log" -f $cfg.Order, $phase, $(if ($attempt -gt 1) { ".retry$attempt" } else { '' }))
+                # Checked here rather than mid-phase: pausing between phases keeps the state file
+                # on a valid boundary, so a Ctrl-C during the wait resumes cleanly.
+                Wait-UsageHeadroom -Context "$slug/$phase"
+
                 Write-PortLog Step "phase $($cfg.Order) $phase  (attempt $attempt, model $phaseModel, timeout $(Format-Duration $timeout), cap `$$budget)"
 
                 $run = Invoke-ClaudePhase -RepoRoot $RepoRoot -Prompt $prompt -LogPath $logPath `

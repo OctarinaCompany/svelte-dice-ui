@@ -124,6 +124,58 @@ and enforces a wall-clock timeout by killing the whole process tree.
 
 Returns [pscustomobject] with ExitCode, TimedOut, DurationSec, StdOut, StdErr, LogPath.
 #>
+function Get-UsageSnapshot {
+    <#
+    .SYNOPSIS
+        Read the plan-usage snapshot mirrored by the interactive status line.
+    .DESCRIPTION
+        Claude Code hands plan usage to a session's status line only; `claude -p` never sees it,
+        and there is no CLI command that reports it. ~/.claude/statusline.sh therefore mirrors the
+        numbers to a file that this function reads.
+
+        A snapshot is only produced while an interactive session is open and rendering, so a stale
+        file means "no reading", NEVER "0% used". Treating stale data as fresh would let the guard
+        wave through a run that is actually about to exhaust the window.
+    #>
+    param(
+        [string]$Path = (Join-Path $HOME '.claude/usage-snapshot.json'),
+        [int]$MaxAgeMinutes = 15
+    )
+
+    $absent = @{ Available = $false; Reason = 'no snapshot file'; AgeMinutes = $null }
+    if (-not (Test-Path -LiteralPath $Path)) { return $absent }
+
+    try {
+        $raw = [System.IO.File]::ReadAllText($Path)
+        $j = $raw | ConvertFrom-Json
+    } catch {
+        return @{ Available = $false; Reason = 'unreadable snapshot'; AgeMinutes = $null }
+    }
+
+    $epoch = [DateTimeOffset]::FromUnixTimeSeconds([int64]$j.capturedAt).ToLocalTime().DateTime
+    $ageMin = ((Get-Date) - $epoch).TotalMinutes
+    if ($ageMin -gt $MaxAgeMinutes) {
+        return @{ Available = $false; Reason = ("snapshot is {0:N0} min old (max {1})" -f $ageMin, $MaxAgeMinutes); AgeMinutes = $ageMin }
+    }
+
+    $toLocal = {
+        param($unix)
+        if ($null -eq $unix -or [int64]$unix -le 0) { return $null }
+        [DateTimeOffset]::FromUnixTimeSeconds([int64]$unix).ToLocalTime().DateTime
+    }
+
+    return @{
+        Available        = $true
+        Reason           = $null
+        AgeMinutes       = $ageMin
+        FiveHourPercent  = [int]$j.fiveHourPercent
+        FiveHourResetsAt = & $toLocal $j.fiveHourResetsAt
+        SevenDayPercent  = [int]$j.sevenDayPercent
+        SevenDayResetsAt = & $toLocal $j.sevenDayResetsAt
+        CapturedAt       = $epoch
+    }
+}
+
 function Invoke-ExternalProcess {
     [CmdletBinding()]
     param(

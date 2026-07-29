@@ -423,6 +423,47 @@ foreach ($p in $shadowParams) {
 Assert-True 'phase loop passes $phaseModel to Invoke-ClaudePhase'  ($orchSrc -match '-Model\s+\$phaseModel')
 Assert-True 'phase loop passes $phaseEffort to Invoke-ClaudePhase' ($orchSrc -match '-Effort\s+\$phaseEffort')
 
+# --- usage snapshot: stale must never read as 0% -----------------------------
+# The snapshot only exists while an interactive session renders its status line. If a stale file
+# were trusted, the guard would wave through a run that is in fact about to exhaust the window -
+# the exact failure it exists to prevent. Absent and stale must both mean "no reading".
+$snapPath = Join-Path $Scratch 'usage-snapshot.json'
+$writeSnap = {
+    param($ageMinutes, $five, $seven)
+    $captured = [DateTimeOffset]::new((Get-Date).AddMinutes(-$ageMinutes)).ToUnixTimeSeconds()
+    $resets = [DateTimeOffset]::new((Get-Date).AddHours(2)).ToUnixTimeSeconds()
+    $o = @{
+        fiveHourPercent = $five; fiveHourResetsAt = $resets
+        sevenDayPercent = $seven; sevenDayResetsAt = $resets
+        contextPercent  = 30; capturedAt = $captured
+    }
+    [System.IO.File]::WriteAllText($snapPath, ($o | ConvertTo-Json -Compress), [System.Text.UTF8Encoding]::new($false))
+}
+
+Assert-True 'missing snapshot reads as unavailable' (-not (Get-UsageSnapshot -Path (Join-Path $Scratch 'nope.json')).Available)
+
+& $writeSnap 1 91 52
+$fresh = Get-UsageSnapshot -Path $snapPath -MaxAgeMinutes 15
+Assert-True  'fresh snapshot is available'   $fresh.Available
+Assert-Equal 'fresh five-hour percent'  91   $fresh.FiveHourPercent
+Assert-Equal 'fresh seven-day percent'  52   $fresh.SevenDayPercent
+Assert-True  'fresh snapshot has a reset time' ($null -ne $fresh.FiveHourResetsAt)
+
+& $writeSnap 45 91 52
+$stale = Get-UsageSnapshot -Path $snapPath -MaxAgeMinutes 15
+Assert-True 'stale snapshot is NOT available'          (-not $stale.Available)
+Assert-True 'stale snapshot explains why'              ($stale.Reason -match 'old')
+Assert-True 'stale snapshot exposes no percentage'     (-not $stale.ContainsKey('FiveHourPercent'))
+
+[System.IO.File]::WriteAllText($snapPath, 'not json at all', [System.Text.UTF8Encoding]::new($false))
+Assert-True 'corrupt snapshot is NOT available' (-not (Get-UsageSnapshot -Path $snapPath).Available)
+
+# The guard must be wired in, and must consider BOTH windows.
+Assert-True 'phase loop calls the usage guard'   ($orchSrc -match 'Wait-UsageHeadroom -Context')
+Assert-True 'usage guard checks the 5-hour window' ($orchSrc -match 'FiveHourPercent -ge \$UsageStopPercent')
+Assert-True 'usage guard checks the 7-day window'  ($orchSrc -match 'SevenDayPercent -ge \$UsageStopPercent')
+Assert-True 'reactive waiter falls back to the snapshot reset time' ($orchSrc -match 'snap\.FiveHourResetsAt')
+
 # --- the watchdog must actually fire -----------------------------------------
 # Regression: WaitForExit(ms) with asynchronously drained stdout/stderr was observed blocking 49
 # minutes on an 18 minute budget, wedging the run. The watchdog now polls HasExited against a
