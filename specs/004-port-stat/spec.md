@@ -148,8 +148,9 @@ value renders both as expected, spanning the full width of the card.
   implementation.
 - **FR-009**: The component MUST provide a description part for supplementary explanatory text,
   rendered as small, muted text spanning the card's full width.
-- **FR-010**: Every part except the indicator and trend MUST be independently optional, and any
-  subset/order of parts MUST render without breaking the grid layout.
+- **FR-010**: Every part MUST be independently optional — including the indicator and the trend — and
+  any subset of the parts, written in any order, MUST render without breaking the container's grid
+  layout (no empty rows, no misplaced cells).
 - **FR-011**: The component MUST expose the indicator's active visual style and colour theme, and the
   trend's active direction, as inspectable, style-hookable attributes on their respective rendered
   elements, so consumers can target a specific combination with their own styling without needing to
@@ -164,6 +165,10 @@ value renders both as expected, spanning the full width of the card.
   following the ambient text/layout direction rather than being pinned left-to-right.
 - **FR-015**: The component MUST be installable, and its usage documented, in exactly the same way as
   every other component already available in this project's component set.
+- **FR-016**: When the interactive-style indicator is composed as the content of a trigger whose only
+  visible content is an icon, that trigger MUST expose a text alternative (an accessible name)
+  describing the action, and the icon MUST NOT contribute a name of its own. Upstream's example omits
+  this; the omission is corrected here because an unnamed control is unusable with a screen reader.
 
 ### Key Entities
 
@@ -198,6 +203,8 @@ value renders both as expected, spanning the full width of the card.
   tests, build) with zero suppressed checks.
 - **SC-007**: Existing consumers of this project's component set can install the card through the
   same installation mechanism as any other component, with no bespoke steps.
+- **SC-008**: The "action" style indicator's trigger exposes a discoverable accessible name, verified
+  by an automated test that queries the trigger by its role and that name.
 
 ## Assumptions _(mandatory)_
 
@@ -258,9 +265,20 @@ value renders both as expected, spanning the full width of the card.
   what composition with an actual interactive element (e.g. a menu trigger) naturally provides — this
   matches the WAI-ARIA Authoring Practices guidance that a purely presentational metric display with
   visible text content needs no additional ARIA role, live region, or `aria-label`, since the label
-  and value text are themselves already accessible as ordinary text content.
+  and value text are themselves already accessible as ordinary text content. The one exception is
+  FR-016: when the composed trigger's only visible content is the icon-only "action" indicator (no
+  label/value text of its own to serve as an accessible name), an explicit `aria-label` is required —
+  this is a targeted correction of an upstream a11y defect, not a general aria-label policy.
 - Only the seven documented parts (container, label, indicator, value, trend, separator, description)
   are ported; no additional convenience parts are invented, since upstream does not offer one.
+- **Divergence**: upstream exports only its `cva` table. This port additionally exports
+  `statTrendVariants` (upstream inlines a `clsx` object), the readonly tuples
+  `STAT_INDICATOR_VARIANTS` / `STAT_INDICATOR_COLORS` / `STAT_TREND_DIRECTIONS`, and the guards
+  `resolveStatIndicatorVariant` / `resolveStatIndicatorColor` / `resolveStatTrendDirection`. The
+  tuples are the single source of truth for the unions, the variant-table keys, the `data-*` values
+  and the test/demo loops; the guards implement the Edge Case requirement that an unrecognised
+  runtime value falls back to the axis default instead of leaking into a `data-*` attribute. This
+  matches the precedent already set by the `status` port. No part, prop or behaviour is added.
 - The upstream package name and CLI install command (`npx shadcn@latest add @diceui/stat`) are
   React/npm-specific and are not carried over; installation in this project happens exclusively
   through this project's own `registry.json` entry and `pnpm run registry:build` output, consistent

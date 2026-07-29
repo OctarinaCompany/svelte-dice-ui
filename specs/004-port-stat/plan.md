@@ -118,7 +118,7 @@ falls back to the neutral/muted row, matching upstream's `trend === "neutral" ||
 | -------------- | ------------------------------- | -------------- | -------- |
 | `ref`          | `HTMLDivElement \| null`        | `null`         | **yes**  |
 | `orientation`  | `'horizontal' \| 'vertical'`    | `'horizontal'` | no       |
-| `decorative`   | `boolean`                       | `true`         | no       |
+| `decorative`   | `boolean`                       | `false` (bits-ui) | no    |
 | `class`        | `ClassValue`                    | —              | no       |
 | `...restProps` | rest of `Separator.RootProps`   | —              | no       |
 

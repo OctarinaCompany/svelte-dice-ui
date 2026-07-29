@@ -27,5 +27,18 @@
 		"dependencies": [],
 		"registryDependencies": [],
 		"relativeUrl": "pending.json"
+	},
+	{
+		"name": "stat",
+		"title": "Stat",
+		"type": "registry:ui",
+		"description": "A card for a key metric — label, value, colour-themed indicator, trend, separator and description — laid out on a two-column grid that positions its parts by slot.",
+		"dependencies": [
+			"tailwind-variants"
+		],
+		"registryDependencies": [
+			"separator"
+		],
+		"relativeUrl": "stat.json"
 	}
 ]

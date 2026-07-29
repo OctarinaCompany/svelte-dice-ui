@@ -48,6 +48,24 @@
 				{ "path": "src/lib/components/ui/pending/pending.svelte", "type": "registry:ui" },
 				{ "path": "src/lib/components/ui/pending/pending.svelte.ts", "type": "registry:ui" }
 			]
+		},
+		{
+			"name": "stat",
+			"type": "registry:ui",
+			"title": "Stat",
+			"description": "A card for a key metric — label, value, colour-themed indicator, trend, separator and description — laid out on a two-column grid that positions its parts by slot.",
+			"registryDependencies": ["separator"],
+			"dependencies": ["tailwind-variants"],
+			"files": [
+				{ "path": "src/lib/components/ui/stat/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/stat/stat.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/stat/stat-label.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/stat/stat-indicator.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/stat/stat-value.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/stat/stat-trend.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/stat/stat-separator.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/stat/stat-description.svelte", "type": "registry:ui" }
+			]
 		}
 	]
 }
