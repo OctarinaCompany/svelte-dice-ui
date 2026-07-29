@@ -305,6 +305,21 @@ module script is acceptable, but a Symbol key plus the throwing getter is the de
   `src/lib/components/ui/button/button.svelte`).
 - **Semantic tokens only**: `bg-background`, `text-muted-foreground`, `border-border`, `bg-primary`,
   `text-destructive`. Never raw palette colours (`bg-blue-500`, `text-gray-600`).
+- **Status colours** use the dedicated tokens, never the palette. Upstream's `green-*` / `orange-*` /
+  `blue-*` map to `success` / `warning` / `info`, each with a `-foreground` companion for solid fills:
+
+  | Upstream                         | Here                                                   |
+  | -------------------------------- | ------------------------------------------------------ |
+  | `bg-green-500/10 text-green-600` | `bg-success/10 text-success`                           |
+  | `bg-orange-500 text-white`       | `bg-warning text-warning-foreground`                   |
+  | `border-blue-500/20`             | `border-info/20`                                       |
+  | `bg-red-500/10 text-red-600`     | `bg-destructive/10 text-destructive` (already existed) |
+
+  They are declared in `src/app.css` for both `:root` and `.dark` and exposed through
+  `@theme inline`, so they flip with the theme like every other token. If a port needs a status
+  colour that is not one of these four, add the token to `src/app.css` **and** to this table —
+  do not reach for the palette.
+
 - **No manual `dark:`** — tokens already flip via CSS variables in `src/app.css`.
 - **No `space-x-*` / `space-y-*`** — use `flex`/`grid` with `gap-*`.
 - Use `size-*` when width and height match; use `truncate` over the three-property spelling.

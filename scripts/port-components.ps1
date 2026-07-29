@@ -811,7 +811,11 @@ try {
         $componentFailed = $null
 
         # ---- phase 00: create the feature directory ----------------------
-        if ($activePhases -contains 'create-feature') {
+        # Every later phase needs a feature directory, so this is a prerequisite rather than
+        # an optional phase: run it whenever one has not been resolved yet, even if -Phases
+        # did not name it. Already-created features are skipped by the `status -ne 'done'`
+        # check below, so this never renumbers an existing feature.
+        if (($activePhases -contains 'create-feature') -or (-not $cs.featureDir)) {
             $rec = if ($cs.phases.ContainsKey('create-feature')) { $cs.phases['create-feature'] } else { New-PhaseRecord }
             $cs.phases['create-feature'] = $rec
             if ($rec.status -ne 'done') {
@@ -1243,7 +1247,17 @@ try {
         }
     }
     $rows | Format-Table -AutoSize | Out-String | Write-Host
-    Write-PortLog Info ("Total: {0} done, {1} failed, {2:N2} USD." -f $State.totals.done, $State.totals.failed, $State.totals.costUsd)
+
+    # Recompute the tallies from the component records rather than trusting the running
+    # counters: a component that failed in an earlier run and succeeded in this one would
+    # otherwise stay counted as failed forever.
+    $allStatuses = @($State.components.Values | ForEach-Object { $_.status })
+    $State.totals.done = @($allStatuses | Where-Object { $_ -eq 'done' }).Count
+    $State.totals.failed = @($allStatuses | Where-Object { $_ -eq 'failed' }).Count
+    $State.totals.skipped = @($allStatuses | Where-Object { $_ -eq 'skipped' }).Count
+    Save-PortState -State $State -Path $StateFull
+
+    Write-PortLog Info ("Total: {0} done, {1} failed, {2:N2} USD (cumulative across runs)." -f $State.totals.done, $State.totals.failed, $State.totals.costUsd)
 
     $failedSlugs = @($rows | Where-Object { $_.Status -eq 'failed' } | ForEach-Object { $_.Slug })
     if ($failedSlugs.Count -gt 0) {
