@@ -66,6 +66,21 @@
 				{ "path": "src/lib/components/ui/stat/stat-separator.svelte", "type": "registry:ui" },
 				{ "path": "src/lib/components/ui/stat/stat-description.svelte", "type": "registry:ui" }
 			]
+		},
+		{
+			"name": "swap",
+			"type": "registry:ui",
+			"title": "Swap",
+			"description": "A component that swaps between two states with click or hover activation modes.",
+			"registryDependencies": [],
+			"dependencies": [],
+			"files": [
+				{ "path": "src/lib/components/ui/swap/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/swap/swap.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/swap/swap-on.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/swap/swap-off.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/swap/swap.svelte.ts", "type": "registry:ui" }
+			]
 		}
 	]
 }

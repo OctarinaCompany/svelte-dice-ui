@@ -40,5 +40,14 @@
 			"separator"
 		],
 		"relativeUrl": "stat.json"
+	},
+	{
+		"name": "swap",
+		"title": "Swap",
+		"type": "registry:ui",
+		"description": "A component that swaps between two states with click or hover activation modes.",
+		"dependencies": [],
+		"registryDependencies": [],
+		"relativeUrl": "swap.json"
 	}
 ]
