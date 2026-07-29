@@ -67,5 +67,14 @@
 		"dependencies": [],
 		"registryDependencies": [],
 		"relativeUrl": "circular-progress.json"
+	},
+	{
+		"name": "gauge",
+		"title": "Gauge",
+		"type": "registry:ui",
+		"description": "A circular meter that displays a value along a configurable arc, with support for custom angles, sizes and an indeterminate state.",
+		"dependencies": [],
+		"registryDependencies": [],
+		"relativeUrl": "gauge.json"
 	}
 ]

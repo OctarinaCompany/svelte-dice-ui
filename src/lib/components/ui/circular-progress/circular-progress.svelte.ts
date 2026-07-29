@@ -99,6 +99,120 @@ export function getRingGeometry(size: number, thickness: number): RingGeometry {
 	return { radius, center, circumference };
 }
 
+/** A cartesian point on an SVG canvas. */
+export type Point = { x: number; y: number };
+
+/** Normalizes `angle` into `[0, 360)`, upstream verbatim. */
+export function getNormalizedAngle(angle: number): number {
+	return ((angle % 360) + 360) % 360;
+}
+
+/** Converts a polar angle (0° = 12 o'clock, clockwise) to a cartesian point on the given circle. */
+export function polarToCartesian(
+	centerX: number,
+	centerY: number,
+	radius: number,
+	angleInDegrees: number
+): Point {
+	const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
+	return {
+		x: centerX + radius * Math.cos(angleInRadians),
+		y: centerY + radius * Math.sin(angleInRadians)
+	};
+}
+
+/**
+ * Builds the SVG `d` attribute for the arc from `startAngle` to `endAngle`. `|Δ| >= 360` draws a
+ * full circle as two chained semicircle `A` segments (a single `A` cannot span 360°).
+ */
+export function describeArc(
+	x: number,
+	y: number,
+	radius: number,
+	startAngle: number,
+	endAngle: number
+): string {
+	const angleDiff = endAngle - startAngle;
+
+	if (Math.abs(angleDiff) >= 360) {
+		const start = polarToCartesian(x, y, radius, startAngle);
+		const mid = polarToCartesian(x, y, radius, startAngle + 180);
+		return [
+			'M',
+			start.x,
+			start.y,
+			'A',
+			radius,
+			radius,
+			0,
+			0,
+			1,
+			mid.x,
+			mid.y,
+			'A',
+			radius,
+			radius,
+			0,
+			0,
+			1,
+			start.x,
+			start.y
+		].join(' ');
+	}
+
+	const start = polarToCartesian(x, y, radius, startAngle);
+	const end = polarToCartesian(x, y, radius, endAngle);
+	const largeArcFlag = angleDiff <= 180 ? '0' : '1';
+
+	return ['M', start.x, start.y, 'A', radius, radius, 0, largeArcFlag, 1, end.x, end.y].join(' ');
+}
+
+/** `(min(|Δ|, 360) / 360) · 2πr` — the drawn length of the arc, clamped at a full circumference. */
+export function getArcLength(radius: number, startAngle: number, endAngle: number): number {
+	const angleDiff = Math.abs(endAngle - startAngle);
+	return (Math.min(angleDiff, 360) / 360) * (2 * Math.PI * radius);
+}
+
+/**
+ * The visual vertical centre of the arc, for positioning a value label. Full circles use the
+ * geometric centre; partial arcs use the midpoint of the endpoints' `y` bounding box, widened to
+ * the circle's top/bottom extreme when the sweep crosses 270°/90° respectively (upstream verbatim
+ * — research.md R-03).
+ */
+export function getArcCenterY(
+	center: number,
+	radius: number,
+	startAngle: number,
+	endAngle: number
+): number {
+	const angleDiffDeg = Math.abs(endAngle - startAngle);
+	const isFullCircle = angleDiffDeg >= 360;
+
+	if (isFullCircle) return center;
+
+	const startRad = (startAngle * Math.PI) / 180;
+	const endRad = (endAngle * Math.PI) / 180;
+
+	const startY = center - radius * Math.cos(startRad);
+	const endY = center - radius * Math.cos(endRad);
+
+	let minY = Math.min(startY, endY);
+	let maxY = Math.max(startY, endY);
+
+	const normStart = getNormalizedAngle(startAngle);
+	const normEnd = getNormalizedAngle(endAngle);
+
+	const includesTop =
+		normStart > normEnd ? normStart <= 270 || normEnd >= 270 : normStart <= 270 && normEnd >= 270;
+	const includesBottom =
+		normStart > normEnd ? normStart <= 90 || normEnd >= 90 : normStart <= 90 && normEnd >= 90;
+
+	if (includesTop) minY = Math.min(minY, center - radius);
+	if (includesBottom) maxY = Math.max(maxY, center + radius);
+
+	return (minY + maxY) / 2;
+}
+
 type CircularProgressStateProps = {
 	readonly getValue: () => number | null | undefined;
 	readonly getGetValueText: () => (value: number, min: number, max: number) => string;

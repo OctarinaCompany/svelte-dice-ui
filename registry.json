@@ -133,6 +133,30 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "gauge",
+			"type": "registry:ui",
+			"title": "Gauge",
+			"description": "A circular meter that displays a value along a configurable arc, with support for custom angles, sizes and an indeterminate state.",
+			"registryDependencies": [],
+			"dependencies": [],
+			"files": [
+				{ "path": "src/lib/components/ui/gauge/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/gauge/gauge.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/gauge/gauge-indicator.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/gauge/gauge-track.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/gauge/gauge-range.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/gauge/gauge-value-text.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/gauge/gauge-label.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/gauge/gauge-combined.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/gauge/gauge.svelte.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/circular-progress/circular-progress.svelte.ts",
+					"type": "registry:ui",
+					"target": "circular-progress/circular-progress.svelte.ts"
+				}
+			]
 		}
 	]
 }
