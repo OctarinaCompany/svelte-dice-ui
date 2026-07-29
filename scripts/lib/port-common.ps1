@@ -124,6 +124,40 @@ and enforces a wall-clock timeout by killing the whole process tree.
 
 Returns [pscustomobject] with ExitCode, TimedOut, DurationSec, StdOut, StdErr, LogPath.
 #>
+function Start-DeadlineWait {
+    <#
+    .SYNOPSIS
+        Sleep until a wall-clock deadline, in interruptible slices.
+    .DESCRIPTION
+        Counting down a remaining-seconds variable is wrong on any machine that suspends: the
+        counter tracks iterations of awake time, not elapsed time. An observed run slept through a
+        4h45 suspend and still had ~100 minutes of countdown left, hours after the usage window had
+        actually reset. Comparing against an absolute deadline is immune to that.
+
+        Sleeps in short slices so Ctrl-C stays responsive, and returns immediately if the deadline
+        has already passed.
+    #>
+    param(
+        [Parameter(Mandatory)][datetime]$Until,
+        [string]$Label = 'waiting',
+        [int]$ProgressEverySeconds = 600
+    )
+
+    $lastReport = Get-Date
+    while ($true) {
+        $remaining = ($Until - (Get-Date)).TotalSeconds
+        if ($remaining -le 0) { break }
+        Start-Sleep -Seconds ([Math]::Max(1, [Math]::Min(30, [int][Math]::Ceiling($remaining))))
+        if (((Get-Date) - $lastReport).TotalSeconds -ge $ProgressEverySeconds) {
+            $left = ($Until - (Get-Date)).TotalSeconds
+            if ($left -gt 0) {
+                Write-PortLog Debug ("{0}: {1} left (until {2})" -f $Label, (Format-Duration ([int]$left)), $Until.ToString('HH:mm'))
+            }
+            $lastReport = Get-Date
+        }
+    }
+}
+
 function Get-UsageSnapshot {
     <#
     .SYNOPSIS

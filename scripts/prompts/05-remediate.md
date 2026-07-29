@@ -26,3 +26,13 @@ Rules:
   item that now genuinely passes to "- [X]". If an item cannot pass, keep editing the artifacts until
   it can. All items must end checked.
 - Finally, re-read spec.md and confirm it contains zero occurrences of "[NEEDS CLARIFICATION".
+
+END OF TURN — MANDATORY, DO NOT SKIP
+
+Your very last output must be the PHASE_RESULT block from RULE 9, with nothing after it. A prose
+summary of what you changed is NOT a substitute and does not end the turn; write the summary inside
+the SUMMARY: section of the block, not instead of it.
+
+This phase in particular tends to finish by narrating its edits and stopping there. A turn that ends
+without the literal line `PHASE_RESULT: SUCCESS` is treated as a failed turn, and every edit you just
+made gets re-done from scratch by a fresh session.

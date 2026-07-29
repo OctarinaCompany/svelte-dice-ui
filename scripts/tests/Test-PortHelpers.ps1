@@ -464,6 +464,23 @@ Assert-True 'usage guard checks the 5-hour window' ($orchSrc -match 'FiveHourPer
 Assert-True 'usage guard checks the 7-day window'  ($orchSrc -match 'SevenDayPercent -ge \$UsageStopPercent')
 Assert-True 'reactive waiter falls back to the snapshot reset time' ($orchSrc -match 'snap\.FiveHourResetsAt')
 
+# --- waits must be deadline-based, not countdown-based ------------------------
+# A remaining-seconds countdown tracks awake time, not elapsed time. One run slept through a
+# machine suspend and still had ~100 minutes of countdown left, hours after its usage window had
+# reset, leaving the orchestrator alive but idle. Both waiters must target an absolute deadline.
+Assert-True 'rate-limit waiter uses the deadline helper' ($orchSrc -match "Start-DeadlineWait -Until .* -Label 'usage limit'")
+Assert-True 'usage guard uses the deadline helper'       ($orchSrc -match "Start-DeadlineWait -Until .* -Label 'usage guard'")
+Assert-True 'no remaining-seconds countdown survives'    ($orchSrc -notmatch '\$remaining -= \$slice')
+
+$t0 = Get-Date
+Start-DeadlineWait -Until $t0.AddSeconds(2) -Label 'test'
+$elapsed = ((Get-Date) - $t0).TotalSeconds
+Assert-True 'deadline wait honours a short deadline' ($elapsed -ge 1.5 -and $elapsed -lt 8) "took ${elapsed}s"
+
+$t1 = Get-Date
+Start-DeadlineWait -Until $t1.AddSeconds(-3600) -Label 'test-past'
+Assert-True 'deadline already passed returns immediately' (((Get-Date) - $t1).TotalSeconds -lt 2)
+
 # --- the watchdog must actually fire -----------------------------------------
 # Regression: WaitForExit(ms) with asynchronously drained stdout/stderr was observed blocking 49
 # minutes on an 18 minute budget, wedging the run. The watchdog now polls HasExited against a

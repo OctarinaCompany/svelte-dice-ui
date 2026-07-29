@@ -498,15 +498,7 @@ function Wait-RateLimit {
     Write-PortLog Warn "$msg. This does not consume a retry."
     if ($RateLimit -and $RateLimit.Evidence) { Write-PortLog Debug $RateLimit.Evidence }
 
-    $remaining = $waitSec
-    while ($remaining -gt 0) {
-        $slice = [Math]::Min(60, $remaining)
-        Start-Sleep -Seconds $slice
-        $remaining -= $slice
-        if ($remaining -gt 0 -and ($remaining % 600) -lt 60) {
-            Write-PortLog Debug "still waiting on the usage limit: $(Format-Duration $remaining) left"
-        }
-    }
+    Start-DeadlineWait -Until ((Get-Date).AddSeconds($waitSec)) -Label 'usage limit'
 }
 
 <#
@@ -570,15 +562,7 @@ function Wait-UsageHeadroom {
         }
         $waitSec = [Math]::Max(60, [Math]::Min($waitSec, 8 * 3600))
 
-        $remaining = $waitSec
-        while ($remaining -gt 0) {
-            $slice = [Math]::Min(60, $remaining)
-            Start-Sleep -Seconds $slice
-            $remaining -= $slice
-            if ($remaining -gt 0 -and ($remaining % 900) -lt 60) {
-                Write-PortLog Debug "usage guard: $(Format-Duration $remaining) left"
-            }
-        }
+        Start-DeadlineWait -Until ((Get-Date).AddSeconds($waitSec)) -Label 'usage guard' -ProgressEverySeconds 900
         # Loop round and re-read: the window may have reset late, or the other one may now breach.
     }
 }
