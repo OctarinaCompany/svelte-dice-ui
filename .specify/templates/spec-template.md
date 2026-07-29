@@ -117,15 +117,28 @@ _Example of marking unclear requirements:_
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
 
-## Assumptions
+## Assumptions _(mandatory)_
 
 <!--
   ACTION REQUIRED: The content in this section represents placeholders.
   Fill them out with the right assumptions based on reasonable defaults
   chosen when the feature description did not specify certain details.
+
+  This section is MANDATORY (constitution Principles II and the unattended
+  Development Workflow):
+
+  - The pipeline runs unattended, so /speckit-clarify is never used. Every
+    ambiguity MUST be resolved here from the feature description, the pinned
+    upstream source, the constitution and industry-standard defaults.
+  - The finished spec.md MUST contain zero occurrences of "[NEEDS CLARIFICATION".
+  - Every deliberate divergence from the upstream Dice UI API MUST be recorded
+    here with the upstream name it replaces and the reason (Principle II).
 -->
 
-- [Assumption about target users, e.g., "Users have stable internet connectivity"]
-- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
-- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
-- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+- [Resolved ambiguity, e.g., "Upstream does not document behaviour for X; assumed Y because Z"]
+- [Upstream divergence, e.g., "Upstream `renderItem` render prop → Svelte `item` snippet, because
+  React render props have no direct equivalent in Svelte 5"]
+- [Upstream divergence, e.g., "Upstream `asChild` dropped in favour of a `child` snippet, matching
+  the repository's existing shadcn-svelte parts"]
+- [Assumption about scope boundaries, e.g., "Only the base (non-Radix) upstream variant is ported"]
+- [Dependency on an existing primitive, e.g., "Positioning is delegated to the bits-ui popover layer"]

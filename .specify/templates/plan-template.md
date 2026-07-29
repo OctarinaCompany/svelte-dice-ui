@@ -40,7 +40,26 @@
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-[Gates determined based on constitution file]
+Record a verdict (PASS / VIOLATION) plus one line of evidence for each principle of
+`.specify/memory/constitution.md`. Principles II, VI and VII admit no exception — a VIOLATION there
+blocks the plan.
+
+| #    | Principle                           | Verdict | Evidence                                                               |
+| ---- | ----------------------------------- | ------- | ---------------------------------------------------------------------- |
+| I    | Svelte 5 Runes Only                 |         | [runes + snippets only; state class in `<slug>.svelte.ts`]             |
+| II   | Upstream Parity (NON-NEGOTIABLE)    |         | [upstream files read at the pinned commit; divergences in Assumptions] |
+| III  | Accessibility Is a MUST             |         | [ARIA pattern, keyboard map, RTL, required test areas]                 |
+| IV   | Composition Over Reimplementation   |         | [primitive composed, or written justification below]                   |
+| V    | shadcn-svelte Distribution Model    |         | [folder layout, `index.ts` barrel, `registry.json` entry, no docs dep] |
+| VI   | TypeScript Strict, No Suppressions  |         | [no `any`, no ignore comments, no config loosening]                    |
+| VII  | Green Gate Before Commit            |         | [four gate commands planned; no skipped tests]                         |
+| VIII | Styling Discipline                  |         | [semantic tokens via `cn()`/`tv()`, `data-slot`, `data-*` state]       |
+| IX   | Every Component Is Documented       |         | [one `<ComponentPreview>` per upstream demo file]                      |
+| X    | One Feature Directory Per Component |         | [work confined to this directory; no git write commands]               |
+
+**Bespoke behaviour justification (Principle IV)**: [For each hand-written behaviour, name the
+`bits-ui` / `$lib/components/ui/*` primitive evaluated and the specific capability it lacks. Write
+"None — all behaviour composed" if nothing is bespoke.]
 
 ## Project Structure
 
@@ -59,56 +78,36 @@ specs/[###-feature]/
 ### Source Code (repository root)
 
 <!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
+  ACTION REQUIRED: Replace the placeholder tree below with the concrete file list
+  for this component. The layout is fixed by constitution Principles V and IX -
+  one folder per component, one part per file, colocated tests, one demo route,
+  one registry entry. Expand `<slug>` and the real part names.
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+src/lib/components/ui/<slug>/
+├── index.ts                    # barrel: short names + prefixed aliases + prop types
+├── <slug>.svelte               # Root
+├── <slug>-<part>.svelte        # one file per part
+├── <slug>.svelte.ts            # state class(es) + Symbol context key (runes module)
+└── <slug>.test.ts              # colocated tests (NOT listed in registry.json)
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+src/routes/docs/components/<slug>/
+└── +page.svelte                # one <ComponentPreview> per upstream demo file
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+registry.json                   # append exactly one registry:ui entry
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: [Name every part file and map it to its upstream counterpart under
+`.reference/diceui`. Confirm the demo route slug equals the folder slug equals the registry
+item name.]
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+> **Fill ONLY if Constitution Check has violations that must be justified.** An unrecorded violation
+> blocks the commit phase. Principles II, VI and VII MUST NOT appear here — they admit no exception.
 
-| Violation                  | Why Needed         | Simpler Alternative Rejected Because |
-| -------------------------- | ------------------ | ------------------------------------ |
-| [e.g., 4th project]        | [current need]     | [why 3 projects insufficient]        |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient]  |
+| Principle | Violation                       | Why Needed         | Compliant Alternative Rejected Because    |
+| --------- | ------------------------------- | ------------------ | ----------------------------------------- |
+| [e.g. IV] | [e.g. hand-rolled positioner]   | [current need]     | [why the bits-ui primitive is not enough] |
+| [e.g. IX] | [e.g. upstream demo not ported] | [specific problem] | [why the demo cannot be reproduced]       |

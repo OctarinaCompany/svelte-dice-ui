@@ -337,8 +337,14 @@ if ($Steps -contains 'constitution' -and -not (Test-StepDone 'constitution')) {
 
     $constitution = Join-Path $RepoRoot '.specify/memory/constitution.md'
     $text = [System.IO.File]::ReadAllText($constitution)
-    if ($text -match '\[PROJECT_NAME\]|\[PRINCIPLE_1_NAME\]|\[GOVERNANCE_RULES\]|\[CONSTITUTION_VERSION\]') {
+    # The skill prepends a "Sync Impact Report" HTML comment that legitimately quotes the
+    # placeholder tokens it replaced, so strip comments before looking for leftovers.
+    $body = [regex]::Replace($text, '(?s)<!--.*?-->', '')
+    if ($body -match '\[PROJECT_NAME\]|\[PRINCIPLE_1_NAME\]|\[GOVERNANCE_RULES\]|\[CONSTITUTION_VERSION\]') {
         Stop-Bootstrap 'B4 left placeholders in .specify/memory/constitution.md.'
+    }
+    if ($body.Trim().Length -lt 1500) {
+        Stop-Bootstrap "B4 produced a suspiciously short constitution ($($body.Trim().Length) chars)."
     }
 
     $skillDiff = (Invoke-Git -RepoRoot $RepoRoot diff --name-only -- .claude/skills).Output

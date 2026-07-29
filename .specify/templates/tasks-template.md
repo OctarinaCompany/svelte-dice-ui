@@ -8,7 +8,7 @@ description: 'Task list template for feature implementation'
 
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Tests**: Tests are MANDATORY. Constitution Principle III requires every component to ship colocated tests at `src/lib/components/ui/<slug>/<slug>.test.ts` asserting roles/ARIA, accessible names, keyboard behaviour, RTL inversion, uncontrolled and controlled modes, guard rails, and the documented out-of-provider error. Principle VII forbids skipped or `.todo` tests.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -20,10 +20,11 @@ description: 'Task list template for feature implementation'
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Component source**: `src/lib/components/ui/<slug>/` — parts, `<slug>.svelte.ts`, `index.ts`
+- **Tests**: colocated at `src/lib/components/ui/<slug>/<slug>.test.ts`
+- **Demo route**: `src/routes/docs/components/<slug>/+page.svelte`
+- **Registry**: `registry.json` at the repository root
+- Paths shown below are generic samples - use the real paths from plan.md
 
 <!--
   ============================================================================
@@ -79,7 +80,7 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 1 (MANDATORY - Principle III) ⚠️
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
@@ -105,7 +106,7 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 2 (MANDATORY - Principle III) ⚠️
 
 - [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
@@ -127,7 +128,7 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 3 (MANDATORY - Principle III) ⚠️
 
 - [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
@@ -153,9 +154,23 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
+- [ ] TXXX [P] Additional unit tests in tests/unit/
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
+
+---
+
+## Phase N+1: Quality Gates (MANDATORY - Principle VII)
+
+**Purpose**: The feature is not complete until all four gates are green. No suppressions
+(`@ts-ignore`, `@ts-expect-error`, `eslint-disable`, `svelte-ignore`, `as any`, `.skip`/`.todo`,
+deleted assertions, loosened configs) may be used to reach green - fix the root cause.
+
+- [ ] TXXX Run `pnpm run format` (shadcn/generator output is not Prettier-formatted)
+- [ ] TXXX Run `pnpm run check` to zero errors and zero warnings
+- [ ] TXXX Run `pnpm run lint` to zero findings
+- [ ] TXXX Run `pnpm run test:unit -- --run` with all tests passing, none skipped
+- [ ] TXXX Run `pnpm run build` successfully, including the demo route
 
 ---
 
@@ -168,7 +183,8 @@ Examples of foundational tasks (adjust based on your project):
 - **User Stories (Phase 3+)**: All depend on Foundational phase completion
   - User stories can then proceed in parallel (if staffed)
   - Or sequentially in priority order (P1 → P2 → P3)
-- **Polish (Final Phase)**: Depends on all desired user stories being complete
+- **Polish**: Depends on all desired user stories being complete
+- **Quality Gates (Final Phase)**: Depends on everything above - the last phase, always run
 
 ### User Story Dependencies
 
@@ -178,7 +194,7 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Within Each User Story
 
-- Tests (if included) MUST be written and FAIL before implementation
+- Tests MUST be written and FAIL before implementation
 - Models before services
 - Services before endpoints
 - Core implementation before integration
@@ -198,7 +214,7 @@ Examples of foundational tasks (adjust based on your project):
 ## Parallel Example: User Story 1
 
 ```bash
-# Launch all tests for User Story 1 together (if tests requested):
+# Launch all tests for User Story 1 together:
 Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
 Task: "Integration test for [user journey] in tests/integration/test_[name].py"
 
@@ -246,6 +262,6 @@ With multiple developers:
 - [Story] label maps task to specific user story for traceability
 - Each user story should be independently completable and testable
 - Verify tests fail before implementing
-- Commit after each task or logical group
+- Do NOT run git write commands - the orchestrator owns the working tree (Principle X)
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
