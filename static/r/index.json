@@ -9,5 +9,14 @@
 		],
 		"registryDependencies": [],
 		"relativeUrl": "status.json"
+	},
+	{
+		"name": "direction-provider",
+		"title": "Direction Provider",
+		"type": "registry:ui",
+		"description": "Provides bidirectional text support (RTL/LTR) across your application, with a reader that falls back to the nearest DOM dir attribute when no provider is present.",
+		"dependencies": [],
+		"registryDependencies": [],
+		"relativeUrl": "direction-provider.json"
 	}
 ]
