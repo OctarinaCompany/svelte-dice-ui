@@ -81,6 +81,19 @@
 				{ "path": "src/lib/components/ui/swap/swap-off.svelte", "type": "registry:ui" },
 				{ "path": "src/lib/components/ui/swap/swap.svelte.ts", "type": "registry:ui" }
 			]
+		},
+		{
+			"name": "color-swatch",
+			"type": "registry:ui",
+			"title": "Color Swatch",
+			"description": "A color swatch component for displaying color values with support for transparency and various sizes.",
+			"registryDependencies": [],
+			"dependencies": [],
+			"files": [
+				{ "path": "src/lib/components/ui/color-swatch/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/color-swatch/color-swatch.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/color-swatch/color.ts", "type": "registry:ui" }
+			]
 		}
 	]
 }

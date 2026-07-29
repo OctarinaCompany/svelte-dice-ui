@@ -49,5 +49,14 @@
 		"dependencies": [],
 		"registryDependencies": [],
 		"relativeUrl": "swap.json"
+	},
+	{
+		"name": "color-swatch",
+		"title": "Color Swatch",
+		"type": "registry:ui",
+		"description": "A color swatch component for displaying color values with support for transparency and various sizes.",
+		"dependencies": [],
+		"registryDependencies": [],
+		"relativeUrl": "color-swatch.json"
 	}
 ]
