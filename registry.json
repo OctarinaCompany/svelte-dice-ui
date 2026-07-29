@@ -2,5 +2,20 @@
 	"$schema": "https://shadcn-svelte.com/schema/registry.json",
 	"name": "svelte-dice-ui",
 	"homepage": "https://github.com/svelte-dice-ui/svelte-dice-ui",
-	"items": []
+	"items": [
+		{
+			"name": "status",
+			"type": "registry:ui",
+			"title": "Status",
+			"description": "A status badge with an animated ping indicator and five colour variants for system states, user presence and service health.",
+			"registryDependencies": [],
+			"dependencies": ["tailwind-variants"],
+			"files": [
+				{ "path": "src/lib/components/ui/status/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/status/status.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/status/status-indicator.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/status/status-label.svelte", "type": "registry:ui" }
+			]
+		}
+	]
 }

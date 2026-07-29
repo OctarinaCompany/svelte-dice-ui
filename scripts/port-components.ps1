@@ -1215,9 +1215,22 @@ try {
             Save-PortState -State $State -Path $StateFull
             if ($StopOnFailure) { $aborted = 'failure'; break }
         } else {
-            $cs.status = 'done'
-            $State.totals.done++
-            Write-PortLog Ok ("$slug done in {0} (`${1:N2})" -f (Format-Duration $cs.durationSec), $cs.costUsd)
+            # A component is only 'done' once every phase of the full pipeline has run. A partial
+            # run (-Phases, -NoConverge, -NoCommit) leaves it 'partial' so a later full run picks
+            # it up instead of skipping it as finished.
+            # 'skipped' counts as satisfied: it means the pipeline deliberately declined the phase
+            # (remediate when the analysis verdict is 'ready', converge under -NoConverge), which is
+            # different from -Phases never having offered it a chance to run.
+            $pending = @($AllPhases | Where-Object {
+                -not ($cs.phases.ContainsKey($_) -and $cs.phases[$_].status -in @('done', 'skipped'))
+            })
+            if ($pending.Count -eq 0) {
+                $cs.status = 'done'
+                Write-PortLog Ok ("$slug done in {0} (`${1:N2})" -f (Format-Duration $cs.durationSec), $cs.costUsd)
+            } else {
+                $cs.status = 'partial'
+                Write-PortLog Warn ("$slug partial - phases not run: {0}. Re-run without -Phases to finish it." -f ($pending -join ', '))
+            }
             Save-PortState -State $State -Path $StateFull
         }
 

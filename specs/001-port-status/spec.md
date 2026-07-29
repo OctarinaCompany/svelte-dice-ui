@@ -80,18 +80,21 @@ attributes, not a badge wrapping a nested interactive element.
 1. **Given** a developer configures the badge to render onto a child anchor element, **When** the
    page renders, **Then** the anchor itself carries the badge's classes and data attributes, and no
    extra wrapping element is introduced.
-2. **Given** the badge is configured this way but no single child element is supplied, **When** the
-   component is used, **Then** the documented error/behaviour for that misuse is produced instead of
-   silently rendering nothing.
+2. **Given** the badge is configured to render onto a caller-supplied element, **When** the page
+   renders, **Then** the badge renders no element and no default content of its own — the caller's
+   element is the only one produced, it receives the badge's merged styling and state attributes,
+   the badge's own default content is not rendered, and no element reference is handed back to the
+   caller (the caller owns the element).
 
 ---
 
 ### Edge Cases
 
-- What happens when the badge label text is very long? It must not force page overflow — text
-  wraps within normal flow to the next line rather than being clipped or overflowing at the badge
-  boundary; the badge width follows its content (`w-fit`), so the badge itself does not stretch to
-  fill an unrelated container.
+- What happens when the badge label text is very long? The badge width follows its content
+  (`w-fit`), so it never stretches to fill an unrelated container; the label stays on a single line
+  (`whitespace-nowrap`) and any text beyond the badge boundary is clipped rather than spilling out
+  (`overflow-hidden`) — exactly as upstream. Callers who want wrapping override it through the
+  `class` prop on the container.
 - What happens when the badge is used with only an indicator and no label (icon/dot-only status)?
   It must still render as a valid, correctly spaced badge.
 - What happens when an unsupported/misspelled variant value reaches the component at runtime (e.g.
@@ -139,6 +142,16 @@ attributes, not a badge wrapping a nested interactive element.
   understandable without colour perception.
 - **FR-012**: The component MUST be installable, and its usage documented, in exactly the same way
   as every other component already available in this project's component set.
+- **FR-013**: In its default, non-interactive form the component MUST NOT be reachable by keyboard
+  tabbing and MUST NOT introduce a role or live-region announcement. When it is rendered onto a
+  caller-supplied interactive element, that element MUST remain in the normal tab order, MUST keep a
+  visible focus indicator (the component MUST NOT suppress it), MUST expose the label text as its
+  accessible name, and MUST activate through its own native keys (`Enter` for a link,
+  `Enter`/`Space` for a button).
+- **FR-014**: The component MUST expose, alongside its three parts, the same programmatic surface as
+  upstream — its variant-class table under upstream's exported name, the list of valid variant values,
+  and a runtime normaliser for that list — plus a way for a caller to obtain a direct reference to
+  each part's rendered element (the equivalent of upstream's forwarded element reference).
 
 ### Key Entities
 
@@ -183,6 +196,16 @@ attributes, not a badge wrapping a nested interactive element.
   pattern already used by e.g. `dialog-content.svelte`. The rendered element and its data
   attributes/classes are handed to the caller-supplied snippet instead of being merged via a Slot
   primitive, since Svelte has no runtime prop-merging primitive equivalent to Radix `Slot`.
+- **Divergence**: upstream passes `variant` straight through to both `cva()` and `data-variant`, so a
+  value outside the union — reachable only from untyped runtime data — renders `data-variant="bogus"`
+  with base classes only. This port normalises through `resolveStatusVariant()` first, so such a value
+  renders `data-variant="default"` with the neutral treatment. The divergence is additive and
+  invisible to typed callers; it replaces no upstream name (see `research.md` Decision 6 and
+  `contracts/status-public-api.md` §6, row 4).
+- **Divergence**: upstream's variant table is built with `cva()` from `class-variance-authority`; this
+  port uses `tv()` from `tailwind-variants` (Principle VIII and the repo precedent `badge.svelte`).
+  The exported name `statusVariants`, the five variant keys and `defaultVariants` are unchanged, so
+  the divergence is in the builder only, not the API (`contracts/status-public-api.md` §6, row 3).
 - This is a presentational, stateless component: it holds no internal reactive state, has no
   controlled/uncontrolled value, no keyboard interaction model of its own beyond whatever the
   element it is rendered onto (via the `child` snippet) already provides, and no
@@ -229,6 +252,12 @@ attributes, not a badge wrapping a nested interactive element.
   behaviour (no open state, no positioning, no focus trap) that `bits-ui` would own; per
   Principle IV, composition applies to `cva`/`tailwind-variants` for the variant styling, which
   this project already uses elsewhere (e.g. `button`).
+- **Correction recorded during planning**: the "very long label" edge case above originally
+  described the text wrapping to the next line. That contradicted upstream's own base classes
+  (`whitespace-nowrap overflow-hidden`), which make wrapping impossible, so under Principle II
+  (Upstream Parity, non-negotiable) the bullet was rewritten to describe the real ported behaviour
+  — clip, do not wrap. No other requirement changed; see `plan.md` and
+  `research.md` Decision 7.
 - The upstream package name (`@diceui/status`) and CLI install command are React/npm-specific and
   are not carried over; installation in this project happens exclusively through this project's own
   `registry.json` entry and `pnpm run registry:build` output, consistent with every other ported

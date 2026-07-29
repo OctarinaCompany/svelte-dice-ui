@@ -1,0 +1,35 @@
+{
+	"$schema": "https://shadcn-svelte.com/schema/registry-item.json",
+	"name": "status",
+	"title": "Status",
+	"type": "registry:ui",
+	"description": "A status badge with an animated ping indicator and five colour variants for system states, user presence and service health.",
+	"dependencies": [
+		"tailwind-variants"
+	],
+	"devDependencies": [
+		"tailwind-variants@^3.3.0"
+	],
+	"files": [
+		{
+			"content": "import Root from './status.svelte';\nimport Indicator from './status-indicator.svelte';\nimport Label from './status-label.svelte';\n\nexport {\n\tstatusVariants,\n\tSTATUS_VARIANTS,\n\tresolveStatusVariant,\n\ttype StatusVariant,\n\ttype StatusRootProps,\n\ttype StatusChildProps\n} from './status.svelte';\nexport { type StatusIndicatorProps } from './status-indicator.svelte';\nexport { type StatusLabelProps } from './status-label.svelte';\n\nexport {\n\tRoot,\n\tIndicator,\n\tLabel,\n\t//\n\tRoot as Status,\n\tIndicator as StatusIndicator,\n\tLabel as StatusLabel\n};\n",
+			"type": "registry:ui",
+			"target": "status/index.ts"
+		},
+		{
+			"content": "<script lang=\"ts\" module>\n\timport { cn, type WithElementRef } from '$UTILS$.js';\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { tv } from 'tailwind-variants';\n\n\t/** Every value `variant` accepts, in upstream declaration order. */\n\texport const STATUS_VARIANTS = ['default', 'success', 'error', 'warning', 'info'] as const;\n\n\t/** The visual style and color theme of the status badge. */\n\texport type StatusVariant = (typeof STATUS_VARIANTS)[number];\n\n\t/**\n\t * Normalise a possibly untyped runtime value to a known variant.\n\t * Anything outside {@link STATUS_VARIANTS} falls back to `\"default\"`.\n\t */\n\texport function resolveStatusVariant(value?: string): StatusVariant {\n\t\treturn STATUS_VARIANTS.includes(value as StatusVariant) ? (value as StatusVariant) : 'default';\n\t}\n\n\texport const statusVariants = tv({\n\t\tbase: 'inline-flex w-fit shrink-0 items-center gap-1.5 overflow-hidden rounded-full border px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors',\n\t\tvariants: {\n\t\t\tvariant: {\n\t\t\t\tdefault:\n\t\t\t\t\t'border-transparent bg-muted text-muted-foreground **:data-[slot=status-indicator]:bg-muted-foreground',\n\t\t\t\tsuccess:\n\t\t\t\t\t'border-success/20 bg-success/10 text-success **:data-[slot=status-indicator]:bg-success',\n\t\t\t\terror:\n\t\t\t\t\t'border-destructive/20 bg-destructive/10 text-destructive **:data-[slot=status-indicator]:bg-destructive',\n\t\t\t\twarning:\n\t\t\t\t\t'border-warning/20 bg-warning/10 text-warning **:data-[slot=status-indicator]:bg-warning',\n\t\t\t\tinfo: 'border-info/20 bg-info/10 text-info **:data-[slot=status-indicator]:bg-info'\n\t\t\t}\n\t\t},\n\t\tdefaultVariants: {\n\t\t\tvariant: 'default'\n\t\t}\n\t});\n\n\t/** The merged attribute payload handed to the `child` snippet. */\n\texport type StatusChildProps = {\n\t\t/** Always `\"status\"`. */\n\t\t'data-slot': 'status';\n\t\t/** The resolved variant. */\n\t\t'data-variant': StatusVariant;\n\t\t/** Variant classes with the caller's `class` merged last. */\n\t\tclass: string;\n\t} & Record<string, unknown>;\n\n\texport type StatusRootProps = WithElementRef<HTMLAttributes<HTMLDivElement>> & {\n\t\t/**\n\t\t * The visual style and color theme of the status badge.\n\t\t *\n\t\t * - `\"default\"`: Neutral muted gray styling\n\t\t * - `\"success\"`: Green styling for online/active states\n\t\t * - `\"error\"`: Red styling for offline/error states\n\t\t * - `\"warning\"`: Orange styling for away/warning states\n\t\t * - `\"info\"`: Blue styling for idle/informational states\n\t\t *\n\t\t * @default \"default\"\n\t\t */\n\t\tvariant?: StatusVariant;\n\t\t/**\n\t\t * Render the badge onto your own element instead of the default `<div>`.\n\t\t * The snippet receives the merged props (class, data-slot, data-variant and every\n\t\t * forwarded attribute) to spread onto that element.\n\t\t *\n\t\t * Replaces upstream's `asChild` (Radix `Slot`), which has no Svelte equivalent.\n\t\t * In `child` mode `children` is not rendered and `ref` is not populated — the\n\t\t * caller owns the element.\n\t\t */\n\t\tchild?: Snippet<[{ props: StatusChildProps }]>;\n\t};\n</script>\n\n<script lang=\"ts\">\n\tlet {\n\t\tref = $bindable(null),\n\t\tvariant = 'default',\n\t\tclass: className,\n\t\tchildren,\n\t\tchild,\n\t\t...restProps\n\t}: StatusRootProps = $props();\n\n\tconst resolved = $derived(resolveStatusVariant(variant));\n\n\t// Built once and shared by both branches, so a `child` element is styled exactly like the\n\t// default `<div>`. `class` can never arrive through `restProps` — it is destructured out — so\n\t// the computed class always wins, matching upstream's `{...rootProps} className={cn(...)}`.\n\tconst rootAttrs: StatusChildProps = $derived({\n\t\t'data-slot': 'status',\n\t\t'data-variant': resolved,\n\t\tclass: cn(statusVariants({ variant: resolved }), className),\n\t\t...restProps\n\t});\n</script>\n\n{#if child}\n\t{@render child({ props: rootAttrs })}\n{:else}\n\t<div bind:this={ref} {...rootAttrs}>\n\t\t{@render children?.()}\n\t</div>\n{/if}\n",
+			"type": "registry:ui",
+			"target": "status/status.svelte"
+		},
+		{
+			"content": "<script lang=\"ts\" module>\n\timport { cn, type WithElementRef } from '$UTILS$.js';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\n\texport type StatusIndicatorProps = WithElementRef<HTMLAttributes<HTMLDivElement>>;\n</script>\n\n<script lang=\"ts\">\n\tlet {\n\t\tref = $bindable(null),\n\t\tclass: className,\n\t\tchildren,\n\t\t...restProps\n\t}: StatusIndicatorProps = $props();\n</script>\n\n<!--\n\t`data-slot=\"status-indicator\"` is load-bearing: the root's variant classes colour this dot\n\tthrough `**:data-[slot=status-indicator]:bg-…`, and `bg-inherit` on both pseudo-elements picks\n\tthat colour up for the ping and the core.\n-->\n<div\n\tbind:this={ref}\n\tdata-slot=\"status-indicator\"\n\tclass={cn(\n\t\t'relative flex size-2 shrink-0 rounded-full before:absolute before:inset-0 before:animate-ping before:rounded-full before:bg-inherit after:absolute after:inset-[2px] after:rounded-full after:bg-inherit',\n\t\tclassName\n\t)}\n\t{...restProps}\n>\n\t{@render children?.()}\n</div>\n",
+			"type": "registry:ui",
+			"target": "status/status-indicator.svelte"
+		},
+		{
+			"content": "<script lang=\"ts\" module>\n\timport { cn, type WithElementRef } from '$UTILS$.js';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\n\texport type StatusLabelProps = WithElementRef<HTMLAttributes<HTMLDivElement>>;\n</script>\n\n<script lang=\"ts\">\n\tlet {\n\t\tref = $bindable(null),\n\t\tclass: className,\n\t\tchildren,\n\t\t...restProps\n\t}: StatusLabelProps = $props();\n</script>\n\n<div bind:this={ref} data-slot=\"status-label\" class={cn('leading-none', className)} {...restProps}>\n\t{@render children?.()}\n</div>\n",
+			"type": "registry:ui",
+			"target": "status/status-label.svelte"
+		}
+	]
+}

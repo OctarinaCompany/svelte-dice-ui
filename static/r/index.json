@@ -1,1 +1,13 @@
-[]
+[
+	{
+		"name": "status",
+		"title": "Status",
+		"type": "registry:ui",
+		"description": "A status badge with an animated ping indicator and five colour variants for system states, user presence and service health.",
+		"dependencies": [
+			"tailwind-variants"
+		],
+		"registryDependencies": [],
+		"relativeUrl": "status.json"
+	}
+]
