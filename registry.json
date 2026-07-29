@@ -94,6 +94,45 @@
 				{ "path": "src/lib/components/ui/color-swatch/color-swatch.svelte", "type": "registry:ui" },
 				{ "path": "src/lib/components/ui/color-swatch/color.ts", "type": "registry:ui" }
 			]
+		},
+		{
+			"name": "circular-progress",
+			"type": "registry:ui",
+			"title": "Circular Progress",
+			"description": "A circular progress indicator that displays completion progress in a ring format with support for indeterminate states.",
+			"registryDependencies": [],
+			"dependencies": [],
+			"files": [
+				{ "path": "src/lib/components/ui/circular-progress/index.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/circular-progress/circular-progress.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/circular-progress/circular-progress-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/circular-progress/circular-progress-track.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/circular-progress/circular-progress-range.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/circular-progress/circular-progress-value-text.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/circular-progress/circular-progress-combined.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/circular-progress/circular-progress.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

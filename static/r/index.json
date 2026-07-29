@@ -58,5 +58,14 @@
 		"dependencies": [],
 		"registryDependencies": [],
 		"relativeUrl": "color-swatch.json"
+	},
+	{
+		"name": "circular-progress",
+		"title": "Circular Progress",
+		"type": "registry:ui",
+		"description": "A circular progress indicator that displays completion progress in a ring format with support for indeterminate states.",
+		"dependencies": [],
+		"registryDependencies": [],
+		"relativeUrl": "circular-progress.json"
 	}
 ]
