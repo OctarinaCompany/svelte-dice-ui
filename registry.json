@@ -35,6 +35,19 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "pending",
+			"type": "registry:ui",
+			"title": "Pending",
+			"description": "A utility that disables interactions, keeps keyboard focus and wires the correct ARIA state for buttons, forms, links, switches and any interactive element while it is pending.",
+			"registryDependencies": [],
+			"dependencies": [],
+			"files": [
+				{ "path": "src/lib/components/ui/pending/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/pending/pending.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/pending/pending.svelte.ts", "type": "registry:ui" }
+			]
 		}
 	]
 }

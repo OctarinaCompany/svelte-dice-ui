@@ -18,5 +18,14 @@
 		"dependencies": [],
 		"registryDependencies": [],
 		"relativeUrl": "direction-provider.json"
+	},
+	{
+		"name": "pending",
+		"title": "Pending",
+		"type": "registry:ui",
+		"description": "A utility that disables interactions, keeps keyboard focus and wires the correct ARIA state for buttons, forms, links, switches and any interactive element while it is pending.",
+		"dependencies": [],
+		"registryDependencies": [],
+		"relativeUrl": "pending.json"
 	}
 ]

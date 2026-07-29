@@ -352,6 +352,7 @@ function Get-PhaseOutcome {
     # The PHASE_RESULT marker does not apply when a JSON output schema was supplied.
     $cfg = $PhaseConfig[$Phase]
     $schemaMode = ($cfg -and $cfg.ContainsKey('Schema') -and $cfg.Schema)
+    $markerMissing = $false
     if (-not $schemaMode) {
         if ($parsed.Result -notmatch '(?m)^\s*PHASE_RESULT:\s*SUCCESS\b') {
             if ($parsed.Result -match '(?m)^\s*PHASE_RESULT:\s*FAILURE\b') {
@@ -361,14 +362,21 @@ function Get-PhaseOutcome {
             if (Test-AskedQuestion -Result $parsed.Result) {
                 return @{ Ok = $false; Reason = 'asked-a-question'; Retryable = $true }
             }
-            return @{ Ok = $false; Reason = 'missing-result-marker'; Retryable = $true }
+            # Not an explicit failure and not a question - the model simply ended in prose. The
+            # artifact contract is the ground truth here, so let it decide rather than discarding
+            # work that may well be complete: a needless retry costs a full phase.
+            $markerMissing = $true
         }
     }
 
     $art = Test-PhaseArtifacts -Phase $Phase -Ctx $Ctx
-    if (-not $art.Ok) { return @{ Ok = $false; Reason = "artifact: $($art.Reason)"; Retryable = $true } }
+    if (-not $art.Ok) {
+        $reason = if ($markerMissing) { "missing-result-marker (artifacts also failed: $($art.Reason))" }
+                  else { "artifact: $($art.Reason)" }
+        return @{ Ok = $false; Reason = $reason; Retryable = $true }
+    }
 
-    return @{ Ok = $true; Reason = $null; Retryable = $false }
+    return @{ Ok = $true; Reason = $null; Retryable = $false; MarkerMissing = $markerMissing }
 }
 
 function Get-DepsHash {
@@ -959,6 +967,9 @@ try {
 
                 if ($outcome.Ok) {
                     $rec.status = 'done'
+                    if ($outcome.MarkerMissing) {
+                        Write-PortLog Warn "phase $phase ended without the PHASE_RESULT marker, but its artifact contract passed - accepting."
+                    }
                     Write-PortLog Ok ("phase {0} {1} done in {2} ({3} turns, `${4:N2})" -f $cfg.Order, $phase, (Format-Duration $rec.durationSec), $rec.numTurns, $rec.costUsd)
 
                     if ($phase -eq 'analyze' -and $run.Parsed) {
