@@ -423,6 +423,29 @@ foreach ($p in $shadowParams) {
 Assert-True 'phase loop passes $phaseModel to Invoke-ClaudePhase'  ($orchSrc -match '-Model\s+\$phaseModel')
 Assert-True 'phase loop passes $phaseEffort to Invoke-ClaudePhase' ($orchSrc -match '-Effort\s+\$phaseEffort')
 
+# --- the watchdog must actually fire -----------------------------------------
+# Regression: WaitForExit(ms) with asynchronously drained stdout/stderr was observed blocking 49
+# minutes on an 18 minute budget, wedging the run. The watchdog now polls HasExited against a
+# stopwatch. This launches a child that sleeps well past its budget and asserts it is killed.
+$sleeperLog = Join-Path $Scratch 'watchdog-sleeper.log'
+$sleeper = Invoke-ExternalProcess -FilePath (Get-PwshPath) `
+    -Arguments @('-NoProfile', '-NonInteractive', '-Command', 'Start-Sleep -Seconds 90') `
+    -LogPath $sleeperLog -TimeoutSeconds 3 -WorkingDirectory $Scratch
+
+Assert-True  'watchdog reports the timeout'            $sleeper.TimedOut
+Assert-True  'watchdog kills well inside 3x the budget' ($sleeper.DurationSec -lt 9)
+Assert-True  'watchdog does not return a success code'  ($sleeper.ExitCode -ne 0)
+
+# A child that exits on its own must NOT be reported as timed out, and must return its real code.
+$quickLog = Join-Path $Scratch 'watchdog-quick.log'
+$quick = Invoke-ExternalProcess -FilePath (Get-PwshPath) `
+    -Arguments @('-NoProfile', '-NonInteractive', '-Command', 'Write-Output hello; exit 0') `
+    -LogPath $quickLog -TimeoutSeconds 60 -WorkingDirectory $Scratch
+
+Assert-True  'fast child is not flagged as timed out' (-not $quick.TimedOut)
+Assert-Equal 'fast child exit code'  0        $quick.ExitCode
+Assert-True  'fast child stdout captured'     ($quick.StdOut -match 'hello')
+
 # --- git output parsing must survive the trailing blank line -----------------
 # `git diff --name-only` ends with a newline, so splitting on newlines always yields a trailing
 # empty entry. Split-Path throws on an empty string, which aborted the whole run at the exact

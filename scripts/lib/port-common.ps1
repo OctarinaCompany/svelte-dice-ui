@@ -197,9 +197,18 @@ function Invoke-ExternalProcess {
         $errTask = $proc.StandardError.ReadToEndAsync()
     }
 
+    # Watchdog driven by our own stopwatch, NOT by WaitForExit's timeout. With stdout/stderr
+    # redirected and drained asynchronously, the timed overload has been observed blocking far past
+    # its deadline - 49 minutes on an 18 minute budget - which turns one hung child into a
+    # permanently stalled run. HasExited is authoritative and cannot be fooled. Polling also keeps
+    # Ctrl-C responsive, which a blocking wait does not.
     $timedOut = $false
-    if (-not $proc.WaitForExit([int]([Math]::Min([double]$TimeoutSeconds * 1000.0, [double][int]::MaxValue)))) {
-        $timedOut = $true
+    $deadlineMs = [double]$TimeoutSeconds * 1000.0
+    while (-not $proc.HasExited) {
+        if ($sw.Elapsed.TotalMilliseconds -ge $deadlineMs) { $timedOut = $true; break }
+        Start-Sleep -Milliseconds 250
+    }
+    if ($timedOut) {
         Write-PortLog Warn "Timeout after ${TimeoutSeconds}s - killing process tree (pid $($proc.Id))."
         try { $proc.Kill($true) } catch { }
         [void]$proc.WaitForExit(20000)
@@ -207,8 +216,9 @@ function Invoke-ExternalProcess {
             if (-not $proc.HasExited) { & taskkill.exe /PID $proc.Id /T /F 2>&1 | Out-Null }
         } catch { }
     }
-    # The argument-less overload is what guarantees the async readers have flushed.
-    $proc.WaitForExit()
+    # Let the async readers flush, but bounded: claude spawns node children that inherit the pipe
+    # handles, and one surviving grandchild would make the argument-less overload block forever.
+    [void]$proc.WaitForExit(30000)
 
     if ($useThreadJob) {
         $null = Wait-Job -Job $outJob, $errJob -Timeout 30
@@ -216,8 +226,10 @@ function Invoke-ExternalProcess {
         $stdout = if (Test-Path -LiteralPath $LogPath) { [System.IO.File]::ReadAllText($LogPath) } else { '' }
         $stderr = if (Test-Path -LiteralPath $errPath) { [System.IO.File]::ReadAllText($errPath) } else { '' }
     } else {
-        $stdout = $outTask.GetAwaiter().GetResult()
-        $stderr = $errTask.GetAwaiter().GetResult()
+        # Bounded for the same reason: GetResult() on a pipe a grandchild still holds open never
+        # returns. Losing the tail of a log is recoverable; a wedged run is not.
+        $stdout = if ($outTask.Wait(30000)) { $outTask.Result } else { '' }
+        $stderr = if ($errTask.Wait(30000)) { $errTask.Result } else { '' }
         [System.IO.File]::WriteAllText($LogPath, $stdout, $script:Utf8NoBom)
         if ($stderr) { [System.IO.File]::WriteAllText($errPath, $stderr, $script:Utf8NoBom) }
     }
