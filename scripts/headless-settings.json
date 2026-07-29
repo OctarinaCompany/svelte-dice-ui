@@ -1,0 +1,15 @@
+{
+	"$comment": "Settings profile for unattended headless runs, passed via `claude --settings`. It neutralises the user's global settings that are hostile to a long batch run: the Stop hook that plays a sound on every session end (~250 times over a full run), the MCP plugins that add startup latency to every invocation, the statusline, and the global model pin (the orchestrator passes --model explicitly per phase). Do not add permissions here; the orchestrator selects a permission profile on the command line.",
+	"hooks": {},
+	"enabledPlugins": {},
+	"enableAllProjectMcpServers": false,
+	"includeCoAuthoredBy": false,
+	"cleanupPeriodDays": 30,
+	"env": {
+		"CI": "1",
+		"NO_COLOR": "1",
+		"FORCE_COLOR": "0",
+		"DO_NOT_TRACK": "1",
+		"npm_config_yes": "true"
+	}
+}

@@ -1,0 +1,22 @@
+# Package Managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
+
+# Build output / generated
+.svelte-kit
+build
+dist
+node_modules
+
+# Generated registry payloads (written by `pnpm registry:build`)
+static/r
+
+# Read-only vendored upstream React source
+.reference
+
+# Orchestrator-owned
+.port-logs
+.port-state.json
