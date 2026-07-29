@@ -50,14 +50,14 @@ describe('isCssColor', () => {
 	});
 
 	it('returns true when CSS is unavailable (SSR fallback)', () => {
-		const original = globalThis.CSS;
-		// @ts-expect-error deliberately deleting a global to simulate an SSR environment
-		delete globalThis.CSS;
+		// `isCssColor` guards on `typeof CSS !== 'undefined'`, so stubbing the global to undefined
+		// reproduces SSR exactly - and, unlike `delete globalThis.CSS`, needs no ts-expect-error.
+		vi.stubGlobal('CSS', undefined);
 
 		try {
 			expect(isCssColor('not-a-color')).toBe(true);
 		} finally {
-			globalThis.CSS = original;
+			vi.unstubAllGlobals();
 		}
 	});
 
