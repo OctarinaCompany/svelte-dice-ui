@@ -74,9 +74,15 @@ param(
     [double]$RateLimitWaitMinutes = 20,
     [int]$MaxRateLimitWaits = 36,
     # Pause before a usage window is exhausted, leaving headroom for interactive work.
-    # 85 means "stop with 15% left". 0 disables the pre-emptive guard entirely.
-    [int]$UsageStopPercent = 85,
-    [int]$UsageSnapshotMaxAgeMinutes = 15,
+    # Per-window because the two behave nothing alike: the 5-hour window is what a side project
+    # must not monopolise, while the weekly one is the long-run ceiling. 0 disables a check.
+    [int]$SessionStopPercent = 50,
+    [int]$WeeklyStopPercent = 85,
+    # 30 rather than 15: observed snapshots are typically 16-33 min old because the interactive
+    # session renders sporadically, so 15 left the guard blind most of the time. A 30-minute-old
+    # weekly reading is still near-exact; a 5-hour reading can drift ~10 points, which the lower
+    # session threshold absorbs.
+    [int]$UsageSnapshotMaxAgeMinutes = 30,
     [string]$UsageSnapshotPath = (Join-Path $HOME '.claude/usage-snapshot.json'),
 
     # ---- safety ----------------------------------------------------------
@@ -508,7 +514,7 @@ Used by the phases that do not go through the main retry loop (fix, converge).
 function Wait-UsageHeadroom {
     <#
     .SYNOPSIS
-        Pause between phases while a usage window is above -UsageStopPercent.
+        Pause between phases while a usage window is above its configured stop percentage.
     .DESCRIPTION
         The reactive waiter only fires once a limit has already been hit, which leaves nothing for
         the user's own interactive work. This stops earlier, at a configurable percentage, and
@@ -521,7 +527,7 @@ function Wait-UsageHeadroom {
     #>
     param([string]$Context = '')
 
-    if ($UsageStopPercent -le 0) { return }
+    if ($SessionStopPercent -le 0 -and $WeeklyStopPercent -le 0) { return }
 
     $waits = 0
     while ($true) {
@@ -538,11 +544,11 @@ function Wait-UsageHeadroom {
         }
 
         $over = @()
-        if ($snap.FiveHourPercent -ge $UsageStopPercent) {
-            $over += @{ Name = '5-hour'; Pct = $snap.FiveHourPercent; ResetsAt = $snap.FiveHourResetsAt }
+        if ($SessionStopPercent -gt 0 -and $snap.FiveHourPercent -ge $SessionStopPercent) {
+            $over += @{ Name = "session $($snap.FiveHourPercent)%/$SessionStopPercent%"; Pct = $snap.FiveHourPercent; ResetsAt = $snap.FiveHourResetsAt }
         }
-        if ($snap.SevenDayPercent -ge $UsageStopPercent) {
-            $over += @{ Name = '7-day'; Pct = $snap.SevenDayPercent; ResetsAt = $snap.SevenDayResetsAt }
+        if ($WeeklyStopPercent -gt 0 -and $snap.SevenDayPercent -ge $WeeklyStopPercent) {
+            $over += @{ Name = "weekly $($snap.SevenDayPercent)%/$WeeklyStopPercent%"; Pct = $snap.SevenDayPercent; ResetsAt = $snap.SevenDayResetsAt }
         }
         if ($over.Count -eq 0) { return }
 
@@ -554,13 +560,13 @@ function Wait-UsageHeadroom {
             return
         }
 
-        $desc = ($over | ForEach-Object { "$($_.Name) at $($_.Pct)%" }) -join ', '
+        $desc = ($over | ForEach-Object { $_.Name }) -join ', '
         if (-not $worst.ResetsAt) {
             Write-PortLog Warn "Usage guard: $desc but no reset time in the snapshot. Sleeping $(Format-Duration ([int]($RateLimitWaitMinutes * 60)))."
             $waitSec = [int]($RateLimitWaitMinutes * 60)
         } else {
             $waitSec = [int]($worst.ResetsAt.AddMinutes(1) - (Get-Date)).TotalSeconds
-            Write-PortLog Warn ("Usage guard{0}: $desc (threshold $UsageStopPercent%). Sleeping until $($worst.ResetsAt.ToString('yyyy-MM-dd HH:mm')) to leave you headroom." -f $(if ($Context) { " before $Context" } else { '' }))
+            Write-PortLog Warn ("Usage guard{0}: over threshold on $desc. Sleeping until $($worst.ResetsAt.ToString('yyyy-MM-dd HH:mm')) to leave you headroom." -f $(if ($Context) { " before $Context" } else { '' }))
         }
         $waitSec = [Math]::Max(60, [Math]::Min($waitSec, 8 * 3600))
 

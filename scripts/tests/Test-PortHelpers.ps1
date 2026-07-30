@@ -460,8 +460,13 @@ Assert-True 'corrupt snapshot is NOT available' (-not (Get-UsageSnapshot -Path $
 
 # The guard must be wired in, and must consider BOTH windows.
 Assert-True 'phase loop calls the usage guard'   ($orchSrc -match 'Wait-UsageHeadroom -Context')
-Assert-True 'usage guard checks the 5-hour window' ($orchSrc -match 'FiveHourPercent -ge \$UsageStopPercent')
-Assert-True 'usage guard checks the 7-day window'  ($orchSrc -match 'SevenDayPercent -ge \$UsageStopPercent')
+Assert-True 'usage guard checks the session window' ($orchSrc -match 'FiveHourPercent -ge \$SessionStopPercent')
+Assert-True 'usage guard checks the weekly window'  ($orchSrc -match 'SevenDayPercent -ge \$WeeklyStopPercent')
+# The two windows must have independent thresholds: a single value low enough to keep a side
+# project off the 5-hour window would also halt it for a whole week on the weekly one.
+Assert-True 'session and weekly thresholds are separate parameters' `
+    ($orchSrc -match '\[int\]\$SessionStopPercent' -and $orchSrc -match '\[int\]\$WeeklyStopPercent')
+Assert-True 'no single global usage threshold remains' ($orchSrc -notmatch '\$UsageStopPercent')
 Assert-True 'reactive waiter falls back to the snapshot reset time' ($orchSrc -match 'snap\.FiveHourResetsAt')
 
 # --- waits must be deadline-based, not countdown-based ------------------------
