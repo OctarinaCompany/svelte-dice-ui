@@ -4,6 +4,33 @@
 	"homepage": "https://github.com/svelte-dice-ui/svelte-dice-ui",
 	"items": [
 		{
+			"name": "timeline",
+			"type": "registry:ui",
+			"title": "Timeline",
+			"description": "A flexible timeline for chronological events, with vertical/horizontal orientations, an alternating variant, RTL support and completed/active/pending states.",
+			"registryDependencies": ["direction-provider"],
+			"dependencies": ["tailwind-variants"],
+			"files": [
+				{ "path": "src/lib/components/ui/timeline/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/timeline/timeline.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/timeline/timeline-item.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/timeline/timeline-dot.svelte", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/timeline/timeline-connector.svelte",
+					"type": "registry:ui"
+				},
+				{ "path": "src/lib/components/ui/timeline/timeline-content.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/timeline/timeline-header.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/timeline/timeline-title.svelte", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/timeline/timeline-description.svelte",
+					"type": "registry:ui"
+				},
+				{ "path": "src/lib/components/ui/timeline/timeline-time.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/timeline/timeline.svelte.ts", "type": "registry:ui" }
+			]
+		},
+		{
 			"name": "status",
 			"type": "registry:ui",
 			"title": "Status",

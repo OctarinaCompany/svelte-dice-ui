@@ -1,5 +1,18 @@
 [
 	{
+		"name": "timeline",
+		"title": "Timeline",
+		"type": "registry:ui",
+		"description": "A flexible timeline for chronological events, with vertical/horizontal orientations, an alternating variant, RTL support and completed/active/pending states.",
+		"dependencies": [
+			"tailwind-variants"
+		],
+		"registryDependencies": [
+			"direction-provider"
+		],
+		"relativeUrl": "timeline.json"
+	},
+	{
 		"name": "status",
 		"title": "Status",
 		"type": "registry:ui",
