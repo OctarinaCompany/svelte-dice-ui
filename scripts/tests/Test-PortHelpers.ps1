@@ -460,8 +460,8 @@ Assert-True 'corrupt snapshot is NOT available' (-not (Get-UsageSnapshot -Path $
 
 # The guard must be wired in, and must consider BOTH windows.
 Assert-True 'phase loop calls the usage guard'   ($orchSrc -match 'Wait-UsageHeadroom -Context')
-Assert-True 'usage guard checks the session window' ($orchSrc -match 'FiveHourPercent -ge \$SessionStopPercent')
-Assert-True 'usage guard checks the weekly window'  ($orchSrc -match 'SevenDayPercent -ge \$WeeklyStopPercent')
+Assert-True 'usage guard checks the session window' ($orchSrc -match 'FiveHourPercent -gt \$SessionStopPercent')
+Assert-True 'usage guard checks the weekly window'  ($orchSrc -match 'SevenDayPercent -gt \$WeeklyStopPercent')
 # The two windows must have independent thresholds: a single value low enough to keep a side
 # project off the 5-hour window would also halt it for a whole week on the weekly one.
 Assert-True 'session and weekly thresholds are separate parameters' `
@@ -515,6 +515,28 @@ Write-Output 'GUARD-OK'
 $probeOut2 = & (Get-PwshPath) -NoProfile -NonInteractive -File $guardProbe 2>&1 | Out-String
 Assert-True 'guard passes through when under both thresholds' ($probeOut2 -match 'GUARD-OK') $probeOut2.Trim()
 Assert-True 'guard does not sleep when under threshold' ($probeOut2 -notmatch 'Sleeping until')
+
+# A cap "at 50%" must permit exactly 50%. With -ge the guard deadlocked on the boundary: a rolling
+# window can sit on the threshold for a long time, and every re-probe blocked again.
+$atThreshold = Join-Path $Scratch 'at-threshold-snap.json'
+& $mkSnap $atThreshold 1 50 20
+@"
+Set-StrictMode -Version Latest
+`$ErrorActionPreference = 'Stop'
+. '$((Resolve-Path (Join-Path $RepoRoot 'scripts/port-components.ps1')).Path)' -NoRun ``
+    -UsageSnapshotPath '$atThreshold' -SessionStopPercent 50 -WeeklyStopPercent 85
+Wait-UsageHeadroom -Context 'probe-boundary'
+Write-Output 'GUARD-OK'
+"@ | Set-Content -LiteralPath $guardProbe -Encoding utf8
+$probeOut3 = & (Get-PwshPath) -NoProfile -NonInteractive -File $guardProbe 2>&1 | Out-String
+Assert-True 'exactly at the threshold is allowed, not blocked' `
+    ($probeOut3 -match 'GUARD-OK' -and $probeOut3 -notmatch 'over threshold') $probeOut3.Trim()
+
+# A rolling window's reset timestamp is useless once it has passed; the guard must re-probe after a
+# decay interval instead of computing a negative delta and spinning on the 60s floor.
+Assert-True 'past reset times trigger a decay re-probe, not a deadline wait' `
+    ($orchSrc -match 'Rolling window, no future reset to wait for')
+Assert-True 'decay probe is at least five minutes' ($orchSrc -match '\[Math\]::Max\(300,')
 Assert-True 'reactive waiter falls back to the snapshot reset time' ($orchSrc -match 'snap\.FiveHourResetsAt')
 
 # --- waits must be deadline-based, not countdown-based ------------------------

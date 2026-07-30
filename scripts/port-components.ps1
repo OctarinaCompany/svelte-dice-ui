@@ -550,10 +550,12 @@ function Wait-UsageHeadroom {
         }
 
         $over = @()
-        if ($SessionStopPercent -gt 0 -and $snap.FiveHourPercent -ge $SessionStopPercent) {
+        # Strictly greater: a "cap at 50%" must permit 50%, otherwise the guard deadlocks on the
+        # boundary - a rolling window can sit at exactly the threshold for a long time.
+        if ($SessionStopPercent -gt 0 -and $snap.FiveHourPercent -gt $SessionStopPercent) {
             $over += @{ Name = "session $($snap.FiveHourPercent)%/$SessionStopPercent%"; Pct = $snap.FiveHourPercent; ResetsAt = $snap.FiveHourResetsAt }
         }
-        if ($WeeklyStopPercent -gt 0 -and $snap.SevenDayPercent -ge $WeeklyStopPercent) {
+        if ($WeeklyStopPercent -gt 0 -and $snap.SevenDayPercent -gt $WeeklyStopPercent) {
             $over += @{ Name = "weekly $($snap.SevenDayPercent)%/$WeeklyStopPercent%"; Pct = $snap.SevenDayPercent; ResetsAt = $snap.SevenDayResetsAt }
         }
         if ($over.Count -eq 0) { return }
@@ -567,12 +569,20 @@ function Wait-UsageHeadroom {
         }
 
         $desc = ($over | ForEach-Object { $_.Name }) -join ', '
-        if (-not $worst.ResetsAt) {
-            Write-PortLog Warn "Usage guard: $desc but no reset time in the snapshot. Sleeping $(Format-Duration ([int]($RateLimitWaitMinutes * 60)))."
-            $waitSec = [int]($RateLimitWaitMinutes * 60)
-        } else {
+        $where = if ($Context) { " before $Context" } else { '' }
+
+        # These windows are ROLLING, not periodic: usage decays continuously and never drops to
+        # zero at `resets_at`. That timestamp is only useful while it is still ahead of us; once it
+        # has passed, the only correct move is to re-probe after a decay interval. Treating a past
+        # timestamp as a deadline yields a negative delta, clamps to the 60s floor, and burns the
+        # whole wait budget on one-minute re-checks before giving up and running anyway.
+        $decayProbeSec = [int]([Math]::Max(300, $RateLimitWaitMinutes * 60 / 2))
+        if ($worst.ResetsAt -and $worst.ResetsAt -gt (Get-Date)) {
             $waitSec = [int]($worst.ResetsAt.AddMinutes(1) - (Get-Date)).TotalSeconds
-            Write-PortLog Warn ("Usage guard{0}: over threshold on $desc. Sleeping until $($worst.ResetsAt.ToString('yyyy-MM-dd HH:mm')) to leave you headroom." -f $(if ($Context) { " before $Context" } else { '' }))
+            Write-PortLog Warn "Usage guard${where}: over threshold on $desc. Sleeping until $($worst.ResetsAt.ToString('yyyy-MM-dd HH:mm')) to leave you headroom."
+        } else {
+            $waitSec = $decayProbeSec
+            Write-PortLog Warn "Usage guard${where}: over threshold on $desc. Rolling window, no future reset to wait for - re-probing in $(Format-Duration $waitSec)."
         }
         $waitSec = [Math]::Max(60, [Math]::Min($waitSec, 8 * 3600))
 
