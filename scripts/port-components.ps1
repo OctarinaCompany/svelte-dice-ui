@@ -527,13 +527,15 @@ function Wait-UsageHeadroom {
     while ($true) {
         $snap = Get-UsageSnapshot -Path $UsageSnapshotPath -MaxAgeMinutes $UsageSnapshotMaxAgeMinutes
         if (-not $snap.Available) {
-            if (-not $script:UsageGuardWarned) {
+            # Throttled by time, not by a flip-flop flag: the snapshot alternates between fresh and
+            # stale as the interactive session renders sporadically, so a "warn once until fresh
+            # again" rule fires on every alternation and buries the log in duplicates.
+            if (-not $script:UsageGuardWarnedAt -or ((Get-Date) - $script:UsageGuardWarnedAt).TotalMinutes -ge 60) {
                 Write-PortLog Warn ("Usage guard inactive ({0}). It needs an interactive Claude Code session open to refresh the snapshot; the run still stops reactively when a limit is hit." -f $snap.Reason)
-                $script:UsageGuardWarned = $true
+                $script:UsageGuardWarnedAt = Get-Date
             }
             return
         }
-        $script:UsageGuardWarned = $false
 
         $over = @()
         if ($snap.FiveHourPercent -ge $UsageStopPercent) {
