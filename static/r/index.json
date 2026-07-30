@@ -136,5 +136,20 @@
 			"direction-provider"
 		],
 		"relativeUrl": "masonry.json"
+	},
+	{
+		"name": "banner",
+		"title": "Banner",
+		"type": "registry:ui",
+		"description": "A notification banner that appears at the top or bottom of the viewport. Supports queuing, priority, and auto-dismiss.",
+		"dependencies": [
+			"tailwind-variants",
+			"@lucide/svelte",
+			"bits-ui"
+		],
+		"registryDependencies": [
+			"button"
+		],
+		"relativeUrl": "banner.json"
 	}
 ]

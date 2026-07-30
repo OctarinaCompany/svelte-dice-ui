@@ -297,6 +297,27 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "banner",
+			"type": "registry:ui",
+			"title": "Banner",
+			"description": "A notification banner that appears at the top or bottom of the viewport. Supports queuing, priority, and auto-dismiss.",
+			"registryDependencies": ["button"],
+			"dependencies": ["tailwind-variants", "@lucide/svelte", "bits-ui"],
+			"files": [
+				{ "path": "src/lib/components/ui/banner/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner-queue.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner-queued.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner-icon.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner-content.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner-title.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner-description.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner-actions.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner-close.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/banner/banner.svelte.ts", "type": "registry:ui" }
+			]
 		}
 	]
 }
