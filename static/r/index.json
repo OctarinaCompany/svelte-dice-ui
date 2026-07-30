@@ -125,5 +125,16 @@
 			"direction-provider"
 		],
 		"relativeUrl": "scroller.json"
+	},
+	{
+		"name": "masonry",
+		"title": "Masonry",
+		"type": "registry:ui",
+		"description": "A responsive masonry layout component for displaying items in a grid.",
+		"dependencies": [],
+		"registryDependencies": [
+			"direction-provider"
+		],
+		"relativeUrl": "masonry.json"
 	}
 ]

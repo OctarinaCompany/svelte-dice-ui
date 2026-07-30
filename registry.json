@@ -277,6 +277,26 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "masonry",
+			"type": "registry:ui",
+			"title": "Masonry",
+			"description": "A responsive masonry layout component for displaying items in a grid.",
+			"registryDependencies": ["direction-provider"],
+			"dependencies": [],
+			"files": [
+				{ "path": "src/lib/components/ui/masonry/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/masonry/masonry.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/masonry/masonry-viewport.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/masonry/masonry-item.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/masonry/masonry.svelte.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/masonry/masonry-positioner.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/masonry/masonry-interval-tree.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
