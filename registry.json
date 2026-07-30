@@ -259,6 +259,24 @@
 				{ "path": "src/lib/components/ui/marquee/marquee-edge.svelte", "type": "registry:ui" },
 				{ "path": "src/lib/components/ui/marquee/marquee.svelte.ts", "type": "registry:ui" }
 			]
+		},
+		{
+			"name": "scroller",
+			"type": "registry:ui",
+			"title": "Scroller",
+			"description": "A scrollable container with customizable scroll shadows and navigation buttons.",
+			"registryDependencies": ["direction-provider"],
+			"dependencies": ["tailwind-variants", "@lucide/svelte"],
+			"files": [
+				{ "path": "src/lib/components/ui/scroller/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/scroller/scroller.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/scroller/scroller-button.svelte", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/scroller/scroller.svelte.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/scroller/scroll-position.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

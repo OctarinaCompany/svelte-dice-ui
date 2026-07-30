@@ -111,5 +111,19 @@
 			"direction-provider"
 		],
 		"relativeUrl": "marquee.json"
+	},
+	{
+		"name": "scroller",
+		"title": "Scroller",
+		"type": "registry:ui",
+		"description": "A scrollable container with customizable scroll shadows and navigation buttons.",
+		"dependencies": [
+			"tailwind-variants",
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"direction-provider"
+		],
+		"relativeUrl": "scroller.json"
 	}
 ]
