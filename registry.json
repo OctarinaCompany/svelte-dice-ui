@@ -345,6 +345,43 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "speed-dial",
+			"type": "registry:ui",
+			"title": "Speed Dial",
+			"description": "A floating action button that reveals a set of actions when triggered.",
+			"registryDependencies": ["button"],
+			"dependencies": ["tailwind-variants"],
+			"files": [
+				{ "path": "src/lib/components/ui/speed-dial/index.ts", "type": "registry:ui" },
+				{ "path": "src/lib/components/ui/speed-dial/speed-dial.svelte", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/speed-dial/speed-dial-trigger.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/speed-dial/speed-dial-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/speed-dial/speed-dial-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/speed-dial/speed-dial-action.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/speed-dial/speed-dial-label.svelte",
+					"type": "registry:ui"
+				},
+				{ "path": "src/lib/components/ui/speed-dial/speed-dial.svelte.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/speed-dial/speed-dial-collection.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

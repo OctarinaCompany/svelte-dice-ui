@@ -165,5 +165,18 @@
 			"hover-card"
 		],
 		"relativeUrl": "relative-time-card.json"
+	},
+	{
+		"name": "speed-dial",
+		"title": "Speed Dial",
+		"type": "registry:ui",
+		"description": "A floating action button that reveals a set of actions when triggered.",
+		"dependencies": [
+			"tailwind-variants"
+		],
+		"registryDependencies": [
+			"button"
+		],
+		"relativeUrl": "speed-dial.json"
 	}
 ]
