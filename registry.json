@@ -455,6 +455,32 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "mask-input",
+			"type": "registry:ui",
+			"title": "Mask Input",
+			"description": "An input that formats what you type against a pattern like a phone number, date, credit card or currency amount.",
+			"registryDependencies": [],
+			"dependencies": [],
+			"files": [
+				{
+					"path": "src/lib/components/ui/mask-input/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mask-input/mask-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mask-input/mask-input.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mask-input/mask-engine.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

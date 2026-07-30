@@ -207,5 +207,14 @@
 			"speed-dial"
 		],
 		"relativeUrl": "segmented-input.json"
+	},
+	{
+		"name": "mask-input",
+		"title": "Mask Input",
+		"type": "registry:ui",
+		"description": "An input that formats what you type against a pattern like a phone number, date, credit card or currency amount.",
+		"dependencies": [],
+		"registryDependencies": [],
+		"relativeUrl": "mask-input.json"
 	}
 ]
