@@ -382,6 +382,49 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "checkbox-group",
+			"type": "registry:ui",
+			"title": "Checkbox Group",
+			"description": "A group of checkboxes that allows multiple selections with support for validation and accessibility.",
+			"registryDependencies": ["direction-provider"],
+			"dependencies": ["bits-ui", "@lucide/svelte"],
+			"files": [
+				{ "path": "src/lib/components/ui/checkbox-group/index.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/checkbox-group/checkbox-group.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/checkbox-group/checkbox-group-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/checkbox-group/checkbox-group-list.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/checkbox-group/checkbox-group-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/checkbox-group/checkbox-group-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/checkbox-group/checkbox-group-description.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/checkbox-group/checkbox-group-message.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/checkbox-group/checkbox-group.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

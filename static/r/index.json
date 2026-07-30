@@ -178,5 +178,19 @@
 			"button"
 		],
 		"relativeUrl": "speed-dial.json"
+	},
+	{
+		"name": "checkbox-group",
+		"title": "Checkbox Group",
+		"type": "registry:ui",
+		"description": "A group of checkboxes that allows multiple selections with support for validation and accessibility.",
+		"dependencies": [
+			"bits-ui",
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"direction-provider"
+		],
+		"relativeUrl": "checkbox-group.json"
 	}
 ]
