@@ -139,10 +139,23 @@ function isCaretAtEnd(element: HTMLInputElement): boolean {
 	return selectionStart === selectionEnd && selectionStart === element.value.length;
 }
 
-function setCaret(element: HTMLInputElement, caret: 'start' | 'end'): void {
+/**
+ * Where a segment's caret lands on arrival.
+ *
+ * `'all'` selects the segment's whole text rather than collapsing the caret — Time Picker arrives at
+ * every segment fully selected (upstream `focus(); select();`, radix/ui/time-picker.tsx:1166-1167),
+ * while Segmented Input keeps using `'start'`/`'end'` for its mid-text editing (research R-04).
+ */
+export type SegmentCaret = 'start' | 'end' | 'all';
+
+function setCaret(element: HTMLInputElement, caret: SegmentCaret): void {
 	// `setSelectionRange` throws on input types that do not support selection; those are exactly the
 	// types whose `selectionStart` reads `null`.
 	if (element.selectionStart === null) return;
+	if (caret === 'all') {
+		element.setSelectionRange(0, element.value.length);
+		return;
+	}
 	const position = caret === 'start' ? 0 : element.value.length;
 	element.setSelectionRange(position, position);
 }
@@ -196,15 +209,20 @@ export class SegmentNavigation {
 	}
 
 	/** Focuses the segment at `index` and places its caret. No-op for an out-of-range index. */
-	focusAt(index: number, caret: 'start' | 'end'): void {
+	focusAt(index: number, caret: SegmentCaret): void {
 		const element = this.segments.ordered[index]?.element;
 		if (!element || !isInputElement(element)) return;
 		element.focus();
 		setCaret(element, caret);
 	}
 
-	/** The first enabled index in `direction` from `from`, exclusive. `-1` when there is none. */
-	#seek(from: number, step: 1 | -1): number {
+	/**
+	 * The first enabled index in `direction` from `from`, exclusive. `-1` when there is none.
+	 *
+	 * Public so a second consumer can apply its own edge policy: Segmented Input hands the key back
+	 * to the browser at the ends, while Time Picker clamps and always `preventDefault()`s (R-04).
+	 */
+	seek(from: number, step: 1 | -1): number {
 		const entries = this.segments.ordered;
 		for (let index = from + step; index >= 0 && index < entries.length; index += step) {
 			if (!entries[index].meta.getDisabled()) return index;
@@ -213,7 +231,7 @@ export class SegmentNavigation {
 	}
 
 	#edge(step: 1 | -1): number {
-		return step === 1 ? this.#seek(-1, 1) : this.#seek(this.segments.ordered.length, -1);
+		return step === 1 ? this.seek(-1, 1) : this.seek(this.segments.ordered.length, -1);
 	}
 
 	/**
@@ -244,11 +262,11 @@ export class SegmentNavigation {
 
 		if (intent === 'next') {
 			if (!isCaretAtEnd(element)) return;
-			target = this.#seek(index, 1);
+			target = this.seek(index, 1);
 			caret = 'start';
 		} else if (intent === 'previous') {
 			if (!isCaretAtStart(element)) return;
-			target = this.#seek(index, -1);
+			target = this.seek(index, -1);
 			caret = 'end';
 		} else if (intent === 'first') {
 			target = this.#edge(1);

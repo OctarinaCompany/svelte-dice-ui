@@ -11,23 +11,50 @@
 			"registryDependencies": ["direction-provider"],
 			"dependencies": ["tailwind-variants"],
 			"files": [
-				{ "path": "src/lib/components/ui/timeline/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/timeline/timeline.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/timeline/timeline-item.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/timeline/timeline-dot.svelte", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/timeline/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/timeline/timeline.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/timeline/timeline-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/timeline/timeline-dot.svelte",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/timeline/timeline-connector.svelte",
 					"type": "registry:ui"
 				},
-				{ "path": "src/lib/components/ui/timeline/timeline-content.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/timeline/timeline-header.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/timeline/timeline-title.svelte", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/timeline/timeline-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/timeline/timeline-header.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/timeline/timeline-title.svelte",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/timeline/timeline-description.svelte",
 					"type": "registry:ui"
 				},
-				{ "path": "src/lib/components/ui/timeline/timeline-time.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/timeline/timeline.svelte.ts", "type": "registry:ui" }
+				{
+					"path": "src/lib/components/ui/timeline/timeline-time.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/timeline/timeline.svelte.ts",
+					"type": "registry:ui"
+				}
 			]
 		},
 		{
@@ -38,10 +65,22 @@
 			"registryDependencies": [],
 			"dependencies": ["tailwind-variants"],
 			"files": [
-				{ "path": "src/lib/components/ui/status/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/status/status.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/status/status-indicator.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/status/status-label.svelte", "type": "registry:ui" }
+				{
+					"path": "src/lib/components/ui/status/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/status/status.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/status/status-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/status/status-label.svelte",
+					"type": "registry:ui"
+				}
 			]
 		},
 		{
@@ -52,7 +91,10 @@
 			"registryDependencies": [],
 			"dependencies": [],
 			"files": [
-				{ "path": "src/lib/components/ui/direction-provider/index.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/direction-provider/index.ts",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/direction-provider/direction-provider.svelte",
 					"type": "registry:ui"
@@ -71,9 +113,18 @@
 			"registryDependencies": [],
 			"dependencies": [],
 			"files": [
-				{ "path": "src/lib/components/ui/pending/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/pending/pending.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/pending/pending.svelte.ts", "type": "registry:ui" }
+				{
+					"path": "src/lib/components/ui/pending/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/pending/pending.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/pending/pending.svelte.ts",
+					"type": "registry:ui"
+				}
 			]
 		},
 		{
@@ -84,14 +135,38 @@
 			"registryDependencies": ["separator"],
 			"dependencies": ["tailwind-variants"],
 			"files": [
-				{ "path": "src/lib/components/ui/stat/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/stat/stat.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/stat/stat-label.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/stat/stat-indicator.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/stat/stat-value.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/stat/stat-trend.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/stat/stat-separator.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/stat/stat-description.svelte", "type": "registry:ui" }
+				{
+					"path": "src/lib/components/ui/stat/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stat/stat.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stat/stat-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stat/stat-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stat/stat-value.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stat/stat-trend.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stat/stat-separator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stat/stat-description.svelte",
+					"type": "registry:ui"
+				}
 			]
 		},
 		{
@@ -102,11 +177,26 @@
 			"registryDependencies": [],
 			"dependencies": [],
 			"files": [
-				{ "path": "src/lib/components/ui/swap/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/swap/swap.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/swap/swap-on.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/swap/swap-off.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/swap/swap.svelte.ts", "type": "registry:ui" }
+				{
+					"path": "src/lib/components/ui/swap/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/swap/swap.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/swap/swap-on.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/swap/swap-off.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/swap/swap.svelte.ts",
+					"type": "registry:ui"
+				}
 			]
 		},
 		{
@@ -117,9 +207,18 @@
 			"registryDependencies": [],
 			"dependencies": [],
 			"files": [
-				{ "path": "src/lib/components/ui/color-swatch/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/color-swatch/color-swatch.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/color-swatch/color.ts", "type": "registry:ui" }
+				{
+					"path": "src/lib/components/ui/color-swatch/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-swatch/color-swatch.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-swatch/color.ts",
+					"type": "registry:ui"
+				}
 			]
 		},
 		{
@@ -130,7 +229,10 @@
 			"registryDependencies": [],
 			"dependencies": [],
 			"files": [
-				{ "path": "src/lib/components/ui/circular-progress/index.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/circular-progress/index.ts",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/circular-progress/circular-progress.svelte",
 					"type": "registry:ui"
@@ -169,15 +271,42 @@
 			"registryDependencies": [],
 			"dependencies": [],
 			"files": [
-				{ "path": "src/lib/components/ui/gauge/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/gauge/gauge.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/gauge/gauge-indicator.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/gauge/gauge-track.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/gauge/gauge-range.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/gauge/gauge-value-text.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/gauge/gauge-label.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/gauge/gauge-combined.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/gauge/gauge.svelte.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/gauge/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/gauge/gauge.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/gauge/gauge-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/gauge/gauge-track.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/gauge/gauge-range.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/gauge/gauge-value-text.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/gauge/gauge-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/gauge/gauge-combined.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/gauge/gauge.svelte.ts",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/circular-progress/circular-progress.svelte.ts",
 					"type": "registry:ui",
@@ -193,7 +322,10 @@
 			"registryDependencies": [],
 			"dependencies": [],
 			"files": [
-				{ "path": "src/lib/components/ui/badge-overflow/index.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/badge-overflow/index.ts",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/badge-overflow/badge-overflow.svelte",
 					"type": "registry:ui"
@@ -227,37 +359,79 @@
 			},
 			"css": {
 				"@keyframes marquee-left": {
-					"0%": { "transform": "translateX(0%)" },
-					"100%": { "transform": "translateX(calc(-100% - var(--marquee-gap)))" }
+					"0%": {
+						"transform": "translateX(0%)"
+					},
+					"100%": {
+						"transform": "translateX(calc(-100% - var(--marquee-gap)))"
+					}
 				},
 				"@keyframes marquee-right": {
-					"0%": { "transform": "translateX(calc(-100% - var(--marquee-gap)))" },
-					"100%": { "transform": "translateX(0%)" }
+					"0%": {
+						"transform": "translateX(calc(-100% - var(--marquee-gap)))"
+					},
+					"100%": {
+						"transform": "translateX(0%)"
+					}
 				},
 				"@keyframes marquee-left-rtl": {
-					"0%": { "transform": "translateX(0%)" },
-					"100%": { "transform": "translateX(calc(100% + var(--marquee-gap)))" }
+					"0%": {
+						"transform": "translateX(0%)"
+					},
+					"100%": {
+						"transform": "translateX(calc(100% + var(--marquee-gap)))"
+					}
 				},
 				"@keyframes marquee-right-rtl": {
-					"0%": { "transform": "translateX(calc(100% + var(--marquee-gap)))" },
-					"100%": { "transform": "translateX(0%)" }
+					"0%": {
+						"transform": "translateX(calc(100% + var(--marquee-gap)))"
+					},
+					"100%": {
+						"transform": "translateX(0%)"
+					}
 				},
 				"@keyframes marquee-up": {
-					"0%": { "transform": "translateY(0%)" },
-					"100%": { "transform": "translateY(calc(-100% - var(--marquee-gap)))" }
+					"0%": {
+						"transform": "translateY(0%)"
+					},
+					"100%": {
+						"transform": "translateY(calc(-100% - var(--marquee-gap)))"
+					}
 				},
 				"@keyframes marquee-down": {
-					"0%": { "transform": "translateY(calc(-100% - var(--marquee-gap)))" },
-					"100%": { "transform": "translateY(0%)" }
+					"0%": {
+						"transform": "translateY(calc(-100% - var(--marquee-gap)))"
+					},
+					"100%": {
+						"transform": "translateY(0%)"
+					}
 				}
 			},
 			"files": [
-				{ "path": "src/lib/components/ui/marquee/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/marquee/marquee.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/marquee/marquee-content.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/marquee/marquee-item.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/marquee/marquee-edge.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/marquee/marquee.svelte.ts", "type": "registry:ui" }
+				{
+					"path": "src/lib/components/ui/marquee/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/marquee/marquee.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/marquee/marquee-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/marquee/marquee-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/marquee/marquee-edge.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/marquee/marquee.svelte.ts",
+					"type": "registry:ui"
+				}
 			]
 		},
 		{
@@ -268,10 +442,22 @@
 			"registryDependencies": ["direction-provider"],
 			"dependencies": ["tailwind-variants", "@lucide/svelte"],
 			"files": [
-				{ "path": "src/lib/components/ui/scroller/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/scroller/scroller.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/scroller/scroller-button.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/scroller/scroller.svelte.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/scroller/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroller/scroller.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroller/scroller-button.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroller/scroller.svelte.ts",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/scroller/scroll-position.svelte.ts",
 					"type": "registry:ui"
@@ -286,12 +472,30 @@
 			"registryDependencies": ["direction-provider"],
 			"dependencies": [],
 			"files": [
-				{ "path": "src/lib/components/ui/masonry/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/masonry/masonry.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/masonry/masonry-viewport.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/masonry/masonry-item.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/masonry/masonry.svelte.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/masonry/masonry-positioner.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/masonry/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/masonry/masonry.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/masonry/masonry-viewport.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/masonry/masonry-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/masonry/masonry.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/masonry/masonry-positioner.ts",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/masonry/masonry-interval-tree.ts",
 					"type": "registry:ui"
@@ -306,17 +510,50 @@
 			"registryDependencies": ["button"],
 			"dependencies": ["tailwind-variants", "@lucide/svelte", "bits-ui"],
 			"files": [
-				{ "path": "src/lib/components/ui/banner/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner-queue.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner-queued.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner-icon.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner-content.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner-title.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner-description.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner-actions.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner-close.svelte", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/banner/banner.svelte.ts", "type": "registry:ui" }
+				{
+					"path": "src/lib/components/ui/banner/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner-queue.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner-queued.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner-icon.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner-title.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner-description.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner-actions.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner-close.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/banner/banner.svelte.ts",
+					"type": "registry:ui"
+				}
 			]
 		},
 		{
@@ -327,7 +564,10 @@
 			"registryDependencies": ["hover-card"],
 			"dependencies": ["bits-ui", "tailwind-variants"],
 			"files": [
-				{ "path": "src/lib/components/ui/relative-time-card/index.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/relative-time-card/index.ts",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/relative-time-card/relative-time-card.svelte",
 					"type": "registry:ui"
@@ -354,8 +594,14 @@
 			"registryDependencies": ["button"],
 			"dependencies": ["tailwind-variants"],
 			"files": [
-				{ "path": "src/lib/components/ui/speed-dial/index.ts", "type": "registry:ui" },
-				{ "path": "src/lib/components/ui/speed-dial/speed-dial.svelte", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/speed-dial/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/speed-dial/speed-dial.svelte",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/speed-dial/speed-dial-trigger.svelte",
 					"type": "registry:ui"
@@ -376,7 +622,10 @@
 					"path": "src/lib/components/ui/speed-dial/speed-dial-label.svelte",
 					"type": "registry:ui"
 				},
-				{ "path": "src/lib/components/ui/speed-dial/speed-dial.svelte.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/speed-dial/speed-dial.svelte.ts",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/speed-dial/speed-dial-collection.svelte.ts",
 					"type": "registry:ui"
@@ -391,7 +640,10 @@
 			"registryDependencies": ["direction-provider"],
 			"dependencies": ["bits-ui", "@lucide/svelte"],
 			"files": [
-				{ "path": "src/lib/components/ui/checkbox-group/index.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/checkbox-group/index.ts",
+					"type": "registry:ui"
+				},
 				{
 					"path": "src/lib/components/ui/checkbox-group/checkbox-group.svelte",
 					"type": "registry:ui"
@@ -512,6 +764,95 @@
 				},
 				{
 					"path": "src/lib/components/ui/phone-input/phone-engine.ts",
+					"type": "registry:ui"
+				}
+			]
+		},
+		{
+			"name": "time-picker",
+			"type": "registry:ui",
+			"title": "Time Picker",
+			"description": "A time picker with always-editable hour, minute, second and AM/PM segments plus a dropdown of scrollable columns, adapting to 12-hour or 24-hour display from the locale.",
+			"registryDependencies": [
+				"button",
+				"popover",
+				"segmented-input",
+				"speed-dial",
+				"checkbox-group",
+				"direction-provider"
+			],
+			"dependencies": ["bits-ui", "@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/time-picker/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-input-group.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-separator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-trigger.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-column.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-column-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-hour.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-minute.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-second.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-period.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker-clear.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-picker.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/column-navigation.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/time-picker/time-engine.ts",
 					"type": "registry:ui"
 				}
 			]

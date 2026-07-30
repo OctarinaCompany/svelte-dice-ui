@@ -234,5 +234,24 @@
 			"checkbox-group"
 		],
 		"relativeUrl": "phone-input.json"
+	},
+	{
+		"name": "time-picker",
+		"title": "Time Picker",
+		"type": "registry:ui",
+		"description": "A time picker with always-editable hour, minute, second and AM/PM segments plus a dropdown of scrollable columns, adapting to 12-hour or 24-hour display from the locale.",
+		"dependencies": [
+			"bits-ui",
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"button",
+			"popover",
+			"segmented-input",
+			"speed-dial",
+			"checkbox-group",
+			"direction-provider"
+		],
+		"relativeUrl": "time-picker.json"
 	}
 ]

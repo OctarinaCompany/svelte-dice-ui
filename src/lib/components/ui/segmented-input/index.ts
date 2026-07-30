@@ -34,6 +34,7 @@ export {
 	SEGMENT_POSITIONS,
 	SegmentNavigation,
 	splitPastedValue,
+	type SegmentCaret,
 	type SegmentEntryMeta,
 	type SegmentIntent,
 	type SegmentNavigationProps,
