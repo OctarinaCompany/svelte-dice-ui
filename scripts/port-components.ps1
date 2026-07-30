@@ -405,11 +405,76 @@ function Get-DepsHash {
     return ($parts -join '|')
 }
 
+function Get-RegistryDependencyViolations {
+    <#
+    .SYNOPSIS
+        Every cross-component import must be backed by a registryDependency.
+    .DESCRIPTION
+        A registry item is copied verbatim into a consumer's project. When component A imports from
+        `$lib/components/ui/B/...`, the consumer only receives B if A lists it in
+        registryDependencies - otherwise the install produces code that references a folder that was
+        never fetched.
+
+        Nothing else catches this. The import resolves in THIS repository, so svelte-check, eslint,
+        vitest, build and `registry build` are all green while the published item is broken. It only
+        surfaces for whoever installs the component.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$RegistryPath,
+        [string]$UiRoot
+    )
+
+    $violations = @()
+    if (-not (Test-Path -LiteralPath $RegistryPath)) { return $violations }
+    $registry = ([System.IO.File]::ReadAllText($RegistryPath) | ConvertFrom-Json)
+
+    $uiRoot = if ($UiRoot) { $UiRoot } else { Join-Path $RepoRoot 'src/lib/components/ui' }
+    foreach ($item in $registry.items) {
+        $slug = $item.name
+        $dir = Join-Path $uiRoot $slug
+        if (-not (Test-Path -LiteralPath $dir)) { continue }
+
+        $declared = @()
+        if ($item.PSObject.Properties.Name -contains 'registryDependencies' -and $item.registryDependencies) {
+            $declared = @($item.registryDependencies)
+        }
+
+        # Test files are never shipped, so an import from one cannot break a consumer.
+        $sources = @(Get-ChildItem -LiteralPath $dir -File -Recurse |
+            Where-Object { $_.Extension -in '.ts', '.svelte' -and $_.Name -notmatch '\.test\.' })
+
+        foreach ($file in $sources) {
+            $text = [System.IO.File]::ReadAllText($file.FullName)
+            foreach ($m in [regex]::Matches($text, '\$lib/components/ui/([a-z0-9-]+)/')) {
+                $target = $m.Groups[1].Value
+                if ($target -eq $slug) { continue }
+                if ($declared -contains $target) { continue }
+                $violations += "$slug imports '$target' ($($file.Name)) but does not list it in registryDependencies"
+            }
+        }
+    }
+    return ($violations | Sort-Object -Unique)
+}
+
 function Invoke-VerifyGate {
     param([hashtable]$Ctx, [hashtable]$State)
 
     $results = @{}
     $depsHash = Get-DepsHash
+
+    $regViolations = @(Get-RegistryDependencyViolations -RegistryPath (Join-Path $RepoRoot 'registry.json'))
+    if ($regViolations.Count -gt 0) {
+        Write-PortLog Warn "gate:registry-deps failed - $($regViolations.Count) undeclared cross-component import(s)."
+        return @{
+            Ok        = $false
+            Steps     = $results
+            Failed    = 'registry-deps'
+            Command   = '(internal) cross-component import vs registryDependencies check'
+            ExitCode  = 1
+            Output    = ("Every `$lib/components/ui/<other>/ import must have <other> in that item's registryDependencies in registry.json, or the published component installs broken.`n`n" + ($regViolations -join "`n"))
+            Remaining = (($GateSteps | ForEach-Object { "$($_.Launcher) $($_.Args -join ' ')" }) -join '; ')
+        }
+    }
 
     foreach ($step in $GateSteps) {
         $name = $step.Name

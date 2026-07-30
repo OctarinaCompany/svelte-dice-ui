@@ -539,6 +539,46 @@ Assert-True 'past reset times trigger a decay re-probe, not a deadline wait' `
 Assert-True 'decay probe is at least five minutes' ($orchSrc -match '\[Math\]::Max\(300,')
 Assert-True 'reactive waiter falls back to the snapshot reset time' ($orchSrc -match 'snap\.FiveHourResetsAt')
 
+# --- cross-component imports need a registryDependency ------------------------
+# A registry item is copied verbatim into the consumer's project, so an import of
+# $lib/components/ui/<other>/ only resolves there if <other> is pulled in as a registryDependency.
+# Every other gate is green in this repository while the published item is broken, because the
+# import resolves locally. This check is the only thing standing between that and a broken install.
+$regFixture = Join-Path $Scratch 'reg-fixture'
+$regUi = Join-Path $regFixture 'ui'
+New-Item -ItemType Directory -Path (Join-Path $regUi 'alpha') -Force | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $regUi 'beta') -Force | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $regUi 'gamma') -Force | Out-Null
+
+Set-Content -LiteralPath (Join-Path $regUi 'alpha/alpha.svelte.ts') -Encoding utf8 `
+    -Value "import { x } from '`$lib/components/ui/beta/index.js';"
+Set-Content -LiteralPath (Join-Path $regUi 'beta/beta.svelte.ts') -Encoding utf8 `
+    -Value "export const x = 1;"
+Set-Content -LiteralPath (Join-Path $regUi 'gamma/gamma.svelte.ts') -Encoding utf8 `
+    -Value "import { x } from '`$lib/components/ui/beta/index.js';"
+# A test file may import anything: it is never shipped to a consumer.
+Set-Content -LiteralPath (Join-Path $regUi 'beta/beta.test.ts') -Encoding utf8 `
+    -Value "import { z } from '`$lib/components/ui/gamma/index.js';"
+
+$regJson = Join-Path $regFixture 'registry.json'
+@{
+    items = @(
+        @{ name = 'alpha'; type = 'registry:ui'; registryDependencies = @('beta') }  # declared - OK
+        @{ name = 'beta';  type = 'registry:ui'; registryDependencies = @() }        # only a test import - OK
+        @{ name = 'gamma'; type = 'registry:ui' }                                     # undeclared - VIOLATION
+    )
+} | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $regJson -Encoding utf8
+
+$regV = @(Get-RegistryDependencyViolations -RegistryPath $regJson -UiRoot $regUi)
+Assert-Equal 'exactly one undeclared cross-import is reported' 1 $regV.Count
+Assert-True  'the violation names the offending item'   ((($regV -join '|') -match 'gamma'))
+Assert-True  'a declared cross-import is not reported'   (($regV -join '|') -notmatch 'alpha')
+Assert-True  'a test-file import is not reported'        (($regV -join '|') -notmatch '^beta')
+
+# And the real tree must stay clean.
+$liveV = @(Get-RegistryDependencyViolations -RegistryPath (Join-Path $RepoRoot 'registry.json'))
+Assert-True 'the repository has no undeclared cross-imports' ($liveV.Count -eq 0) ($liveV -join '; ')
+
 # --- waits must be deadline-based, not countdown-based ------------------------
 # A remaining-seconds countdown tracks awake time, not elapsed time. One run slept through a
 # machine suspend and still had ~100 minutes of countdown left, hours after its usage window had
