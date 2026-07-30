@@ -318,6 +318,33 @@
 				{ "path": "src/lib/components/ui/banner/banner-close.svelte", "type": "registry:ui" },
 				{ "path": "src/lib/components/ui/banner/banner.svelte.ts", "type": "registry:ui" }
 			]
+		},
+		{
+			"name": "relative-time-card",
+			"type": "registry:ui",
+			"title": "Relative Time Card",
+			"description": "A hover card that displays relative time relative to local time with timezone information.",
+			"registryDependencies": ["hover-card"],
+			"dependencies": ["bits-ui", "tailwind-variants"],
+			"files": [
+				{ "path": "src/lib/components/ui/relative-time-card/index.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/relative-time-card/relative-time-card.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/relative-time-card/relative-time-card-timezone.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/relative-time-card/relative-time-card.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/relative-time-card/relative-time-format.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

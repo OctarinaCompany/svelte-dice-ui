@@ -151,5 +151,19 @@
 			"button"
 		],
 		"relativeUrl": "banner.json"
+	},
+	{
+		"name": "relative-time-card",
+		"title": "Relative Time Card",
+		"type": "registry:ui",
+		"description": "A hover card that displays relative time relative to local time with timezone information.",
+		"dependencies": [
+			"bits-ui",
+			"tailwind-variants"
+		],
+		"registryDependencies": [
+			"hover-card"
+		],
+		"relativeUrl": "relative-time-card.json"
 	}
 ]
