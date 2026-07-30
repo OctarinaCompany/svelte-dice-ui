@@ -98,5 +98,18 @@
 		"dependencies": [],
 		"registryDependencies": [],
 		"relativeUrl": "badge-overflow.json"
+	},
+	{
+		"name": "marquee",
+		"title": "Marquee",
+		"type": "registry:ui",
+		"description": "An animated scrolling component that continuously moves content horizontally or vertically.",
+		"dependencies": [
+			"tailwind-variants"
+		],
+		"registryDependencies": [
+			"direction-provider"
+		],
+		"relativeUrl": "marquee.json"
 	}
 ]
