@@ -192,5 +192,20 @@
 			"direction-provider"
 		],
 		"relativeUrl": "checkbox-group.json"
+	},
+	{
+		"name": "segmented-input",
+		"title": "Segmented Input",
+		"type": "registry:ui",
+		"description": "A group of connected input fields that appear as a single segmented visual unit.",
+		"dependencies": [
+			"tailwind-variants"
+		],
+		"registryDependencies": [
+			"input",
+			"direction-provider",
+			"speed-dial"
+		],
+		"relativeUrl": "segmented-input.json"
 	}
 ]

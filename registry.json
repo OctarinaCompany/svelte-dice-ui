@@ -425,6 +425,36 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "segmented-input",
+			"type": "registry:ui",
+			"title": "Segmented Input",
+			"description": "A group of connected input fields that appear as a single segmented visual unit.",
+			"registryDependencies": ["input", "direction-provider", "speed-dial"],
+			"dependencies": ["tailwind-variants"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/segmented-input/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/segmented-input/segmented-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/segmented-input/segmented-input-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/segmented-input/segmented-input.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/segmented-input/segment-navigation.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
