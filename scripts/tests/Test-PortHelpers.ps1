@@ -467,6 +467,54 @@ Assert-True 'usage guard checks the weekly window'  ($orchSrc -match 'SevenDayPe
 Assert-True 'session and weekly thresholds are separate parameters' `
     ($orchSrc -match '\[int\]\$SessionStopPercent' -and $orchSrc -match '\[int\]\$WeeklyStopPercent')
 Assert-True 'no single global usage threshold remains' ($orchSrc -notmatch '\$UsageStopPercent')
+
+# Actually RUN the guard rather than pattern-matching its source. Asserting on source text is what
+# let an uninitialised $script: variable through: under Set-StrictMode, reading one is a terminating
+# error, and it killed a run mid-component after 55 minutes of work. Both branches must execute.
+$guardProbe = Join-Path $Scratch 'guard-probe.ps1'
+$staleSnap = Join-Path $Scratch 'stale-snap.json'
+$freshSnap = Join-Path $Scratch 'fresh-snap.json'
+$mkSnap = {
+    param($path, $ageMin, $five, $seven)
+    $o = @{
+        fiveHourPercent  = $five
+        fiveHourResetsAt = [DateTimeOffset]::new((Get-Date).AddHours(2)).ToUnixTimeSeconds()
+        sevenDayPercent  = $seven
+        sevenDayResetsAt = [DateTimeOffset]::new((Get-Date).AddDays(1)).ToUnixTimeSeconds()
+        capturedAt       = [DateTimeOffset]::new((Get-Date).AddMinutes(-$ageMin)).ToUnixTimeSeconds()
+    }
+    [System.IO.File]::WriteAllText($path, ($o | ConvertTo-Json -Compress), [System.Text.UTF8Encoding]::new($false))
+}
+& $mkSnap $staleSnap 120 99 99      # stale: guard must warn and return, not sleep
+& $mkSnap $freshSnap 1 10 20        # fresh and under both thresholds: must return immediately
+
+@"
+Set-StrictMode -Version Latest
+`$ErrorActionPreference = 'Stop'
+. '$((Resolve-Path (Join-Path $RepoRoot 'scripts/port-components.ps1')).Path)' -NoRun ``
+    -UsageSnapshotPath '$staleSnap' -SessionStopPercent 50 -WeeklyStopPercent 85
+Wait-UsageHeadroom -Context 'probe-stale'
+Wait-UsageHeadroom -Context 'probe-stale-again'
+Write-Output 'GUARD-OK'
+"@ | Set-Content -LiteralPath $guardProbe -Encoding utf8
+
+$probeOut = & (Get-PwshPath) -NoProfile -NonInteractive -File $guardProbe 2>&1 | Out-String
+Assert-True 'guard survives a stale snapshot under StrictMode' ($probeOut -match 'GUARD-OK') $probeOut.Trim()
+Assert-True 'guard warns once, not twice, for repeated staleness' `
+    ((([regex]::Matches($probeOut, 'Usage guard inactive')).Count) -eq 1) "warned $((([regex]::Matches($probeOut,'Usage guard inactive')).Count)) times"
+
+@"
+Set-StrictMode -Version Latest
+`$ErrorActionPreference = 'Stop'
+. '$((Resolve-Path (Join-Path $RepoRoot 'scripts/port-components.ps1')).Path)' -NoRun ``
+    -UsageSnapshotPath '$freshSnap' -SessionStopPercent 50 -WeeklyStopPercent 85
+Wait-UsageHeadroom -Context 'probe-fresh'
+Write-Output 'GUARD-OK'
+"@ | Set-Content -LiteralPath $guardProbe -Encoding utf8
+
+$probeOut2 = & (Get-PwshPath) -NoProfile -NonInteractive -File $guardProbe 2>&1 | Out-String
+Assert-True 'guard passes through when under both thresholds' ($probeOut2 -match 'GUARD-OK') $probeOut2.Trim()
+Assert-True 'guard does not sleep when under threshold' ($probeOut2 -notmatch 'Sleeping until')
 Assert-True 'reactive waiter falls back to the snapshot reset time' ($orchSrc -match 'snap\.FiveHourResetsAt')
 
 # --- waits must be deadline-based, not countdown-based ------------------------

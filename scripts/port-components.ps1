@@ -143,6 +143,12 @@ $PhaseConfig = @{
 
 $ComplexityMultiplier = @{ 'S' = 1.0; 'M' = 1.5; 'L' = 2.5 }
 
+# Set-StrictMode makes reading an unset $script: variable a terminating error, so every one of
+# them must be declared up front. Missing this crashed a run mid-component after the first
+# 55 minutes of work on it.
+$script:UsageGuardWarnedAt = $null
+$script:AuthSummary = ''
+
 <#
 -Economy model map. `Any` applies to every complexity; otherwise the component's
 manifest `complexity` selects the entry.
