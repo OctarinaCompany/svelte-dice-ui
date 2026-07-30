@@ -481,6 +481,40 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "phone-input",
+			"type": "registry:ui",
+			"title": "Phone Input",
+			"description": "A phone number input with country detection, international formatting and a searchable country picker.",
+			"registryDependencies": ["command", "input", "popover", "mask-input", "checkbox-group"],
+			"dependencies": ["bits-ui", "@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/phone-input/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/phone-input/phone-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/phone-input/phone-input-country-select.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/phone-input/phone-input-field.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/phone-input/phone-input.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/phone-input/phone-engine.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

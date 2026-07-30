@@ -216,5 +216,23 @@
 		"dependencies": [],
 		"registryDependencies": [],
 		"relativeUrl": "mask-input.json"
+	},
+	{
+		"name": "phone-input",
+		"title": "Phone Input",
+		"type": "registry:ui",
+		"description": "A phone number input with country detection, international formatting and a searchable country picker.",
+		"dependencies": [
+			"bits-ui",
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"command",
+			"input",
+			"popover",
+			"mask-input",
+			"checkbox-group"
+		],
+		"relativeUrl": "phone-input.json"
 	}
 ]
