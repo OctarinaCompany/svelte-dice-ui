@@ -157,6 +157,29 @@
 					"target": "circular-progress/circular-progress.svelte.ts"
 				}
 			]
+		},
+		{
+			"name": "badge-overflow",
+			"type": "registry:ui",
+			"title": "Badge Overflow",
+			"description": "A component that intelligently manages badge overflow by measuring available space and displaying only what fits with an overflow indicator.",
+			"registryDependencies": [],
+			"dependencies": [],
+			"files": [
+				{ "path": "src/lib/components/ui/badge-overflow/index.ts", "type": "registry:ui" },
+				{
+					"path": "src/lib/components/ui/badge-overflow/badge-overflow.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/badge-overflow/badge-overflow-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/badge-overflow/badge-overflow.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

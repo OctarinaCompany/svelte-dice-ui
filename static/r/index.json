@@ -76,5 +76,14 @@
 		"dependencies": [],
 		"registryDependencies": [],
 		"relativeUrl": "gauge.json"
+	},
+	{
+		"name": "badge-overflow",
+		"title": "Badge Overflow",
+		"type": "registry:ui",
+		"description": "A component that intelligently manages badge overflow by measuring available space and displaying only what fits with an overflow indicator.",
+		"dependencies": [],
+		"registryDependencies": [],
+		"relativeUrl": "badge-overflow.json"
 	}
 ]
