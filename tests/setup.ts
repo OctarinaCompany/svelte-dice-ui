@@ -22,6 +22,15 @@ beforeAll(() => {
 		Element.prototype.scrollIntoView = () => {};
 	}
 
+	// jsdom implements `Range` but performs no layout, so it ships neither of these. Anything that
+	// anchors a floating surface to a text selection (`selection-toolbar`) measures the range, so
+	// the two missing methods answer with the same all-zero box jsdom returns for elements.
+	if (!Range.prototype.getBoundingClientRect) {
+		Range.prototype.getBoundingClientRect = () => new DOMRect(0, 0, 0, 0);
+		Range.prototype.getClientRects = () =>
+			Object.assign([] as unknown as DOMRectList, { item: () => null });
+	}
+
 	globalThis.matchMedia ??= ((query: string) => ({
 		matches: false,
 		media: query,

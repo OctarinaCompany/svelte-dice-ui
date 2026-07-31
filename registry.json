@@ -1278,6 +1278,40 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "selection-toolbar",
+			"type": "registry:ui",
+			"title": "Selection Toolbar",
+			"description": "A floating toolbar that appears on text selection with formatting and utility actions.",
+			"registryDependencies": ["button", "direction-provider"],
+			"dependencies": ["bits-ui"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/selection-toolbar/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/selection-toolbar/selection-toolbar.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/selection-toolbar/selection-toolbar-portal.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/selection-toolbar/selection-toolbar-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/selection-toolbar/selection-toolbar-separator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/selection-toolbar/selection-toolbar.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

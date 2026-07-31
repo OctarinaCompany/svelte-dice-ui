@@ -352,5 +352,19 @@
 			"speed-dial"
 		],
 		"relativeUrl": "action-bar.json"
+	},
+	{
+		"name": "selection-toolbar",
+		"title": "Selection Toolbar",
+		"type": "registry:ui",
+		"description": "A floating toolbar that appears on text selection with formatting and utility actions.",
+		"dependencies": [
+			"bits-ui"
+		],
+		"registryDependencies": [
+			"button",
+			"direction-provider"
+		],
+		"relativeUrl": "selection-toolbar.json"
 	}
 ]
