@@ -960,6 +960,60 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "key-value",
+			"type": "registry:ui",
+			"title": "Key Value",
+			"description": "A dynamic input for managing key-value pairs with paste support and validation.",
+			"registryDependencies": ["editable", "button", "direction-provider", "checkbox-group"],
+			"dependencies": ["@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/key-value/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value-list.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value-item-provider.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value-key-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value-value-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value-remove.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value-add.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value-error.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/key-value/key-value.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

@@ -279,5 +279,21 @@
 			"checkbox-group"
 		],
 		"relativeUrl": "editable.json"
+	},
+	{
+		"name": "key-value",
+		"title": "Key Value",
+		"type": "registry:ui",
+		"description": "A dynamic input for managing key-value pairs with paste support and validation.",
+		"dependencies": [
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"editable",
+			"button",
+			"direction-provider",
+			"checkbox-group"
+		],
+		"relativeUrl": "key-value.json"
 	}
 ]
