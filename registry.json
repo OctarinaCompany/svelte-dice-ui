@@ -1416,6 +1416,88 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "tour",
+			"type": "registry:ui",
+			"title": "Tour",
+			"description": "A guided tour component that highlights elements and provides step-by-step instructions to help users learn about your application.",
+			"registryDependencies": ["button", "direction-provider"],
+			"dependencies": ["bits-ui", "@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/tour/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-portal.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-spotlight.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-spotlight-ring.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-step.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-arrow.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-header.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-title.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-description.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-close.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-footer.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-default-footer.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-step-counter.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-prev.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-next.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour-skip.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tour/tour.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

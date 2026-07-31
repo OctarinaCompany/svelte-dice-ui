@@ -396,5 +396,20 @@
 			"action-bar"
 		],
 		"relativeUrl": "stepper.json"
+	},
+	{
+		"name": "tour",
+		"title": "Tour",
+		"type": "registry:ui",
+		"description": "A guided tour component that highlights elements and provides step-by-step instructions to help users learn about your application.",
+		"dependencies": [
+			"bits-ui",
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"button",
+			"direction-provider"
+		],
+		"relativeUrl": "tour.json"
 	}
 ]
