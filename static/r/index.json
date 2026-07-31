@@ -411,5 +411,25 @@
 			"direction-provider"
 		],
 		"relativeUrl": "tour.json"
+	},
+	{
+		"name": "color-picker",
+		"title": "Color Picker",
+		"type": "registry:ui",
+		"description": "A color picker component that allows users to select colors using various input methods.",
+		"dependencies": [
+			"bits-ui",
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"button",
+			"input",
+			"popover",
+			"select",
+			"color-swatch",
+			"checkbox-group",
+			"direction-provider"
+		],
+		"relativeUrl": "color-picker.json"
 	}
 ]

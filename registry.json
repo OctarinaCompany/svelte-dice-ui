@@ -1498,6 +1498,80 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "color-picker",
+			"type": "registry:ui",
+			"title": "Color Picker",
+			"description": "A color picker component that allows users to select colors using various input methods.",
+			"registryDependencies": [
+				"button",
+				"input",
+				"popover",
+				"select",
+				"color-swatch",
+				"checkbox-group",
+				"direction-provider"
+			],
+			"dependencies": ["bits-ui", "@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/color-picker/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-trigger.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-area.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-hue-slider.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-alpha-slider.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-swatch.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-eye-dropper.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-format-select.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker-input-field.svelte",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
