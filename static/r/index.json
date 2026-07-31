@@ -336,5 +336,21 @@
 			"drawer"
 		],
 		"relativeUrl": "responsive-dialog.json"
+	},
+	{
+		"name": "action-bar",
+		"title": "Action Bar",
+		"type": "registry:ui",
+		"description": "A floating action bar that appears at the bottom or top of the viewport to display contextual actions for selected items.",
+		"dependencies": [
+			"bits-ui",
+			"tailwind-variants"
+		],
+		"registryDependencies": [
+			"button",
+			"direction-provider",
+			"speed-dial"
+		],
+		"relativeUrl": "action-bar.json"
 	}
 ]

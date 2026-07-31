@@ -1224,6 +1224,60 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "action-bar",
+			"type": "registry:ui",
+			"title": "Action Bar",
+			"description": "A floating action bar that appears at the bottom or top of the viewport to display contextual actions for selected items.",
+			"registryDependencies": ["button", "direction-provider", "speed-dial"],
+			"dependencies": ["bits-ui", "tailwind-variants"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/action-bar/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar-portal.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar-selection.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar-group.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar-close.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar-separator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar-floating.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/action-bar/action-bar-roving-focus.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
