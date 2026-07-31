@@ -1,0 +1,215 @@
+<script lang="ts" module>
+	import type { Column, RowData } from '@tanstack/table-core';
+
+	import type { DataTableFilterAttributes } from './types.js';
+
+	export type DataTableDateFilterProps<TData extends RowData> = DataTableFilterAttributes & {
+		/**
+		 * The column being filtered. Its filter value stays **epoch milliseconds** — a `number` in
+		 * single mode, a `[from?, to?]` tuple in range mode (plan.md Divergence 11).
+		 */
+		column: Column<TData, unknown>;
+		/** Trigger label. */
+		title?: string;
+		/**
+		 * Pick a range instead of a single date.
+		 * @default false
+		 */
+		multiple?: boolean;
+		/**
+		 * Whether the popover is open. Bindable (plan.md Divergence 8).
+		 * @default false
+		 */
+		open?: boolean;
+		/** Called whenever the popover opens or closes. */
+		onOpenChange?: (open: boolean) => void;
+		/** The trigger element. Every other attribute is spread onto it too. */
+		ref?: HTMLElement | null;
+	};
+</script>
+
+<script lang="ts" generics="TData extends RowData">
+	import type { DateValue } from '@internationalized/date';
+	import CalendarIcon from '@lucide/svelte/icons/calendar';
+	import XCircleIcon from '@lucide/svelte/icons/x-circle';
+	import { RangeCalendar } from 'bits-ui';
+
+	import { buttonVariants } from '$lib/components/ui/button/index.js';
+	import * as Calendar from '$lib/components/ui/calendar/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { cn } from '$lib/utils.js';
+
+	import {
+		formatDate,
+		fromDateValue,
+		parseAsDate,
+		parseColumnFilterValue,
+		toDateValue
+	} from './data-table-utils.js';
+
+	let {
+		ref = $bindable(null),
+		column,
+		title,
+		multiple = false,
+		open = $bindable(false),
+		onOpenChange,
+		class: className,
+		...restProps
+	}: DataTableDateFilterProps<TData> = $props();
+
+	const timestamps = $derived(parseColumnFilterValue(column.getFilterValue()));
+	const fromDate = $derived(column.getFilterValue() ? parseAsDate(timestamps[0]) : undefined);
+	const toDate = $derived(
+		multiple && column.getFilterValue() ? parseAsDate(timestamps[1]) : undefined
+	);
+
+	const hasValue = $derived(multiple ? Boolean(fromDate || toDate) : Boolean(fromDate));
+
+	const label = $derived.by(() => {
+		if (!hasValue) return '';
+		if (!multiple) return formatDate(fromDate);
+		if (fromDate && toDate) return `${formatDate(fromDate)} - ${formatDate(toDate)}`;
+		return formatDate(fromDate ?? toDate);
+	});
+
+	const placeholderText = $derived(multiple ? 'Select date range' : 'Select date');
+
+	const singleValue = $derived(toDateValue(timestamps[0]));
+	const rangeValue = $derived({
+		start: toDateValue(timestamps[0]),
+		end: multiple ? toDateValue(timestamps[1]) : undefined
+	});
+
+	let calendarPlaceholder = $state<DateValue | undefined>(undefined);
+
+	function onSingleSelect(next: DateValue | undefined) {
+		column.setFilterValue(fromDateValue(next));
+	}
+
+	function onRangeSelect(next: { start: DateValue | undefined; end: DateValue | undefined }) {
+		const from = fromDateValue(next.start);
+		const to = fromDateValue(next.end);
+		column.setFilterValue(from || to ? [from, to] : undefined);
+	}
+
+	function onReset() {
+		column.setFilterValue(undefined);
+	}
+</script>
+
+<div class="inline-flex items-center gap-1">
+	{#if hasValue}
+		<!-- Sibling, keyboard-operable clear affordance — plan.md Divergence 14, FR-014. -->
+		<button
+			type="button"
+			aria-label={`Clear ${title} filter`}
+			class="rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none [&_svg]:size-3.5"
+			onclick={onReset}
+		>
+			<XCircleIcon />
+		</button>
+	{/if}
+	<Popover.Root bind:open {onOpenChange}>
+		<Popover.Trigger
+			bind:ref
+			data-slot="data-table-date-filter"
+			data-multiple={multiple ? '' : undefined}
+			data-selected={hasValue ? '' : undefined}
+			class={cn(
+				buttonVariants({ variant: 'outline', size: 'sm' }),
+				'border-dashed font-normal',
+				className
+			)}
+			{...restProps}
+		>
+			{#if !hasValue}
+				<CalendarIcon />
+			{/if}
+			<span class="flex items-center gap-2">
+				<span>{title ?? placeholderText}</span>
+				{#if hasValue}
+					<Separator orientation="vertical" class="mx-0.5 data-[orientation=vertical]:h-4" />
+					<span>{label}</span>
+				{/if}
+			</span>
+		</Popover.Trigger>
+		<Popover.Content class="w-auto p-0" align="start">
+			{#if multiple}
+				<!--
+					bits-ui's `RangeCalendar` shares the calendar context with every non-day part, so
+					the local `calendar` wrapper's header, nav and grid parts compose over it
+					unchanged; only `Cell` and `Day` are range-specific (research D-05).
+				-->
+				<RangeCalendar.Root
+					value={rangeValue}
+					onValueChange={onRangeSelect}
+					bind:placeholder={calendarPlaceholder}
+					weekdayFormat="short"
+					locale="en-US"
+					class="bg-background p-2 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(7)] in-data-[slot=popover-content]:bg-transparent"
+				>
+					{#snippet children({ months, weekdays })}
+						<Calendar.Months>
+							<Calendar.Nav>
+								<Calendar.PrevButton />
+								<Calendar.NextButton />
+							</Calendar.Nav>
+							{#each months as month, monthIndex (month.value)}
+								<Calendar.Month>
+									<Calendar.Header>
+										<Calendar.Caption
+											captionLayout="dropdown"
+											months={undefined}
+											monthFormat="short"
+											years={undefined}
+											yearFormat="numeric"
+											month={month.value}
+											bind:placeholder={calendarPlaceholder}
+											locale="en-US"
+											{monthIndex}
+										/>
+									</Calendar.Header>
+									<Calendar.Grid>
+										<Calendar.GridHead>
+											<Calendar.GridRow class="select-none">
+												{#each weekdays as weekday, index (index)}
+													<Calendar.HeadCell>{weekday.slice(0, 2)}</Calendar.HeadCell>
+												{/each}
+											</Calendar.GridRow>
+										</Calendar.GridHead>
+										<Calendar.GridBody>
+											{#each month.weeks as weekDates (weekDates)}
+												<Calendar.GridRow class="mt-2 w-full">
+													{#each weekDates as date (date)}
+														<RangeCalendar.Cell
+															{date}
+															month={month.value}
+															class="relative size-(--cell-size) p-0 text-center text-sm focus-within:z-20"
+														>
+															<RangeCalendar.Day
+																class="flex size-(--cell-size) flex-col items-center justify-center rounded-(--cell-radius) p-0 leading-none font-normal whitespace-nowrap select-none not-data-selected:hover:bg-accent/50 not-data-selected:hover:text-accent-foreground data-[outside-month]:text-muted-foreground data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[today]:bg-accent data-[today]:text-accent-foreground data-[unavailable]:text-muted-foreground data-[unavailable]:line-through data-disabled:pointer-events-none data-disabled:text-muted-foreground data-disabled:opacity-50"
+															/>
+														</RangeCalendar.Cell>
+													{/each}
+												</Calendar.GridRow>
+											{/each}
+										</Calendar.GridBody>
+									</Calendar.Grid>
+								</Calendar.Month>
+							{/each}
+						</Calendar.Months>
+					{/snippet}
+				</RangeCalendar.Root>
+			{:else}
+				<Calendar.Calendar
+					type="single"
+					captionLayout="dropdown"
+					value={singleValue}
+					onValueChange={onSingleSelect}
+				/>
+			{/if}
+		</Popover.Content>
+	</Popover.Root>
+</div>

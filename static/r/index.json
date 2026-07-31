@@ -471,5 +471,34 @@
 			"direction-provider"
 		],
 		"relativeUrl": "kanban.json"
+	},
+	{
+		"name": "data-table",
+		"title": "Data Table",
+		"type": "registry:ui",
+		"description": "A powerful and flexible data table for displaying, filtering, sorting, and paginating tabular data.",
+		"dependencies": [
+			"@tanstack/table-core",
+			"bits-ui",
+			"@internationalized/date"
+		],
+		"registryDependencies": [
+			"badge",
+			"button",
+			"calendar",
+			"checkbox",
+			"command",
+			"dropdown-menu",
+			"input",
+			"label",
+			"popover",
+			"select",
+			"separator",
+			"skeleton",
+			"table",
+			"sortable",
+			"direction-provider"
+		],
+		"relativeUrl": "data-table.json"
 	}
 ]

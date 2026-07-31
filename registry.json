@@ -1730,6 +1730,96 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "data-table",
+			"type": "registry:ui",
+			"title": "Data Table",
+			"description": "A powerful and flexible data table for displaying, filtering, sorting, and paginating tabular data.",
+			"registryDependencies": [
+				"badge",
+				"button",
+				"calendar",
+				"checkbox",
+				"command",
+				"dropdown-menu",
+				"input",
+				"label",
+				"popover",
+				"select",
+				"separator",
+				"skeleton",
+				"table",
+				"sortable",
+				"direction-provider"
+			],
+			"dependencies": ["@tanstack/table-core", "bits-ui", "@internationalized/date"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/data-table/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/types.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-config.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-utils.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-flex-render.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-column-header.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-toolbar.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-toolbar-filter.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-faceted-filter.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-date-filter.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-slider-filter.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-view-options.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-pagination.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-table/data-table-skeleton.svelte",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
