@@ -602,6 +602,27 @@ $regJson = Join-Path $regFixture 'registry.json'
     )
 } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $regJson -Encoding utf8
 
+# A component can exist on disk, pass every gate and be committed while having no registry entry at
+# all - registry.json is a manifest no build step reads. Lost once when a failed rollback reverted
+# the entry with `git reset --hard` while leaving the untracked component files behind.
+$fakeState = @{ components = @{
+    alpha = @{ status = 'done' }
+    beta  = @{ status = 'done' }
+    gamma = @{ status = 'done' }
+    delta = @{ status = 'running' }   # mid-flight: must not be reported
+} }
+$missV = @(Get-MissingRegistryEntries -RegistryPath $regJson -State $fakeState -UiRoot $regUi)
+Assert-Equal 'a ported component with no registry entry is caught' 0 $missV.Count
+
+New-Item -ItemType Directory -Path (Join-Path $regUi 'orphan') -Force | Out-Null
+Set-Content -LiteralPath (Join-Path $regUi 'orphan/orphan.svelte') -Encoding utf8 -Value '<div></div>'
+$fakeState.components['orphan'] = @{ status = 'done' }
+$missV2 = @(Get-MissingRegistryEntries -RegistryPath $regJson -State $fakeState -UiRoot $regUi)
+Assert-Equal 'the orphan is reported'                1 $missV2.Count
+Assert-True  'the orphan is named'                   (($missV2 -join '|') -match 'orphan')
+$fakeState.components['delta'] = @{ status = 'running' }
+Assert-True  'a mid-flight component is not reported' ((($missV2 -join '|') -notmatch 'delta'))
+
 $regV = @(Get-RegistryDependencyViolations -RegistryPath $regJson -UiRoot $regUi)
 Assert-Equal 'exactly one undeclared cross-import is reported' 1 $regV.Count
 Assert-True  'the violation names the offending item'   ((($regV -join '|') -match 'gamma'))

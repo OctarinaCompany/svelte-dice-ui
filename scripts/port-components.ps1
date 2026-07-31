@@ -405,6 +405,37 @@ function Get-DepsHash {
     return ($parts -join '|')
 }
 
+function Get-MissingRegistryEntries {
+    <#
+    .SYNOPSIS
+        Every component recorded as ported must have a registry.json entry.
+    .DESCRIPTION
+        registry.json is a manifest that no build step reads, so a component can exist on disk,
+        pass every gate and be committed while remaining uninstallable. Checked against the state
+        file rather than the folder listing so that a component still mid-flight is not reported.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$RegistryPath,
+        [hashtable]$State,
+        [string]$UiRoot
+    )
+
+    $missing = @()
+    if (-not (Test-Path -LiteralPath $RegistryPath)) { return $missing }
+    $registry = ([System.IO.File]::ReadAllText($RegistryPath) | ConvertFrom-Json)
+    $declared = @($registry.items | ForEach-Object { $_.name })
+
+    $root = if ($UiRoot) { $UiRoot } else { Join-Path $RepoRoot 'src/lib/components/ui' }
+    foreach ($slug in @($State.components.Keys)) {
+        if ($State.components[$slug].status -ne 'done') { continue }
+        if (-not (Test-Path -LiteralPath (Join-Path $root $slug))) { continue }
+        if ($declared -notcontains $slug) {
+            $missing += "$slug is ported and committed but has no entry in registry.json"
+        }
+    }
+    return ($missing | Sort-Object -Unique)
+}
+
 function Get-RegistryDependencyViolations {
     <#
     .SYNOPSIS
@@ -461,6 +492,24 @@ function Invoke-VerifyGate {
 
     $results = @{}
     $depsHash = Get-DepsHash
+
+    # A component with no registry entry at all is invisible to consumers, and every other gate is
+    # green without it: registry.json is a manifest, so check/lint/test/build never read it. Lost
+    # once when a failed rollback did `git reset --hard`, reverting the entry while leaving the
+    # untracked component files in place.
+    $entryViolations = @(Get-MissingRegistryEntries -RegistryPath (Join-Path $RepoRoot 'registry.json') -State $State)
+    if ($entryViolations.Count -gt 0) {
+        Write-PortLog Warn "gate:registry-entry failed - $($entryViolations.Count) ported component(s) missing from registry.json."
+        return @{
+            Ok        = $false
+            Steps     = $results
+            Failed    = 'registry-entry'
+            Command   = '(internal) ported component vs registry.json entry check'
+            ExitCode  = 1
+            Output    = ("Every ported component needs one registry:ui entry in registry.json, or it cannot be installed.`n`n" + ($entryViolations -join "`n"))
+            Remaining = (($GateSteps | ForEach-Object { "$($_.Launcher) $($_.Args -join ' ')" }) -join '; ')
+        }
+    }
 
     $regViolations = @(Get-RegistryDependencyViolations -RegistryPath (Join-Path $RepoRoot 'registry.json'))
     if ($regViolations.Count -gt 0) {

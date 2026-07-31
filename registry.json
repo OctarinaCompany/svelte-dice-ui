@@ -1632,6 +1632,127 @@
 			]
 		},
 		{
+			"name": "media-player",
+			"type": "registry:ui",
+			"title": "Media Player",
+			"description": "A fully featured media player component supporting video and audio playback with custom controls.",
+			"registryDependencies": [
+				"badge",
+				"button",
+				"dropdown-menu",
+				"spinner",
+				"tooltip",
+				"direction-provider"
+			],
+			"dependencies": ["bits-ui", "@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/media-player/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-audio.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-captions.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-controls-overlay.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-controls.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-download.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-error.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-fullscreen.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-loading.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-loop.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-pip.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-play.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-playback-speed.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-portal.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-seek-backward.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-seek-forward.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-seek.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-settings.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-time.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-tooltip.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-video.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-volume-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player-volume.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/media-player.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/media-player/time.ts",
+					"type": "registry:ui"
+				}
+			]
+		},
+		{
 			"name": "sortable",
 			"type": "registry:ui",
 			"title": "Sortable",

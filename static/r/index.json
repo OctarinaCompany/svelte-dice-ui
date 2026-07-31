@@ -446,6 +446,25 @@
 		"relativeUrl": "file-upload.json"
 	},
 	{
+		"name": "media-player",
+		"title": "Media Player",
+		"type": "registry:ui",
+		"description": "A fully featured media player component supporting video and audio playback with custom controls.",
+		"dependencies": [
+			"bits-ui",
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"badge",
+			"button",
+			"dropdown-menu",
+			"spinner",
+			"tooltip",
+			"direction-provider"
+		],
+		"relativeUrl": "media-player.json"
+	},
+	{
 		"name": "sortable",
 		"title": "Sortable",
 		"type": "registry:ui",
