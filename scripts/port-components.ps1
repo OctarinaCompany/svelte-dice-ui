@@ -1389,7 +1389,15 @@ try {
                     Write-PortLog Warn '-StopOnFailure: leaving the working tree as-is for inspection.'
                 } else {
                     $null = Invoke-Git -RepoRoot $RepoRoot reset --hard HEAD
-                    $null = Invoke-Git -RepoRoot $RepoRoot clean -fd -e .port-state.json -e .port-state.lock -e .port-logs -e .reference
+                    # -GitArgs explicitly: Invoke-Git is [CmdletBinding()], so a bare `-e` is matched
+                    # against the common parameters and fails as ambiguous with -ErrorAction /
+                    # -ErrorVariable before it ever reaches git. This is the rollback path, so the
+                    # crash only surfaced the first time a component actually failed.
+                    $null = Invoke-Git -RepoRoot $RepoRoot -GitArgs @(
+                        'clean', '-fd',
+                        '-e', '.port-state.json', '-e', '.port-state.lock',
+                        '-e', '.port-logs', '-e', '.reference'
+                    )
                     Write-PortLog Info 'Working tree rolled back to the last good commit.'
                 }
             }

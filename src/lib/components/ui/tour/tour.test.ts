@@ -419,7 +419,12 @@ describe('Tour keyboard interaction', () => {
 	});
 
 	it('keeps `Tab` inside the step card, never reaching the page behind it', async () => {
-		const user = userEvent.setup();
+		// `delay: null`, for the same reason as the `Enter` test below: `bits-ui`'s focus scope
+		// reclaims focus to the card whenever it cannot rank the card's controls by measured
+		// visibility, which under jsdom is always. The default delay yields between the keydown and
+		// the focus change, leaving the scope a window to steal focus back — which made this
+		// assertion fail roughly one run in five.
+		const user = userEvent.setup({ delay: null });
 		setup({ defaultOpen: true });
 		await settle();
 

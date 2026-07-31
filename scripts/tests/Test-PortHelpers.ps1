@@ -555,6 +555,23 @@ Assert-True 'past reset times trigger a decay re-probe, not a deadline wait' `
 Assert-True 'decay probe is at least five minutes' ($orchSrc -match '\[Math\]::Max\(300,')
 Assert-True 'reactive waiter falls back to the snapshot reset time' ($orchSrc -match 'snap\.FiveHourResetsAt')
 
+# --- Invoke-Git must never receive a bare colliding short option --------------
+# Invoke-Git is an advanced function, so PowerShell matches short options against the common
+# parameters BEFORE ValueFromRemainingArguments. `-e` is ambiguous with -ErrorAction/-ErrorVariable
+# and threw; -v, -d, -o and -w would bind silently to -Verbose, -Debug, -OutVariable and the
+# -Warning* pair, which is worse - git would simply not receive the flag. Pass -GitArgs explicitly.
+$gitHazards = @()
+foreach ($f in @('scripts/port-components.ps1', 'scripts/bootstrap.ps1', 'scripts/lib/port-common.ps1')) {
+    $src = [System.IO.File]::ReadAllText((Join-Path $RepoRoot $f))
+    foreach ($line in ($src -split "`r?`n")) {
+        if ($line -notmatch 'Invoke-Git\s') { continue }
+        if ($line -match '-GitArgs') { continue }
+        if ($line -match '\s-[edovw]\s') { $gitHazards += "$f : $($line.Trim())" }
+    }
+}
+Assert-True 'no Invoke-Git call passes a colliding short option positionally' `
+    ($gitHazards.Count -eq 0) ($gitHazards -join ' | ')
+
 # --- cross-component imports need a registryDependency ------------------------
 # A registry item is copied verbatim into the consumer's project, so an import of
 # $lib/components/ui/<other>/ only resolves there if <other> is pulled in as a registryDependency.
