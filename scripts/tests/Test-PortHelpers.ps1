@@ -458,6 +458,22 @@ Assert-True 'stale snapshot exposes no percentage'     (-not $stale.ContainsKey(
 [System.IO.File]::WriteAllText($snapPath, 'not json at all', [System.Text.UTF8Encoding]::new($false))
 Assert-True 'corrupt snapshot is NOT available' (-not (Get-UsageSnapshot -Path $snapPath).Available)
 
+# capturedAt says when the status line ran, not when its rate-limit data was current: Claude Code
+# can hand it a cached rate_limits block, which then looks fresh. A five-hour reset time already in
+# the past proves the numbers describe a window that no longer exists. Seen once with a reset 25
+# hours old, which blocked the guard on 64% while real usage was 0%.
+$pastReset = @{
+    fiveHourPercent  = 64
+    fiveHourResetsAt = [DateTimeOffset]::new((Get-Date).AddHours(-25)).ToUnixTimeSeconds()
+    sevenDayPercent  = 9
+    sevenDayResetsAt = [DateTimeOffset]::new((Get-Date).AddDays(6)).ToUnixTimeSeconds()
+    capturedAt       = [DateTimeOffset]::new((Get-Date)).ToUnixTimeSeconds()
+}
+[System.IO.File]::WriteAllText($snapPath, ($pastReset | ConvertTo-Json -Compress), [System.Text.UTF8Encoding]::new($false))
+$phantom = Get-UsageSnapshot -Path $snapPath -MaxAgeMinutes 30
+Assert-True 'a freshly-stamped but expired window is NOT available' (-not $phantom.Available)
+Assert-True 'the reason names the expired window' ($phantom.Reason -match 'five-hour window reset')
+
 # The guard must be wired in, and must consider BOTH windows.
 Assert-True 'phase loop calls the usage guard'   ($orchSrc -match 'Wait-UsageHeadroom -Context')
 Assert-True 'usage guard checks the session window' ($orchSrc -match 'FiveHourPercent -gt \$SessionStopPercent')

@@ -198,12 +198,26 @@ function Get-UsageSnapshot {
         [DateTimeOffset]::FromUnixTimeSeconds([int64]$unix).ToLocalTime().DateTime
     }
 
+    # capturedAt records when the status line RAN, not when the rate-limit data it received was
+    # current. Claude Code can hand the status line a cached rate_limits block, which then gets
+    # stamped as fresh. A five-hour window whose reset time has already passed is the tell: the
+    # numbers belong to a window that no longer exists. Observed once with a reset time 25 hours
+    # old, which made the guard block on a 64% reading while actual usage was 0%.
+    $fiveReset = & $toLocal $j.fiveHourResetsAt
+    if ($fiveReset -and $fiveReset -lt (Get-Date).AddMinutes(-2)) {
+        return @{
+            Available  = $false
+            Reason     = ("rate-limit data is stale: the five-hour window reset at {0}, already past" -f $fiveReset.ToString('yyyy-MM-dd HH:mm'))
+            AgeMinutes = $ageMin
+        }
+    }
+
     return @{
         Available        = $true
         Reason           = $null
         AgeMinutes       = $ageMin
         FiveHourPercent  = [int]$j.fiveHourPercent
-        FiveHourResetsAt = & $toLocal $j.fiveHourResetsAt
+        FiveHourResetsAt = $fiveReset
         SevenDayPercent  = [int]$j.sevenDayPercent
         SevenDayResetsAt = & $toLocal $j.sevenDayResetsAt
         CapturedAt       = $epoch
