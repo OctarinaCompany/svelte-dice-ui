@@ -321,5 +321,20 @@
 			"checkbox-group"
 		],
 		"relativeUrl": "combobox.json"
+	},
+	{
+		"name": "responsive-dialog",
+		"title": "Responsive Dialog",
+		"type": "registry:ui",
+		"description": "A dialog that renders as a centered modal on desktop and a bottom drawer on mobile.",
+		"dependencies": [
+			"bits-ui",
+			"vaul-svelte"
+		],
+		"registryDependencies": [
+			"dialog",
+			"drawer"
+		],
+		"relativeUrl": "responsive-dialog.json"
 	}
 ]

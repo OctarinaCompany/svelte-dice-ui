@@ -1162,6 +1162,68 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "responsive-dialog",
+			"type": "registry:ui",
+			"title": "Responsive Dialog",
+			"description": "A dialog that renders as a centered modal on desktop and a bottom drawer on mobile.",
+			"registryDependencies": ["dialog", "drawer"],
+			"dependencies": ["bits-ui", "vaul-svelte"],
+			"files": [
+				{
+					"path": "src/lib/hooks/is-mobile.svelte.ts",
+					"type": "registry:hook"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog-trigger.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog-close.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog-portal.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog-overlay.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog-header.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog-footer.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog-title.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog-description.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/responsive-dialog/responsive-dialog.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
