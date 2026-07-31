@@ -253,5 +253,19 @@
 			"direction-provider"
 		],
 		"relativeUrl": "time-picker.json"
+	},
+	{
+		"name": "tags-input",
+		"title": "Tags Input",
+		"type": "registry:ui",
+		"description": "Display a list of tags in an input field with the ability to add, edit, and remove them.",
+		"dependencies": [
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"direction-provider",
+			"checkbox-group"
+		],
+		"relativeUrl": "tags-input.json"
 	}
 ]

@@ -856,6 +856,56 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "tags-input",
+			"type": "registry:ui",
+			"title": "Tags Input",
+			"description": "Display a list of tags in an input field with the ability to add, edit, and remove them.",
+			"registryDependencies": ["direction-provider", "checkbox-group"],
+			"dependencies": ["@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/tags-input/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tags-input/tags-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tags-input/tags-input-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tags-input/tags-input-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tags-input/tags-input-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tags-input/tags-input-item-text.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tags-input/tags-input-item-edit.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tags-input/tags-input-item-delete.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tags-input/tags-input-clear.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/tags-input/tags-input.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
