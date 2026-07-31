@@ -1676,6 +1676,60 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "kanban",
+			"type": "registry:ui",
+			"title": "Kanban",
+			"description": "A drag and drop kanban board component for organizing items into columns.",
+			"registryDependencies": ["sortable", "direction-provider"],
+			"dependencies": ["bits-ui"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/kanban/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban-collision.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban-dnd.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban-board.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban-column.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban-column-handle.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban-item-handle.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/kanban/kanban-overlay.svelte",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

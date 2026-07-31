@@ -457,5 +457,19 @@
 			"direction-provider"
 		],
 		"relativeUrl": "sortable.json"
+	},
+	{
+		"name": "kanban",
+		"title": "Kanban",
+		"type": "registry:ui",
+		"description": "A drag and drop kanban board component for organizing items into columns.",
+		"dependencies": [
+			"bits-ui"
+		],
+		"registryDependencies": [
+			"sortable",
+			"direction-provider"
+		],
+		"relativeUrl": "kanban.json"
 	}
 ]
