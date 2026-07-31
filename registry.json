@@ -1312,6 +1312,48 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "scroll-spy",
+			"type": "registry:ui",
+			"title": "Scroll Spy",
+			"description": "Navigation links that track scroll position and scroll to their section on click.",
+			"registryDependencies": ["direction-provider", "scroller"],
+			"dependencies": ["tailwind-variants"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/scroll-spy/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroll-spy/scroll-spy.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroll-spy/scroll-spy-nav.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroll-spy/scroll-spy-link.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroll-spy/scroll-spy-viewport.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroll-spy/scroll-spy-section.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroll-spy/scroll-spy.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/scroll-spy/section-observer.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

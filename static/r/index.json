@@ -366,5 +366,19 @@
 			"direction-provider"
 		],
 		"relativeUrl": "selection-toolbar.json"
+	},
+	{
+		"name": "scroll-spy",
+		"title": "Scroll Spy",
+		"type": "registry:ui",
+		"description": "Navigation links that track scroll position and scroll to their section on click.",
+		"dependencies": [
+			"tailwind-variants"
+		],
+		"registryDependencies": [
+			"direction-provider",
+			"scroller"
+		],
+		"relativeUrl": "scroll-spy.json"
 	}
 ]
