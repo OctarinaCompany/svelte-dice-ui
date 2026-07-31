@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import type { Pathname } from '$app/types';
-	import { getComponentItems } from '$lib/registry.js';
+	import { resolve } from '$app/paths';
+	import { getComponentItems, type DocsRoute } from '$lib/registry.js';
 	import { cn } from '$lib/utils.js';
 	import type { Snippet } from 'svelte';
 
@@ -12,12 +11,12 @@
 	// appends a `registry:ui` entry shows up here automatically.
 	const components = getComponentItems();
 
-	const overview: { title: string; route: Pathname }[] = [
+	const overview: { title: string; route: DocsRoute }[] = [
 		{ title: 'Introduction', route: '/docs' },
 		{ title: 'Components', route: '/docs/components' }
 	];
 
-	function linkClass(route: Pathname) {
+	function linkClass(route: DocsRoute) {
 		const active = page.url.pathname === resolve(route);
 		return cn(
 			'rounded-md px-2 py-1 text-sm transition-colors hover:bg-muted',
@@ -25,7 +24,7 @@
 		);
 	}
 
-	function ariaCurrent(route: Pathname) {
+	function ariaCurrent(route: DocsRoute) {
 		return page.url.pathname === resolve(route) ? ('page' as const) : undefined;
 	}
 </script>

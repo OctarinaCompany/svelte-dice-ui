@@ -19,12 +19,24 @@ export type Registry = {
 	items: RegistryItem[];
 };
 
+/**
+ * A route id the docs app links to. Every one of them is parameterless.
+ *
+ * Deliberately *not* the whole `Pathname` union: `resolve()`'s parameter list is the distributive
+ * conditional `ResolveArgs<T>`, so a value typed as every route at once asks TypeScript to relate one
+ * union-typed argument to a union of per-route argument tuples — a comparison it stops attempting
+ * once the route list grows past a couple of dozen entries, which this registry has. Parameterless
+ * route ids all instantiate `resolve()` identically, so the two static docs routes stand in for the
+ * generated component ones as well.
+ */
+export type DocsRoute = Extract<Pathname, '/docs' | '/docs/components'>;
+
 /** An entry of the docs sidebar / component index, derived from a registry item. */
 export type ComponentEntry = {
 	name: string;
 	title: string;
 	description?: string;
-	route: Pathname;
+	route: DocsRoute;
 };
 
 export const registry = registryJson as Registry;
@@ -47,8 +59,8 @@ export function getComponentItems(): ComponentEntry[] {
 			description: item.description,
 			// Every `registry:ui` item must ship a demo route at
 			// `src/routes/docs/components/<name>/+page.svelte` (see CLAUDE.md), so the
-			// generated path is always a real route id.
-			route: `/docs/components/${item.name}` as Pathname
+			// generated path is always a real, parameterless route id — see `DocsRoute`.
+			route: `/docs/components/${item.name}` as DocsRoute
 		}))
 		.sort((a, b) => a.title.localeCompare(b.title));
 }

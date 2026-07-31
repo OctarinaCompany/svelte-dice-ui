@@ -906,6 +906,60 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "editable",
+			"type": "registry:ui",
+			"title": "Editable",
+			"description": "An accessible inline editable component for editing text content in place.",
+			"registryDependencies": ["direction-provider", "checkbox-group"],
+			"dependencies": [],
+			"files": [
+				{
+					"path": "src/lib/components/ui/editable/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable-area.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable-preview.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable-trigger.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable-toolbar.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable-cancel.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable-submit.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/editable/editable.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

@@ -267,5 +267,17 @@
 			"checkbox-group"
 		],
 		"relativeUrl": "tags-input.json"
+	},
+	{
+		"name": "editable",
+		"title": "Editable",
+		"type": "registry:ui",
+		"description": "An accessible inline editable component for editing text content in place.",
+		"dependencies": [],
+		"registryDependencies": [
+			"direction-provider",
+			"checkbox-group"
+		],
+		"relativeUrl": "editable.json"
 	}
 ]

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Empty from '$lib/components/ui/empty/index.js';
+	import { resolve } from '$app/paths';
 	import { getComponentItems } from '$lib/registry.js';
 	import BoxIcon from '@lucide/svelte/icons/box';
 
