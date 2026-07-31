@@ -1060,6 +1060,108 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "combobox",
+			"type": "registry:ui",
+			"title": "Combobox",
+			"description": "An input with a popover that helps users filter through a list of options.",
+			"registryDependencies": ["direction-provider", "checkbox-group"],
+			"dependencies": ["bits-ui", "@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/combobox/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-anchor.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-trigger.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-cancel.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-badge-list.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-badge-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-badge-item-delete.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-portal.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-arrow.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-loading.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-empty.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-group.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-group-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-item-text.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-item-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-separator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/combobox/combobox-filter.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

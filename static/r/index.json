@@ -306,5 +306,20 @@
 		],
 		"registryDependencies": [],
 		"relativeUrl": "qr-code.json"
+	},
+	{
+		"name": "combobox",
+		"title": "Combobox",
+		"type": "registry:ui",
+		"description": "An input with a popover that helps users filter through a list of options.",
+		"dependencies": [
+			"bits-ui",
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"direction-provider",
+			"checkbox-group"
+		],
+		"relativeUrl": "combobox.json"
 	}
 ]
