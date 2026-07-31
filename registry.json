@@ -1572,6 +1572,64 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "file-upload",
+			"type": "registry:ui",
+			"title": "File Upload",
+			"description": "A file upload component with drag and drop, previewing, and progress tracking.",
+			"registryDependencies": ["direction-provider"],
+			"dependencies": ["@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/file-upload/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload-dropzone.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload-trigger.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload-list.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload-item-preview.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload-item-metadata.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload-item-progress.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload-item-delete.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/file-upload/file-upload-clear.svelte",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

@@ -431,5 +431,18 @@
 			"direction-provider"
 		],
 		"relativeUrl": "color-picker.json"
+	},
+	{
+		"name": "file-upload",
+		"title": "File Upload",
+		"type": "registry:ui",
+		"description": "A file upload component with drag and drop, previewing, and progress tracking.",
+		"dependencies": [
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"direction-provider"
+		],
+		"relativeUrl": "file-upload.json"
 	}
 ]
