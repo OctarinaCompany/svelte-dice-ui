@@ -1354,6 +1354,68 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "stepper",
+			"type": "registry:ui",
+			"title": "Stepper",
+			"description": "A component that guides users through a multi-step process with clear visual progress indicators.",
+			"registryDependencies": ["direction-provider", "speed-dial", "action-bar"],
+			"dependencies": ["@lucide/svelte", "tailwind-variants"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/stepper/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-list.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-trigger.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-separator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-title.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-description.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-prev.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper-next.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stepper/stepper.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
