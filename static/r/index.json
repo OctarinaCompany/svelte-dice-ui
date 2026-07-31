@@ -295,5 +295,16 @@
 			"checkbox-group"
 		],
 		"relativeUrl": "key-value.json"
+	},
+	{
+		"name": "qr-code",
+		"title": "QR Code",
+		"type": "registry:ui",
+		"description": "A flexible QR code component for generating and displaying QR codes with customization options.",
+		"dependencies": [
+			"qrcode"
+		],
+		"registryDependencies": [],
+		"relativeUrl": "qr-code.json"
 	}
 ]

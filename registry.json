@@ -1014,6 +1014,52 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "qr-code",
+			"type": "registry:ui",
+			"title": "QR Code",
+			"description": "A flexible QR code component for generating and displaying QR codes with customization options.",
+			"registryDependencies": [],
+			"dependencies": ["qrcode"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/qr-code/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/qr-code/qr-code.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/qr-code/qr-code-canvas.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/qr-code/qr-code-svg.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/qr-code/qr-code-image.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/qr-code/qr-code-overlay.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/qr-code/qr-code-skeleton.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/qr-code/qr-code-download.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/qr-code/qr-code.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
