@@ -1630,6 +1630,52 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "sortable",
+			"type": "registry:ui",
+			"title": "Sortable",
+			"description": "A drag and drop sortable component for reordering items.",
+			"registryDependencies": ["direction-provider"],
+			"dependencies": ["bits-ui"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/sortable/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/sortable/sortable-geometry.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/sortable/sortable-dnd.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/sortable/sortable.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/sortable/sortable.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/sortable/sortable-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/sortable/sortable-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/sortable/sortable-item-handle.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/sortable/sortable-overlay.svelte",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

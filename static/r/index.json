@@ -444,5 +444,18 @@
 			"direction-provider"
 		],
 		"relativeUrl": "file-upload.json"
+	},
+	{
+		"name": "sortable",
+		"title": "Sortable",
+		"type": "registry:ui",
+		"description": "A drag and drop sortable component for reordering items.",
+		"dependencies": [
+			"bits-ui"
+		],
+		"registryDependencies": [
+			"direction-provider"
+		],
+		"relativeUrl": "sortable.json"
 	}
 ]
