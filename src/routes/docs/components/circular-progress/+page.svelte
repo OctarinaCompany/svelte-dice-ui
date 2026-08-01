@@ -6,10 +6,14 @@
 
 	let demoValue = $state(0);
 
+	// The effect must not read `demoValue`, or every tick invalidates it and restarts the interval.
+	// The running total lives in a plain `let` the effect owns; the rune only receives it.
 	$effect(() => {
+		let progress = 0;
 		const interval = setInterval(() => {
-			demoValue = demoValue >= 100 ? 100 : demoValue + 2;
-			if (demoValue >= 100) clearInterval(interval);
+			progress = Math.min(100, progress + 2);
+			demoValue = progress;
+			if (progress >= 100) clearInterval(interval);
 		}, 150);
 
 		return () => clearInterval(interval);
@@ -305,18 +309,9 @@
 
 	<ComponentPreview
 		title="Combined"
-		description="The one-line Combined form next to a manual composition, at the same value."
+		description="The one-line form, equivalent to the manual composition in the Default example."
 	>
-		<div class="flex items-center gap-8">
-			<CircularProgress.Combined value={65} size={60} />
-			<CircularProgress.Root value={65} size={60}>
-				<CircularProgress.Indicator>
-					<CircularProgress.Track />
-					<CircularProgress.Range />
-				</CircularProgress.Indicator>
-				<CircularProgress.ValueText />
-			</CircularProgress.Root>
-		</div>
+		<CircularProgress.Combined value={65} size={60} />
 	</ComponentPreview>
 
 	<section class="flex flex-col gap-6">
