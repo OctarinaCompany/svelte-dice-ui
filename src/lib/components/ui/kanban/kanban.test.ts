@@ -1166,6 +1166,26 @@ describe('Kanban pointer drags (T011)', () => {
 		expect(itemValues(container, 'todo')).toEqual(['b', 'a', 'c']);
 	});
 
+	it('opens a gap while a column is dragged, before anything is dropped', async () => {
+		const user = userEvent.setup();
+		const { container } = renderHarness();
+		stubRects(container);
+
+		await grab(user, columnActivator(container, 'todo'));
+		await user.keyboard('{ArrowRight}');
+
+		// Nothing is committed yet: a column reorder only lands on drop, exactly as upstream's
+		// `onDragOver` leaves it alone. The movement during the gesture is purely visual.
+		expect(columnValues(container)).toEqual(['todo', 'doing', 'done']);
+		// The column being crossed has already slid into the slot the dragged one vacated…
+		expect(columnFor(container, 'doing').getAttribute('style')).toContain(
+			'translate3d(-300px, 0px, 0)'
+		);
+		expect(columnFor(container, 'doing').getAttribute('style')).toContain('transition: transform');
+		// …and the one beyond the target is untouched.
+		expect(columnFor(container, 'done').getAttribute('style') ?? '').not.toContain('translate3d');
+	});
+
 	it('inverts a displaced sibling, then hands it a transform transition', async () => {
 		const user = userEvent.setup();
 		const { container } = renderHarness();

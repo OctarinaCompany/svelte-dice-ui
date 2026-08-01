@@ -224,6 +224,12 @@ export class KanbanRootState {
 		overId: UniqueIdentifier;
 	} | null = null;
 
+	/**
+	 * Where each column sat when a column drag was picked up, before anything was transformed. Empty
+	 * for an item drag. See {@link #columnStrategyShift}.
+	 */
+	#columnLayout: { id: UniqueIdentifier; rect: ClientRect }[] = [];
+
 	/** FLIP state, keyed by stringified identifier. See {@link #playLayoutShift}. */
 	#layoutShifts = $state<Record<string, Coordinates>>({});
 	#layoutAnimating = $state<Record<string, Coordinates>>({});
@@ -295,14 +301,74 @@ export class KanbanRootState {
 	}
 
 	/**
-	 * The transform an element renders with (research R-07): nothing at all for a settled column or
-	 * item — `value` has already reordered, so a sorting-strategy shift would double-count the move —
-	 * and, for the dragged one, nothing when an overlay is mounted or the clamped delta when not.
+	 * The transform an element renders with. For the dragged one: nothing when an overlay is mounted,
+	 * the clamped delta when not. For everything else it depends on whether `value` has already
+	 * moved underneath it.
+	 *
+	 * An **item** drag commits through `#commitOver` on every target change, so the array has already
+	 * reordered by the time the parts render and the move is animated by FLIP. Adding a
+	 * sorting-strategy shift on top would count it twice.
+	 *
+	 * A **column** drag commits nothing until the drop — `#commitOver` returns early for columns, and
+	 * so does upstream's `onDragOver`, whose cross-column branch looks the active column up among its
+	 * own items and finds `-1`. dnd-kit still opens a gap during the gesture, because upstream wraps
+	 * the board in `<SortableContext strategy={horizontal|verticalListSortingStrategy}>`
+	 * (`kanban.tsx:662-668`), which displaces the non-active columns without touching any data. That
+	 * displacement is what {@link #columnStrategyShift} reproduces.
 	 */
 	getDragTransform(id: UniqueIdentifier): Coordinates | null {
 		const session = this.dnd.session;
-		if (!session || session.activeId !== id) return null;
+		if (!session) return null;
+		if (session.activeId !== id) return this.#columnStrategyShift(session, id);
 		return this.hasOverlay ? null : session.transform;
+	}
+
+	/**
+	 * Where a non-active column sits while a column is being dragged over it: one slot along, towards
+	 * the gap the dragged column left behind.
+	 *
+	 * The offsets come from the layout snapshot taken at pick-up rather than from a live measurement,
+	 * because `getBoundingClientRect` reports the transform we are in the middle of applying — reading
+	 * it here would feed each frame's shift back into the next one. Measured slots also mean variable
+	 * column widths, gaps and `dir="rtl"` all fall out for free instead of needing arithmetic.
+	 */
+	#columnStrategyShift(session: DragSession, id: UniqueIdentifier): Coordinates | null {
+		const layout = this.#columnLayout;
+		if (layout.length === 0 || !this.isColumn(id) || !this.isColumn(session.activeId)) return null;
+
+		const overId = session.overId;
+		if (overId === null || !this.isColumn(overId)) return null;
+
+		const active = layout.findIndex((entry) => entry.id === session.activeId);
+		const over = layout.findIndex((entry) => entry.id === overId);
+		const self = layout.findIndex((entry) => entry.id === id);
+		if (active === -1 || over === -1 || self === -1 || active === over) return null;
+
+		// Only the columns the dragged one has travelled across move, and each takes its neighbour's
+		// slot: forwards they shift back one, backwards they shift on one.
+		let target: number;
+		if (active < over) {
+			if (self <= active || self > over) return null;
+			target = self - 1;
+		} else {
+			if (self >= active || self < over) return null;
+			target = self + 1;
+		}
+
+		const from = layout[self];
+		const to = layout[target];
+		if (!from || !to) return null;
+
+		return this.orientation === 'horizontal'
+			? { x: to.rect.left - from.rect.left, y: 0 }
+			: { x: 0, y: to.rect.top - from.rect.top };
+	}
+
+	/** Whether a column is one of those a column drag is currently displacing. */
+	isStrategyDisplaced(id: UniqueIdentifier): boolean {
+		const session = this.dnd.session;
+		if (!session || session.activeId === id) return false;
+		return this.#columnLayout.length > 0 && this.isColumn(id) && this.isColumn(session.activeId);
 	}
 
 	/** The floating preview's clamped delta. */
@@ -405,7 +471,12 @@ export class KanbanRootState {
 			const isColumn = this.isColumn(id);
 			entries.push({
 				id,
-				rect: toClientRect(entry.node),
+				// While a column drag is displacing the other columns, their painted boxes are no longer
+				// where the layout put them. Resolving against the paint would chase the displacement:
+				// shifting a column out from under the pointer makes the next one win, which shifts that
+				// one too, and the cascade runs to the end of the board. dnd-kit measures droppables with
+				// `ignoreTransform`; the pick-up snapshot is our equivalent.
+				rect: (isColumn ? this.#columnLayoutRect(id) : null) ?? toClientRect(entry.node),
 				isColumn,
 				isEmpty: isColumn ? (this.value[id]?.length ?? 0) === 0 : false,
 				disabled: entry.disabled(),
@@ -697,14 +768,33 @@ export class KanbanRootState {
 		this.#startValue = null;
 		this.#committed = false;
 		this.#sameColumnMove = null;
+		this.#columnLayout = [];
 		// Cancels a reflow still in flight when a new drag starts. At the end of a drag this runs
 		// before `#playLayoutShift` has awaited its first tick, so the drop animation is untouched.
 		this.#clearLayoutShift();
 	}
 
+	/** The columns' slots as laid out, read before any transform is applied. */
+	#captureColumnLayout(): { id: UniqueIdentifier; rect: ClientRect }[] {
+		const layout: { id: UniqueIdentifier; rect: ClientRect }[] = [];
+		for (const id of this.columns) {
+			const node = this.dnd.getEntry(id)?.node;
+			if (!node) continue;
+			layout.push({ id, rect: toClientRect(node) });
+		}
+		return layout;
+	}
+
+	/** The untransformed slot a column occupies, while a column drag is displacing the others. */
+	#columnLayoutRect(id: UniqueIdentifier): ClientRect | null {
+		return this.#columnLayout.find((entry) => entry.id === id)?.rect ?? null;
+	}
+
 	#onSessionStart(session: DragSession): void {
 		this.#reset();
 		this.#startColumn = this.getColumn(session.activeId);
+		// Taken here and not per frame: nothing is transformed yet, so these are the true slots.
+		if (this.isColumn(session.activeId)) this.#columnLayout = this.#captureColumnLayout();
 		// Every commit builds a new record and new arrays rather than mutating, so holding the current
 		// board is a sufficient snapshot for the cancel path below.
 		this.#startValue = this.value;
@@ -827,8 +917,15 @@ class KanbanPartState {
 	readonly layoutShift: Coordinates | null = $derived(
 		this.#props.inOverlay ? null : this.#props.root.layoutShiftFor(this.value)
 	);
+	/**
+	 * Carried while FLIP releases an offset, and for the whole of a column drag by the columns being
+	 * displaced — without it the sorting-strategy shift would jump a slot at a time instead of
+	 * gliding, which is the transition dnd-kit's `useSortable` hands every sortable node.
+	 */
 	readonly layoutTransition: string | null = $derived(
-		!this.#props.inOverlay && this.#props.root.isLayoutAnimating(this.value)
+		!this.#props.inOverlay &&
+			(this.#props.root.isLayoutAnimating(this.value) ||
+				this.#props.root.isStrategyDisplaced(this.value))
 			? LAYOUT_SHIFT_TRANSITION
 			: null
 	);
