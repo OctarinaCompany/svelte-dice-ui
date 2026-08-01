@@ -5,6 +5,7 @@
 	import * as Button from '$lib/components/ui/button/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import DirectionConsumer from './direction-consumer.svelte';
+	import DirectionButton from './direction-button.svelte';
 
 	let dir = $state<Direction>('ltr');
 
@@ -86,12 +87,22 @@
 					>rtl</Button.Root
 				>
 			</div>
-			<DirectionProvider.Root {dir} class="flex flex-col items-center gap-3 rounded-lg border p-4">
-				<DirectionConsumer />
-				<DirectionProvider.Root dir="rtl" class="rounded-lg border border-dashed p-3">
-					<p class="text-xs text-muted-foreground">Nested provider, always dir="rtl":</p>
+			<!--
+				The provider renders a `display: contents` wrapper, so it cannot carry the card's own
+				layout: `contents` suppresses the box that the border and padding would paint. The
+				styling lives on a plain element inside it, which also keeps the provider headless the
+				way upstream's context-only provider is.
+			-->
+			<DirectionProvider.Root {dir}>
+				<div class="flex flex-col items-center gap-3 rounded-lg border p-4">
 					<DirectionConsumer />
-				</DirectionProvider.Root>
+					<DirectionProvider.Root dir="rtl">
+						<div class="flex flex-col items-center gap-2 rounded-lg border border-dashed p-3">
+							<p class="text-xs text-muted-foreground">Nested provider, always dir="rtl":</p>
+							<DirectionConsumer />
+						</div>
+					</DirectionProvider.Root>
+				</div>
 			</DirectionProvider.Root>
 		</div>
 	</ComponentPreview>
@@ -101,7 +112,7 @@
 		description="Mirrors the API Reference block's useDirection example."
 	>
 		<DirectionProvider.Root {dir}>
-			<Button.Root {dir}>Do a kickflip</Button.Root>
+			<DirectionButton />
 		</DirectionProvider.Root>
 	</ComponentPreview>
 

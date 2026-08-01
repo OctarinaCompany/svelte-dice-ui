@@ -7,6 +7,15 @@
 		type Direction
 	} from './direction-provider.svelte.js';
 
+	/**
+	 * Upstream is a bare React context provider and renders no DOM at all; consumers must call
+	 * `useDirection()` and forward `dir` themselves. We render a `display: contents` wrapper instead,
+	 * so the real `dir` attribute reaches the subtree and descendants flip without opting in.
+	 *
+	 * The cost of that choice: `contents` suppresses the element's own box, so passing layout classes
+	 * through `class` silently discards borders, padding and background. Style a child element, not
+	 * the provider.
+	 */
 	export type DirectionProviderProps = WithElementRef<
 		Omit<HTMLAttributes<HTMLDivElement>, 'dir'>,
 		HTMLDivElement
