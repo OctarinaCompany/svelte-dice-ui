@@ -320,16 +320,18 @@ export class KanbanRootState {
 		if (!activeRect) return session.overId;
 
 		const collisionRect = translateRect(activeRect, session.transform);
-		// The dragged element follows the pointer, so leaving it in would make every hit its own.
-		const droppables = this.droppables().filter(
-			(entry) => !entry.disabled && entry.id !== activeId
-		);
+		// The active entry stays in the candidate set, exactly as dnd-kit keeps its own droppable in
+		// `droppableContainers`. Once the board has reflowed under the pointer, the pointer sits over
+		// the dragged item's *new* slot, so resolving to the active identifier is the correct answer:
+		// `#commitOver` reads it as "already where it belongs" and commits nothing. Filtering it out
+		// forces a neighbour to win instead, which shifts the item one slot further on every reflow.
+		const droppables = this.droppables().filter((entry) => !entry.disabled);
 
 		// 1. A column only ever lands on another column.
 		if (this.isColumn(activeId)) {
 			return closestCenterAmong(
 				collisionRect,
-				droppables.filter((entry) => entry.isColumn)
+				droppables.filter((entry) => entry.isColumn && entry.id !== activeId)
 			);
 		}
 
@@ -408,6 +410,18 @@ export class KanbanRootState {
 		};
 	}
 
+	/**
+	 * Which identifier a mid-drag announcement describes. An item is relocated live by `#commitOver`,
+	 * so its own position is already the news. A column is only reordered on drop (`#commitOver`
+	 * returns early for columns), so the board still reads as it did at pick-up and the announcement
+	 * has to name the position the column is heading for — that is the drop target.
+	 */
+	#announcementSubject(session: DragSession): UniqueIdentifier {
+		return this.isColumn(session.activeId)
+			? (session.overId ?? session.activeId)
+			: session.activeId;
+	}
+
 	#argsFor(session: DragSession, id: UniqueIdentifier): KanbanAnnouncementArgs {
 		const variant: KanbanOverlayVariant = this.isColumn(session.activeId) ? 'column' : 'item';
 		const column = this.getColumn(id);
@@ -431,10 +445,12 @@ export class KanbanRootState {
 	 * the pointer and what makes "drop into an empty column" reachable at all. Both publish through
 	 * `onValueChange` only, unconditionally — `onMove` is never routed to from here (contract §12).
 	 *
-	 * One deliberate departure, recorded in the divergence register: after a commit the drop target
-	 * becomes the active identifier, mirroring the state dnd-kit re-measures itself into. Without it
-	 * the next resolution would fall back to the remembered target and swap the same pair straight
-	 * back, and the drop would undo the move.
+	 * The drop target is deliberately left alone after a commit, exactly as upstream leaves `over`
+	 * alone. `resolveOverId` excludes the active identifier from its candidate set, so writing it
+	 * into `session.overId` here would guarantee that the next resolution differs, re-firing `onOver`
+	 * and swapping the same pair straight back — a self-sustaining cycle that reorders on every
+	 * pointer frame even when the pointer has not moved. Leaving the session on the neighbour makes
+	 * the next resolution a no-op, which is what keeps the board stable under the pointer.
 	 */
 	#commitOver(session: DragSession): void {
 		const activeId = session.activeId;
@@ -482,11 +498,16 @@ export class KanbanRootState {
 				[overColumn]: [...overItems, activeItem]
 			});
 			this.#hasMoved = true;
+			// dnd-kit re-fires `onDragOver` only when `over.id` actually changes, so upstream's append
+			// is the last word until the pointer reaches a different card. Our cascade re-resolves a
+			// populated column to its closest item, which would turn the very next frame into a
+			// same-column reorder and undo the append. Parking the target on the active identifier
+			// reproduces upstream's "no new event" without freezing the same-column path below.
+			this.#lastOverId = activeId;
+			session.overId = activeId;
 		}
 
 		this.#committed = true;
-		this.#lastOverId = activeId;
-		session.overId = activeId;
 	}
 
 	/** Upstream's `onDragEnd` (`kanban.tsx:380-465`): the column reorder and the same-column drop. */
@@ -574,14 +595,18 @@ export class KanbanRootState {
 		this.#retainFocus(session);
 
 		if (session.overId === null) return;
-		this.announce(this.#announcements.onDragOver(this.#argsFor(session, session.overId)));
+		this.announce(
+			this.#announcements.onDragOver(this.#argsFor(session, this.#announcementSubject(session)))
+		);
 	}
 
 	#onSessionMove(session: DragSession): void {
 		this.#props.getOnDragMove()?.(this.#eventOf(session));
 
 		if (session.overId === null) return;
-		this.announce(this.#announcements.onDragMove(this.#argsFor(session, session.overId)));
+		this.announce(
+			this.#announcements.onDragMove(this.#argsFor(session, this.#announcementSubject(session)))
+		);
 	}
 
 	/**

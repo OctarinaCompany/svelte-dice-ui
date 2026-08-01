@@ -1134,6 +1134,30 @@ describe('Kanban pointer drags (T011)', () => {
 		expect(itemValues(container, 'todo')).toEqual(['b', 'a', 'c']);
 	});
 
+	it('holds the order still while the pointer does not move', async () => {
+		const user = userEvent.setup();
+		const { container } = renderHarness();
+		stubRects(container);
+
+		await press(user, itemFor(container, 'a'), 150, 80);
+		await movePointer(user, 150, 150);
+
+		const settled = itemValues(container, 'todo');
+		expect(settled).toEqual(['b', 'a', 'c']);
+
+		// Re-resolving the same pointer position must be a no-op. Committing the reorder used to park
+		// the drop target on the dragged identifier, which guaranteed the next resolution differed and
+		// swapped the same pair straight back — so the board oscillated on every frame of a held drag
+		// and landed wherever the last frame's parity left it.
+		for (let frame = 0; frame < 4; frame++) {
+			await movePointer(user, 150, 150);
+			expect(itemValues(container, 'todo')).toEqual(settled);
+		}
+
+		await release(user);
+		expect(itemValues(container, 'todo')).toEqual(settled);
+	});
+
 	it('commits the cross-column move as soon as the target changes', async () => {
 		const user = userEvent.setup();
 		const { container } = renderHarness();
@@ -1328,7 +1352,9 @@ describe('Kanban controlled and uncontrolled state (T012)', () => {
 		expect(onDragStart).toHaveBeenCalledWith({ active: { id: 'a' }, over: { id: 'a' } });
 		expect(onDragMove).toHaveBeenCalled();
 		expect(onDragOver).toHaveBeenCalledWith({ active: { id: 'a' }, over: { id: 'b' } });
-		expect(onDragEnd).toHaveBeenCalledWith({ active: { id: 'a' }, over: { id: 'a' } });
+		// `over` is the drop target the pointer actually ended on, exactly as dnd-kit reports it to
+		// upstream's `onDragEnd` — it is never rewritten to the dragged identifier.
+		expect(onDragEnd).toHaveBeenCalledWith({ active: { id: 'a' }, over: { id: 'b' } });
 		expect(onDragCancel).not.toHaveBeenCalled();
 	});
 
