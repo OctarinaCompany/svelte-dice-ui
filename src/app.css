@@ -135,12 +135,18 @@
 }
 
 /*
- * Marquee animations. Declared in a plain `@theme` (never `@theme inline`) so Tailwind v4 registers
- * the `@keyframes` alongside the `--animate-*` utilities; `inline` would substitute the value at the
- * use site and never emit the keyframes. Mirrored in `registry.json` as the marquee item's
- * `cssVars.theme` + `css`, so installing the component brings its animations along.
+ * Marquee animations. These MUST live in `@theme inline` (never a plain `@theme`), because the
+ * animation shorthand references `--marquee-duration` / `--marquee-loop-count`, which only exist on
+ * the `<Marquee.Root>` element. A plain `@theme` emits `--animate-marquee-*` as a `:root` custom
+ * property, where it is substituted at its own computed-value time — on `:root`, where those two
+ * variables are undefined. The substitution fails, the property becomes guaranteed-invalid, and
+ * `animation: var(--animate-marquee-left)` resolves to `animation-name: none`. `inline` pastes the
+ * literal value into the utility rule instead, so the `var()`s resolve on the content element, which
+ * inherits the per-instance duration. `@theme inline` still emits the `@keyframes` (upstream's
+ * `docs/styles/globals.css` does exactly this). Mirrored in `registry.json` as the marquee item's
+ * `css` block, so installing the component brings working animations along.
  */
-@theme {
+@theme inline {
 	--animate-marquee-left: marquee-left var(--marquee-duration) linear var(--marquee-loop-count);
 	--animate-marquee-right: marquee-right var(--marquee-duration) linear var(--marquee-loop-count);
 	--animate-marquee-left-rtl: marquee-left-rtl var(--marquee-duration) linear

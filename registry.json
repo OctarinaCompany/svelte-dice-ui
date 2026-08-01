@@ -347,17 +347,15 @@
 			"description": "An animated scrolling component that continuously moves content horizontally or vertically.",
 			"registryDependencies": ["direction-provider"],
 			"dependencies": ["tailwind-variants"],
-			"cssVars": {
-				"theme": {
+			"css": {
+				"@theme inline": {
 					"--animate-marquee-left": "marquee-left var(--marquee-duration) linear var(--marquee-loop-count)",
 					"--animate-marquee-right": "marquee-right var(--marquee-duration) linear var(--marquee-loop-count)",
 					"--animate-marquee-left-rtl": "marquee-left-rtl var(--marquee-duration) linear var(--marquee-loop-count)",
 					"--animate-marquee-right-rtl": "marquee-right-rtl var(--marquee-duration) linear var(--marquee-loop-count)",
 					"--animate-marquee-up": "marquee-up var(--marquee-duration) linear var(--marquee-loop-count)",
 					"--animate-marquee-down": "marquee-down var(--marquee-duration) linear var(--marquee-loop-count)"
-				}
-			},
-			"css": {
+				},
 				"@keyframes marquee-left": {
 					"0%": {
 						"transform": "translateX(0%)"

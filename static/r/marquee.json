@@ -14,6 +14,14 @@
 		"direction-provider"
 	],
 	"css": {
+		"@theme inline": {
+			"--animate-marquee-left": "marquee-left var(--marquee-duration) linear var(--marquee-loop-count)",
+			"--animate-marquee-right": "marquee-right var(--marquee-duration) linear var(--marquee-loop-count)",
+			"--animate-marquee-left-rtl": "marquee-left-rtl var(--marquee-duration) linear var(--marquee-loop-count)",
+			"--animate-marquee-right-rtl": "marquee-right-rtl var(--marquee-duration) linear var(--marquee-loop-count)",
+			"--animate-marquee-up": "marquee-up var(--marquee-duration) linear var(--marquee-loop-count)",
+			"--animate-marquee-down": "marquee-down var(--marquee-duration) linear var(--marquee-loop-count)"
+		},
 		"@keyframes marquee-left": {
 			"0%": {
 				"transform": "translateX(0%)"
@@ -61,16 +69,6 @@
 			"100%": {
 				"transform": "translateY(0%)"
 			}
-		}
-	},
-	"cssVars": {
-		"theme": {
-			"--animate-marquee-left": "marquee-left var(--marquee-duration) linear var(--marquee-loop-count)",
-			"--animate-marquee-right": "marquee-right var(--marquee-duration) linear var(--marquee-loop-count)",
-			"--animate-marquee-left-rtl": "marquee-left-rtl var(--marquee-duration) linear var(--marquee-loop-count)",
-			"--animate-marquee-right-rtl": "marquee-right-rtl var(--marquee-duration) linear var(--marquee-loop-count)",
-			"--animate-marquee-up": "marquee-up var(--marquee-duration) linear var(--marquee-loop-count)",
-			"--animate-marquee-down": "marquee-down var(--marquee-duration) linear var(--marquee-loop-count)"
 		}
 	},
 	"files": [
