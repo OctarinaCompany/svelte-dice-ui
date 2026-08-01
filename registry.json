@@ -2007,6 +2007,44 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "listbox",
+			"type": "registry:ui",
+			"title": "Listbox",
+			"description": "A component for creating keyboard-navigable selection lists and grids.",
+			"registryDependencies": ["direction-provider", "checkbox-group"],
+			"dependencies": ["@lucide/svelte"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/listbox/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/listbox/listbox.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/listbox/listbox-group.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/listbox/listbox-group-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/listbox/listbox-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/listbox/listbox-item-indicator.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/listbox/listbox.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }

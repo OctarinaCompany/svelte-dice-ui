@@ -543,5 +543,19 @@
 			"direction-provider"
 		],
 		"relativeUrl": "angle-slider.json"
+	},
+	{
+		"name": "listbox",
+		"title": "Listbox",
+		"type": "registry:ui",
+		"description": "A component for creating keyboard-navigable selection lists and grids.",
+		"dependencies": [
+			"@lucide/svelte"
+		],
+		"registryDependencies": [
+			"direction-provider",
+			"checkbox-group"
+		],
+		"relativeUrl": "listbox.json"
 	}
 ]
