@@ -17,10 +17,11 @@
 	type PropRow = { prop: string; type: string; default: string; description: string };
 
 	// --- Sources ------------------------------------------------------------
-	// Long-lived public samples replace upstream's docs-local and ephemeral third-party URLs;
-	// upstream's own Mux and media-chrome URLs are kept because the credits section names them.
-	const VIDEO_SRC = 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
-	const AUDIO_SRC = 'https://storage.googleapis.com/media-session/sintel/snow-fight.mp3';
+	// Upstream self-hosts its two primary samples under `docs/public/assets`, and so do we: a demo
+	// whose media 404s teaches nothing, and third-party sample URLs rot. Upstream's own Mux and
+	// media-chrome URLs are kept for the chaptered/HLS demos because the credits section names them.
+	const VIDEO_SRC = '/assets/cloud.mp4';
+	const AUDIO_SRC = '/assets/lofi.mp3';
 	const CHAPTERED_SRC =
 		'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008/low.mp4';
 	const VTT_BASE = 'https://media-chrome.mux.dev/examples/vanilla/vtt/elephantsdream';
@@ -41,17 +42,17 @@
 	const tracks: Track[] = [
 		{
 			id: '1',
-			title: 'Snow Fight',
-			artist: 'Sintel',
+			title: 'Lofi',
+			artist: 'Dice UI',
 			src: AUDIO_SRC,
-			cover: 'https://picsum.photos/seed/snowfight/200/200'
+			cover: 'https://picsum.photos/seed/lofi/200/200'
 		},
 		{
 			id: '2',
-			title: 'Caminandes',
-			artist: 'Blender Foundation',
-			src: 'https://storage.googleapis.com/media-session/caminandes/short.mp3',
-			cover: 'https://picsum.photos/seed/caminandes/200/200'
+			title: 'Medieval: Battle',
+			artist: 'RandomMind',
+			src: 'https://opengameart.org/sites/default/files/battle.mp3',
+			cover: 'https://picsum.photos/seed/battle/200/200'
 		}
 	];
 
