@@ -532,5 +532,16 @@
 			"speed-dial"
 		],
 		"relativeUrl": "stack.json"
+	},
+	{
+		"name": "angle-slider",
+		"title": "Angle Slider",
+		"type": "registry:ui",
+		"description": "An interactive circular slider for selecting angles with support for single values and ranges.",
+		"dependencies": [],
+		"registryDependencies": [
+			"direction-provider"
+		],
+		"relativeUrl": "angle-slider.json"
 	}
 ]

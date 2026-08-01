@@ -1965,6 +1965,48 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "angle-slider",
+			"type": "registry:ui",
+			"title": "Angle Slider",
+			"description": "An interactive circular slider for selecting angles with support for single values and ranges.",
+			"registryDependencies": ["direction-provider"],
+			"dependencies": [],
+			"files": [
+				{
+					"path": "src/lib/components/ui/angle-slider/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/angle-slider/angle-slider.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/angle-slider/angle-slider-track.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/angle-slider/angle-slider-range.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/angle-slider/angle-slider-thumb.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/angle-slider/angle-slider-value.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/angle-slider/angle-slider-hidden-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/angle-slider/angle-slider.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
