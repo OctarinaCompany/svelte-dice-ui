@@ -519,5 +519,18 @@
 			"direction-provider"
 		],
 		"relativeUrl": "data-table.json"
+	},
+	{
+		"name": "stack",
+		"title": "Stack",
+		"type": "registry:ui",
+		"description": "A component that displays items in a stacked layout with hover expansion effects, similar to Sonner toast stacking.",
+		"dependencies": [
+			"tailwind-variants"
+		],
+		"registryDependencies": [
+			"speed-dial"
+		],
+		"relativeUrl": "stack.json"
 	}
 ]

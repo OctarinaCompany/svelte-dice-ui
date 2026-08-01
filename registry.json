@@ -1939,6 +1939,32 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "stack",
+			"type": "registry:ui",
+			"title": "Stack",
+			"description": "A component that displays items in a stacked layout with hover expansion effects, similar to Sonner toast stacking.",
+			"registryDependencies": ["speed-dial"],
+			"dependencies": ["tailwind-variants"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/stack/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stack/stack.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stack/stack-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/stack/stack.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
