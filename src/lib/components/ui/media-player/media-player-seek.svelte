@@ -149,6 +149,9 @@
 	let verticalMovement = 0;
 	let lastSeekCommitTime = 0;
 
+	/** The slider's step, in seconds. Also the granularity the echo guard reasons about. */
+	const SEEK_STEP = 0.01;
+
 	const isDisabled = $derived(Boolean(disabled) || root.disabled);
 	const tooltipDisabled = $derived(withoutTooltip || root.withoutTooltip || root.menuOpen);
 	const sideOffset = $derived(tooltipSideOffset ?? root.tooltipSideOffset);
@@ -371,7 +374,23 @@
 		});
 	}
 
+	/**
+	 * `bits-ui` calls `onValueChange` for *any* change to its value, including the one it performs
+	 * itself when the controlled `value` prop is re-synced. Playback therefore echoes back through
+	 * this callback ~60 times a second: `currentTime` advances, `displayValue` changes, `bits-ui`
+	 * reports it as a change, and the seek below re-seeks the element to where it already is —
+	 * flushing the decode pipeline every frame. Measured at 56 seeks/s and a third of real speed.
+	 *
+	 * An echo carries the value we just handed down, so anything within half a step of it is not a
+	 * user gesture. A real drag or an arrow key always moves at least a full step.
+	 */
+	function isEchoOfDisplayedValue(value: number): boolean {
+		return Math.abs(value - displayValue) < SEEK_STEP / 2;
+	}
+
 	function onValueChange(value: number) {
+		if (isEchoOfDisplayedValue(value)) return;
+
 		pendingSeekTime = value;
 		root.dragging = true;
 
@@ -385,6 +404,9 @@
 	}
 
 	function onValueCommit(value: number) {
+		// Same echo guard: a commit that lands on the displayed value is not a gesture the user made.
+		if (isEchoOfDisplayedValue(value) && !root.dragging) return;
+
 		if (seekThrottleId !== null) {
 			cancelAnimationFrame(seekThrottleId);
 			seekThrottleId = null;
@@ -439,7 +461,7 @@
 			{...restProps}
 			min={root.seekableStart}
 			max={root.seekableEnd}
-			step={0.01}
+			step={SEEK_STEP}
 			value={displayValue}
 			{onValueChange}
 			{onValueCommit}

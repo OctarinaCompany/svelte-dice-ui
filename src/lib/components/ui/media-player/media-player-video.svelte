@@ -82,19 +82,16 @@
 {#if child}
 	{@render child({ props: videoAttrs })}
 {:else}
+	<!--
+		No `bind:` media properties. `attachMedia()` already mirrors every one of them from the
+		element's own events, and every mutator (`seekTo`, `setVolume`, `toggleMute`, …) writes the
+		element imperatively — so a two-way binding has nothing to push and only adds a second writer.
+		Having both is a feedback loop: the listener copies `element.currentTime` into state, the
+		binding writes that value straight back onto the element, and assigning `currentTime` *is* a
+		seek. Measured, it produced 156 seeks/s and dropped playback to a fifth of real time.
+	-->
 	<video
 		bind:this={ref}
-		bind:paused={root.paused}
-		bind:currentTime={root.currentTime}
-		bind:duration={root.duration}
-		bind:volume={root.volume}
-		bind:muted={root.muted}
-		bind:playbackRate={root.playbackRate}
-		bind:buffered={root.buffered}
-		bind:seekable={root.seekable}
-		bind:seeking={root.seeking}
-		bind:ended={root.ended}
-		bind:readyState={root.readyState}
 		aria-labelledby={root.labelId}
 		aria-describedby={root.descriptionId}
 		{...restProps}

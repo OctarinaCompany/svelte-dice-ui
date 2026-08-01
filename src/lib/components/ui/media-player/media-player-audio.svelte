@@ -73,19 +73,9 @@
 {#if child}
 	{@render child({ props: audioAttrs })}
 {:else}
+	<!-- See `media-player-video.svelte`: the media bindings are a second writer and cause a seek loop. -->
 	<audio
 		bind:this={ref}
-		bind:paused={root.paused}
-		bind:currentTime={root.currentTime}
-		bind:duration={root.duration}
-		bind:volume={root.volume}
-		bind:muted={root.muted}
-		bind:playbackRate={root.playbackRate}
-		bind:buffered={root.buffered}
-		bind:seekable={root.seekable}
-		bind:seeking={root.seeking}
-		bind:ended={root.ended}
-		bind:readyState={root.readyState}
 		aria-labelledby={root.labelId}
 		aria-describedby={root.descriptionId}
 		{...restProps}

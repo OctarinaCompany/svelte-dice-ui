@@ -166,11 +166,15 @@ const SUBTITLE_KINDS: TextTrackKind[] = ['subtitles', 'captions'];
  *
  * Collapses upstream's two React contexts — the `useSyncExternalStore` `Store` for ephemeral UI
  * state and `MediaPlayerContext` for ids, refs and config — into a single rune class (research
- * R-02). The media element is mirrored by Svelte's native media bindings on `<MediaPlayer.Video>` /
- * `<MediaPlayer.Audio>` (research R-01); everything those bindings do not cover — `loop`,
- * `loading`, `hasPlayed`, `error`, `fullscreen`, `pip` and the text tracks — is mirrored by the
- * listeners {@link attachMedia} and {@link attachRoot} install, both of which return the teardown
- * their caller's `$effect` must run.
+ * R-02).
+ *
+ * The data flow is deliberately one-way, matching upstream: the element's own events are the only
+ * thing that writes this state, through the listeners {@link attachMedia} and {@link attachRoot}
+ * install, and every mutator writes the element imperatively. `<MediaPlayer.Video>` and
+ * `<MediaPlayer.Audio>` must therefore carry **no** `bind:` media properties — Svelte's media
+ * bindings are two-way, so pairing them with these listeners makes each `timeupdate` write
+ * `currentTime` back onto the element, and assigning `currentTime` is a seek. Both return the
+ * teardown their caller's `$effect` must run.
  */
 export class MediaPlayerState {
 	// $derived below is lazy at runtime (evaluated only when read), but svelte-check's static
