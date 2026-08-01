@@ -667,6 +667,110 @@
 			"notes": "Highest fan-in component, ported last so every dependency is a real file on disk. Built on TanStack Table.",
 			"promptExtra": "Use @tanstack/table-core via its Svelte adapter - the headless core is framework-agnostic, so column defs, sorting, filtering, pagination and row selection port almost directly. Compose the already-ported `combobox`, `badge-overflow`, `checkbox-group` and `sortable` for the filter, facet, selection and column-reorder surfaces instead of reimplementing them. This is a LARGE component: expect the plan to schedule the toolbar, column header, faceted filter, date filter, slider filter, pagination, view options and skeleton as separate subcomponents, mirroring upstream's file split.",
 			"enabled": true
+		},
+		{
+			"slug": "stack",
+			"name": "Stack",
+			"kind": "component",
+			"wave": 6,
+			"complexity": "S",
+			"docsUrl": "https://diceui.com/docs/components/radix/stack",
+			"docsMdx": ".reference/diceui/docs/content/docs/components/radix/stack.mdx",
+			"sourcePaths": [".reference/diceui/docs/registry/bases/radix/ui/stack.tsx"],
+			"dependsOn": [],
+			"shadcnDeps": [],
+			"notes": "Overlapping children that fan out on hover or focus. Variant-driven layout, no drag and no popup - the simplest of this wave and the one that re-establishes the conventions.",
+			"promptExtra": "Upstream builds its variants with `class-variance-authority`. Do NOT port `cva`: this repo uses `tv()` from `tailwind-variants` declared in the module script and exported, exactly as `src/lib/components/ui/button/button.svelte` does (CLAUDE.md section 6). Reproduce every upstream variant axis and default. The fan-out is a transform plus a transition on each child; assert `prefers-reduced-motion` collapses it to an instant change, and make sure any keyframes you need are declared in `@theme inline` rather than a plain `@theme` - a plain `@theme` publishes the animation shorthand on `:root`, where per-instance custom properties do not exist, and the animation silently resolves to `none`.",
+			"enabled": true
+		},
+		{
+			"slug": "angle-slider",
+			"name": "Angle Slider",
+			"kind": "component",
+			"wave": 6,
+			"complexity": "M",
+			"docsUrl": "https://diceui.com/docs/components/radix/angle-slider",
+			"docsMdx": ".reference/diceui/docs/content/docs/components/radix/angle-slider.mdx",
+			"sourcePaths": [
+				".reference/diceui/docs/registry/bases/radix/ui/angle-slider.tsx",
+				".reference/diceui/docs/registry/bases/radix/components/visually-hidden-input.tsx"
+			],
+			"dependsOn": ["direction-provider"],
+			"shadcnDeps": ["label"],
+			"notes": "Circular slider: the angle is derived from the pointer position relative to the control's centre. Pointer geometry is the one thing jsdom cannot simulate, so the tests must drive the state class directly as well as the DOM.",
+			"promptExtra": "The value comes from `Math.atan2` on the pointer offset from the element centre, then snapping to `step` and clamping to `minAngle`/`maxAngle`. Port that arithmetic exactly - an off-by-one quadrant is invisible in tests and obvious in a browser. Cover: pointer drag across all four quadrants and across the 0/360 seam, every documented key (Arrow keys, Home, End, PageUp, PageDown, with and without Shift), `disabled`, `readOnly`, RTL inversion of the horizontal arrows, and the hidden input that carries the value into a form. Upstream renders that input through `components/visually-hidden-input` - port it as part of this component rather than adding a dependency. Beware a feedback loop: never write the value back into the element you read the pointer from inside the same effect.",
+			"enabled": true
+		},
+		{
+			"slug": "listbox",
+			"name": "Listbox",
+			"kind": "component",
+			"wave": 6,
+			"complexity": "L",
+			"docsUrl": "https://diceui.com/docs/components/radix/listbox",
+			"docsMdx": ".reference/diceui/docs/content/docs/components/radix/listbox.mdx",
+			"sourcePaths": [
+				".reference/diceui/packages/listbox",
+				".reference/diceui/docs/registry/bases/radix/ui/listbox.tsx"
+			],
+			"dependsOn": ["direction-provider"],
+			"shadcnDeps": [],
+			"notes": "Published package plus a registry wrapper - read both, the package holds the complete keyboard and selection semantics. Our `combobox` references listbox only as ARIA roles, so this is a new component and not a refactor of it.",
+			"promptExtra": "Read the standalone package at .reference/diceui/packages/listbox first: the registry file is a thin wrapper. Full WAI-ARIA APG listbox pattern is the floor - roving tabindex, `aria-activedescendant`, typeahead, Home/End/PageUp/PageDown, Shift+Arrow range selection, Ctrl/Cmd+A, single and multiple selection, `orientation` horizontal as well as vertical, the grid layout, and option groups with their labels. `src/lib/components/ui/combobox/` is the closest ported precedent - match its file layout, its state-class split and its test structure. RTL must invert the horizontal arrows; use the already-ported `direction-provider`.",
+			"enabled": true
+		},
+		{
+			"slug": "mention",
+			"name": "Mention",
+			"kind": "component",
+			"wave": 6,
+			"complexity": "L",
+			"docsUrl": "https://diceui.com/docs/components/radix/mention",
+			"docsMdx": ".reference/diceui/docs/content/docs/components/radix/mention.mdx",
+			"sourcePaths": [
+				".reference/diceui/packages/mention",
+				".reference/diceui/docs/registry/bases/radix/ui/mention.tsx"
+			],
+			"dependsOn": ["direction-provider", "listbox"],
+			"shadcnDeps": ["popover"],
+			"notes": "Largest of this wave. A trigger character inside a textarea opens a filtered, anchored list; selection splices text back into the input at the right offset.",
+			"promptExtra": "Read the standalone package at .reference/diceui/packages/mention first - the registry file is a thin wrapper. The hard parts are the trigger detection (the trigger character must only fire at a word boundary), the caret offset arithmetic that decides where the selected value is spliced in, and keeping the popup anchored to the caret rather than to the textarea. Compose bits-ui for the anchored layer rather than reimplementing positioning. Cover: opening and closing on the trigger character, filtering as the user types, custom `filter`, a custom trigger character, Escape, Arrow navigation and Enter selection, that selection splices at the correct offset and leaves surrounding text untouched, and that a trigger typed mid-word does not open the list. Note that bits-ui layer content is not visible to jsdom's `getByRole`, so query the popup by `data-slot` instead.",
+			"enabled": true
+		},
+		{
+			"slug": "data-grid",
+			"name": "Data Grid",
+			"kind": "component",
+			"wave": 6,
+			"complexity": "XL",
+			"docsUrl": "https://diceui.com/docs/components/radix/data-grid",
+			"docsMdx": ".reference/diceui/docs/content/docs/components/radix/data-grid.mdx",
+			"sourcePaths": [
+				".reference/diceui/docs/components/data-grid",
+				".reference/diceui/docs/hooks/use-data-grid.ts",
+				".reference/diceui/docs/lib/data-grid.ts",
+				".reference/diceui/docs/types/radix/data-grid.ts",
+				".reference/diceui/docs/registry/bases/radix/examples/data-grid-demo.tsx"
+			],
+			"dependsOn": ["data-table", "combobox"],
+			"shadcnDeps": [
+				"table",
+				"button",
+				"input",
+				"select",
+				"popover",
+				"command",
+				"dropdown-menu",
+				"context-menu",
+				"dialog",
+				"checkbox",
+				"badge",
+				"separator",
+				"skeleton"
+			],
+			"notes": "The largest component in the upstream repo: 9308 lines across 10 files plus hooks, lib and types - 5.4x `data-table`, which is why it carries the XL complexity multiplier. An editable spreadsheet grid: cell editing, clipboard copy/paste with a paste dialog, a context menu, keyboard shortcuts and search.",
+			"promptExtra": "This is the biggest port of the project. Read every file under .reference/diceui/docs/components/data-grid before writing anything, plus `hooks/use-data-grid.ts` and `lib/data-grid.ts` - the hook holds the selection, editing and clipboard state machine and is the real specification. Build on @tanstack/table-core exactly as the already-ported `data-table` does, and reuse `src/lib/components/ui/data-table/` wherever the surfaces overlap rather than duplicating them; read that folder first to match its layout and its state-class split. Expect the plan to schedule the grid root, row, cell, cell wrapper, cell variants, column header, context menu, paste dialog, keyboard shortcuts and search as separate subcomponents, mirroring upstream's file split. The clipboard path needs particular care: jsdom implements no clipboard, so the tests must drive the parse/serialise helpers directly and assert the DOM effects separately. Cell-range selection is pointer geometry, which jsdom cannot simulate either - drive the state class for the arithmetic and reserve the DOM tests for what jsdom can actually observe.",
+			"enabled": true
 		}
 	]
 }

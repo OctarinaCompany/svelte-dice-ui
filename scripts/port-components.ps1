@@ -141,7 +141,10 @@ $PhaseConfig = @{
     'converge'  = @{ Order = '09'; Template = '09-converge.md';  Model = 'opus';   Effort = 'high';   Budget = 3;  TimeMul = 1.0; Format = 'json' }
 }
 
-$ComplexityMultiplier = @{ 'S' = 1.0; 'M' = 1.5; 'L' = 2.5 }
+# Scales both the phase timeout and the phase budget. `XL` exists for the handful of components that
+# are several times the size of an `L` — `data-grid` is 9 300 lines against `data-table`'s 1 700 — and
+# would otherwise time out mid-implement at the `L` ceiling.
+$ComplexityMultiplier = @{ 'S' = 1.0; 'M' = 1.5; 'L' = 2.5; 'XL' = 4.0 }
 
 # Set-StrictMode makes reading an unset $script: variable a terminating error, so every one of
 # them must be declared up front. Missing this crashed a run mid-component after the first
@@ -178,9 +181,9 @@ $EconomyModelMap = @{
     'remediate' = @{ Any = 'sonnet' }
     'plan'      = @{ Any = 'opus' }
     'analyze'   = @{ Any = 'opus' }
-    'implement' = @{ S = 'sonnet'; M = 'opus'; L = 'opus' }
-    'fix'       = @{ S = 'sonnet'; M = 'opus'; L = 'opus' }
-    'converge'  = @{ S = 'sonnet'; M = 'opus'; L = 'opus' }
+    'implement' = @{ S = 'sonnet'; M = 'opus'; L = 'opus'; XL = 'opus' }
+    'fix'       = @{ S = 'sonnet'; M = 'opus'; L = 'opus'; XL = 'opus' }
+    'converge'  = @{ S = 'sonnet'; M = 'opus'; L = 'opus'; XL = 'opus' }
 }
 
 $AnalyzeSchema = @'
@@ -762,6 +765,13 @@ if ($dupes) { throw "Duplicate slug(s) in the manifest: $($dupes.Name -join ', '
 foreach ($c in $allComponents) {
     foreach ($d in $c.dependsOn) {
         if ($slugs -notcontains $d) { throw "Component '$($c.slug)' depends on unknown slug '$d'." }
+    }
+    # An unrecognised complexity silently falls back to the 1.0 multiplier, i.e. the timeout and the
+    # budget of the smallest component. That degradation is invisible until an L-sized implement dies
+    # on an S-sized clock, so refuse the manifest instead.
+    if (-not $ComplexityMultiplier.ContainsKey([string]$c.complexity)) {
+        throw ("Component '$($c.slug)' has complexity '$($c.complexity)'. " +
+            "Valid values: $(($ComplexityMultiplier.Keys | Sort-Object) -join ', ').")
     }
 }
 

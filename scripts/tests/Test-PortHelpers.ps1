@@ -361,8 +361,9 @@ Write-Host "`nManifest" -ForegroundColor Cyan
 
 $manifest = [System.IO.File]::ReadAllText((Join-Path $RepoRoot 'scripts/components.json')) | ConvertFrom-Json -Depth 50 -AsHashtable
 $slugs = $manifest.components | ForEach-Object { $_.slug }
-Assert-Equal 'component count' 38 $manifest.components.Count
-Assert-Equal 'slugs are unique' 38 (($slugs | Sort-Object -Unique).Count)
+# 38 in the first run, plus the wave-6 batch: stack, angle-slider, listbox, mention, data-grid.
+Assert-Equal 'component count' 43 $manifest.components.Count
+Assert-Equal 'slugs are unique' 43 (($slugs | Sort-Object -Unique).Count)
 
 $badDeps = @()
 foreach ($c in $manifest.components) { foreach ($d in $c.dependsOn) { if ($slugs -notcontains $d) { $badDeps += "$($c.slug) -> $d" } } }
@@ -376,8 +377,18 @@ for ($i = 0; $i -lt $manifest.components.Count; $i++) {
 }
 Assert-True 'no component depends on a later one' ($forwardRefs.Count -eq 0) ($forwardRefs -join ', ')
 
-$badCx = @($manifest.components | Where-Object { $_.complexity -notin @('S', 'M', 'L') } | ForEach-Object { $_.slug })
-Assert-True 'every complexity is S/M/L' ($badCx.Count -eq 0) ($badCx -join ', ')
+# Must match `$ComplexityMultiplier` in the orchestrator: a value outside it silently falls back to
+# the 1.0 multiplier, i.e. an XL component would run on an S-sized clock and budget.
+$validCx = @('S', 'M', 'L', 'XL')
+$badCx = @($manifest.components | Where-Object { $_.complexity -notin $validCx } | ForEach-Object { $_.slug })
+Assert-True 'every complexity is S/M/L/XL' ($badCx.Count -eq 0) ($badCx -join ', ')
+
+$orchSrcCx = [System.IO.File]::ReadAllText((Join-Path $RepoRoot 'scripts/port-components.ps1'))
+Assert-True 'orchestrator knows every complexity the manifest uses' `
+    (@($manifest.components | ForEach-Object { $_.complexity } | Sort-Object -Unique |
+        Where-Object { $orchSrcCx -notmatch "'$_'\s*=\s*[\d.]+" }).Count -eq 0)
+Assert-True 'the manifest rejects an unknown complexity' `
+    ($orchSrcCx -match 'ComplexityMultiplier\.ContainsKey\(\[string\]\$c\.complexity\)')
 
 $missingFields = @()
 foreach ($c in $manifest.components) {
