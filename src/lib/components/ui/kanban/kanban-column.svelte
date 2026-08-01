@@ -126,8 +126,10 @@
 	}
 
 	const columnStyle = $derived.by(() => {
-		const transform = translate3d(column.transform);
-		const own = transform ? `transform: ${transform};` : '';
+		// The drag transform wins: a dragged column follows the pointer and carries no FLIP offset.
+		const transform = translate3d(column.transform) ?? translate3d(column.layoutShift);
+		let own = transform ? `transform: ${transform};` : '';
+		if (column.layoutTransition) own += `transition: ${column.layoutTransition};`;
 		// Caller declarations come last so they win, matching upstream's `...style` spread order.
 		const merged = style ? `${own}${style}` : own;
 		return merged === '' ? undefined : merged;

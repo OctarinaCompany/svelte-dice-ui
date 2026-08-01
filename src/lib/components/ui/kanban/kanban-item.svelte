@@ -127,8 +127,10 @@
 	}
 
 	const itemStyle = $derived.by(() => {
-		const transform = translate3d(item.transform);
-		const own = transform ? `transform: ${transform};` : '';
+		// The drag transform wins: a dragged item follows the pointer and never carries a FLIP offset.
+		const transform = translate3d(item.transform) ?? translate3d(item.layoutShift);
+		let own = transform ? `transform: ${transform};` : '';
+		if (item.layoutTransition) own += `transition: ${item.layoutTransition};`;
 		// Caller declarations come last so they win, matching upstream's `...style` spread order.
 		const merged = style ? `${own}${style}` : own;
 		return merged === '' ? undefined : merged;

@@ -100,10 +100,42 @@ function overlayElement(): HTMLElement | null {
 	return maybeBySlot(document.body, 'kanban-overlay');
 }
 
+function asDomRect(rect: ClientRect): DOMRect {
+	return { ...rect, x: rect.left, y: rect.top, toJSON: () => rect } as DOMRect;
+}
+
 /** jsdom performs no layout, so geometry-dependent cases install their own boxes. */
 function stubRect(element: Element, rect: ClientRect): void {
-	const domRect = { ...rect, x: rect.left, y: rect.top, toJSON: () => rect } as DOMRect;
-	vi.spyOn(element, 'getBoundingClientRect').mockReturnValue(domRect);
+	vi.spyOn(element, 'getBoundingClientRect').mockReturnValue(asDomRect(rect));
+}
+
+/**
+ * Like {@link stubRects}, but every box is derived from where the element sits in the DOM *now*, so
+ * a reorder genuinely moves it. The layout animation is measured geometry — a frozen box reports the
+ * same rect before and after a reorder, which is a zero delta and therefore no animation at all.
+ */
+function stubLiveRects(container: HTMLElement): void {
+	stubRect(bySlot(container, 'kanban-board'), rectOf(0, 0, 900, 400));
+
+	const columnIndexOf = (column: HTMLElement) =>
+		allBySlot(container, 'kanban-column').indexOf(column);
+
+	for (const column of allBySlot(container, 'kanban-column')) {
+		vi.spyOn(column, 'getBoundingClientRect').mockImplementation(() =>
+			asDomRect(rectOf(columnIndexOf(column) * 300, 0, 300, 400))
+		);
+	}
+
+	for (const item of allBySlot(container, 'kanban-item')) {
+		vi.spyOn(item, 'getBoundingClientRect').mockImplementation(() => {
+			const owner = item.closest('[data-slot="kanban-column"]');
+			if (!(owner instanceof HTMLElement)) return asDomRect(rectOf(0, 0, 0, 0));
+			const left = columnIndexOf(owner) * 300 + 10;
+			return asDomRect(
+				rectOf(left, 50 + allBySlot(owner, 'kanban-item').indexOf(item) * 70, 280, 60)
+			);
+		});
+	}
 }
 
 /**
@@ -1132,6 +1164,45 @@ describe('Kanban pointer drags (T011)', () => {
 		await release(user);
 
 		expect(itemValues(container, 'todo')).toEqual(['b', 'a', 'c']);
+	});
+
+	it('inverts a displaced sibling, then hands it a transform transition', async () => {
+		const user = userEvent.setup();
+		const { container } = renderHarness();
+		stubLiveRects(container);
+
+		await grab(user, itemActivator(container, 'a'));
+		await user.keyboard('{ArrowDown}');
+
+		// `a` and `b` swapped, so `b` climbed one 70px slot. FLIP puts it back where it was painted…
+		await vi.waitFor(() => {
+			expect(itemFor(container, 'b').getAttribute('style')).toContain('translate3d(0px, 70px, 0)');
+		});
+		// …and the dragged item is never inverted. It carries a transform of its own — the drag one,
+		// following the pointer — so the discriminator is the transition, which only FLIP adds.
+		expect(itemFor(container, 'a').getAttribute('style') ?? '').not.toContain('transition');
+
+		// …then the offset is released under a transition, which is what makes the move visible.
+		await vi.waitFor(() => {
+			const style = itemFor(container, 'b').getAttribute('style') ?? '';
+			expect(style).toContain('transition: transform');
+			expect(style).not.toContain('translate3d');
+		});
+	});
+
+	it('leaves an undisturbed sibling alone', async () => {
+		const user = userEvent.setup();
+		const { container } = renderHarness();
+		stubLiveRects(container);
+
+		await grab(user, itemActivator(container, 'a'));
+		await user.keyboard('{ArrowDown}');
+
+		// Only `a` and `b` trade places; `c` keeps its slot and must not be animated.
+		await vi.waitFor(() => {
+			expect(itemFor(container, 'b').getAttribute('style')).toContain('translate3d');
+		});
+		expect(itemFor(container, 'c').getAttribute('style') ?? '').not.toContain('translate3d');
 	});
 
 	it('holds the order still while the pointer does not move', async () => {

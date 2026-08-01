@@ -97,6 +97,13 @@ export const DEFAULT_KANBAN_ANNOUNCEMENTS: KanbanAnnouncements = {
 	onDragCancel: ({ variant }) => `Dragging was cancelled. ${variant} was dropped.`
 };
 
+/**
+ * How long a displaced column or item takes to travel to its new slot. dnd-kit's sortable default
+ * is `200ms ease-out`, which upstream never overrides.
+ */
+const LAYOUT_SHIFT_MS = 200;
+const LAYOUT_SHIFT_TRANSITION = `transform ${LAYOUT_SHIFT_MS}ms cubic-bezier(0.2, 0, 0, 1)`;
+
 /** Upstream's instruction text (`kanban.tsx:629-633`), its source indentation collapsed. */
 const DEFAULT_INSTRUCTIONS =
 	'To pick up a kanban item or column, press space or enter. While dragging, use the arrow keys to move the item. Press space or enter again to drop the item in its new position, or press escape to cancel.';
@@ -216,6 +223,11 @@ export class KanbanRootState {
 		overIndex: number;
 		overId: UniqueIdentifier;
 	} | null = null;
+
+	/** FLIP state, keyed by stringified identifier. See {@link #playLayoutShift}. */
+	#layoutShifts = $state<Record<string, Coordinates>>({});
+	#layoutAnimating = $state<Record<string, Coordinates>>({});
+	#layoutTimer: ReturnType<typeof setTimeout> | null = null;
 
 	constructor(props: KanbanRootStateProps) {
 		this.#props = props;
@@ -435,8 +447,119 @@ export class KanbanRootState {
 		};
 	}
 
+	/**
+	 * Every reorder funnels through here, which makes it the one place that can see a layout change
+	 * coming. Upstream gets its animation from dnd-kit: `useSortable` runs on every column and item,
+	 * so each one is re-measured and given a `transform` + `transition` when the board reflows, and
+	 * columns force `defaultAnimateLayoutChanges({ wasDragging: true })` on top.
+	 *
+	 * We cannot borrow the sorting-strategy shift directly, because `value` has already been
+	 * reordered by the time the parts render — adding an index-derived offset on top would count the
+	 * move twice. Measured geometry has no such problem: capture where every node is, let Svelte
+	 * relocate them, then invert the difference and release it. That is FLIP, and it is what
+	 * dnd-kit's own layout animation reduces to.
+	 */
 	#publish(next: KanbanValue<unknown>): void {
+		const before = this.#captureRects();
 		this.#props.setValue(next);
+		void this.#playLayoutShift(before);
+	}
+
+	/**
+	 * Where every registered node sits right now, before the DOM is allowed to move. A plain array
+	 * rather than a `Map`: this is a synchronous snapshot that nothing renders from, so it must stay
+	 * outside the reactive graph.
+	 */
+	#captureRects(): { id: UniqueIdentifier; x: number; y: number }[] {
+		const rects: { id: UniqueIdentifier; x: number; y: number }[] = [];
+		for (const id of this.identifiers) {
+			const node = this.dnd.getEntry(id)?.node;
+			if (!node) continue;
+			const rect = node.getBoundingClientRect();
+			rects.push({ id, x: rect.left, y: rect.top });
+		}
+		return rects;
+	}
+
+	async #playLayoutShift(before: { id: UniqueIdentifier; x: number; y: number }[]): Promise<void> {
+		if (before.length === 0 || typeof requestAnimationFrame !== 'function') return;
+
+		await tick();
+
+		// Mid-drag the session is still open and the dragged node is following the pointer, so
+		// animating it too would fight that. At the drop the session has already closed by the time
+		// this resumes, so `activeId` is null and the dropped node animates into its final slot —
+		// which is dnd-kit's drop animation, and what stops a drop from snapping.
+		const activeId = this.dnd.session?.activeId ?? null;
+		const moved: { id: UniqueIdentifier; node: HTMLElement; x: number; y: number }[] = [];
+
+		for (const prev of before) {
+			const { id } = prev;
+			if (id === activeId) continue;
+			const node = this.dnd.getEntry(id)?.node;
+			if (!node) continue;
+
+			const rect = node.getBoundingClientRect();
+			const x = prev.x - rect.left;
+			const y = prev.y - rect.top;
+			if (Math.abs(x) < 0.5 && Math.abs(y) < 0.5) continue;
+
+			moved.push({ id, node, x, y });
+		}
+
+		// A reordered column takes its cards with it, so every card measures as moved too. Transforms
+		// inherit, so translating both would displace each card twice. Only the outermost mover is
+		// animated; its descendants ride along, which is also the cheaper composite.
+		const shifts: Record<string, Coordinates> = {};
+		let shifted = false;
+		for (const entry of moved) {
+			if (moved.some((other) => other.node !== entry.node && other.node.contains(entry.node))) {
+				continue;
+			}
+			shifts[String(entry.id)] = { x: entry.x, y: entry.y };
+			shifted = true;
+		}
+
+		if (!shifted) return;
+
+		// Invert: the parts re-render translated back to where they were, with no transition, so the
+		// move is invisible so far.
+		this.#layoutShifts = shifts;
+		this.#layoutAnimating = {};
+		await tick();
+
+		// Play: one frame later the offset is dropped and the transition is switched on, so each node
+		// travels from its old geometry to its new one.
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				this.#layoutShifts = {};
+				this.#layoutAnimating = shifts;
+				this.#layoutTimer = setTimeout(() => {
+					this.#layoutAnimating = {};
+					this.#layoutTimer = null;
+				}, LAYOUT_SHIFT_MS);
+			});
+		});
+	}
+
+	/** Drop the transform and the transition immediately, without waiting for the timer. */
+	#clearLayoutShift(): void {
+		if (this.#layoutTimer !== null) {
+			clearTimeout(this.#layoutTimer);
+			this.#layoutTimer = null;
+		}
+		this.#layoutShifts = {};
+		this.#layoutAnimating = {};
+	}
+
+	/** The FLIP offset a part renders with, or `null` when it is settled. */
+	layoutShiftFor(id: UniqueIdentifier): Coordinates | null {
+		return this.#layoutShifts[String(id)] ?? null;
+	}
+
+	/** Whether a part should carry the transform transition this frame. */
+	isLayoutAnimating(id: UniqueIdentifier): boolean {
+		return this.#layoutAnimating[String(id)] !== undefined;
 	}
 
 	/**
@@ -574,6 +697,9 @@ export class KanbanRootState {
 		this.#startValue = null;
 		this.#committed = false;
 		this.#sameColumnMove = null;
+		// Cancels a reflow still in flight when a new drag starts. At the end of a drag this runs
+		// before `#playLayoutShift` has awaited its first tick, so the drop animation is untouched.
+		this.#clearLayoutShift();
 	}
 
 	#onSessionStart(session: DragSession): void {
@@ -696,6 +822,15 @@ class KanbanPartState {
 	);
 	readonly transform: Coordinates | null = $derived(
 		this.#props.inOverlay ? null : this.#props.root.getDragTransform(this.value)
+	);
+	/** The FLIP offset while the board reflows around this part. Never set on the dragged one. */
+	readonly layoutShift: Coordinates | null = $derived(
+		this.#props.inOverlay ? null : this.#props.root.layoutShiftFor(this.value)
+	);
+	readonly layoutTransition: string | null = $derived(
+		!this.#props.inOverlay && this.#props.root.isLayoutAnimating(this.value)
+			? LAYOUT_SHIFT_TRANSITION
+			: null
 	);
 
 	/** dnd-kit's default draggable attribute set, which upstream passes straight through (R-11). */
