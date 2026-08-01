@@ -1,7 +1,7 @@
 {
 	"$schema": "https://shadcn-svelte.com/schema/registry.json",
 	"name": "svelte-dice-ui",
-	"homepage": "https://github.com/svelte-dice-ui/svelte-dice-ui",
+	"homepage": "https://github.com/OctarinaCompany/svelte-dice-ui",
 	"items": [
 		{
 			"name": "timeline",
