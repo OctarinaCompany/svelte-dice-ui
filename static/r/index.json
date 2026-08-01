@@ -572,5 +572,36 @@
 			"checkbox-group"
 		],
 		"relativeUrl": "mention.json"
+	},
+	{
+		"name": "data-grid",
+		"title": "Data Grid",
+		"type": "registry:ui",
+		"description": "A high-performance editable data grid with virtualization, keyboard navigation, cell selection, clipboard support and nine cell variants.",
+		"dependencies": [
+			"@tanstack/table-core",
+			"bits-ui",
+			"@internationalized/date",
+			"svelte-sonner"
+		],
+		"registryDependencies": [
+			"badge",
+			"badge-overflow",
+			"button",
+			"calendar",
+			"checkbox",
+			"command",
+			"dialog",
+			"direction-provider",
+			"dropdown-menu",
+			"input",
+			"label",
+			"radio-group",
+			"separator",
+			"sonner",
+			"textarea",
+			"tooltip"
+		],
+		"relativeUrl": "data-grid.json"
 	}
 ]

@@ -2095,6 +2095,154 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "data-grid",
+			"type": "registry:ui",
+			"title": "Data Grid",
+			"description": "A high-performance editable data grid with virtualization, keyboard navigation, cell selection, clipboard support and nine cell variants.",
+			"registryDependencies": [
+				"badge",
+				"badge-overflow",
+				"button",
+				"calendar",
+				"checkbox",
+				"command",
+				"dialog",
+				"direction-provider",
+				"dropdown-menu",
+				"input",
+				"label",
+				"radio-group",
+				"separator",
+				"sonner",
+				"textarea",
+				"tooltip"
+			],
+			"dependencies": [
+				"@tanstack/table-core",
+				"bits-ui",
+				"@internationalized/date",
+				"svelte-sonner"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/data-grid/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-cell-wrapper.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-checkbox-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-clipboard.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-column-header.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-column-resizer.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-context-menu.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-date-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-dom-registry.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-file-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-keyboard-shortcuts.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-long-text-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-multi-select-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-number-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-paste-dialog.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-row.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-search.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-search.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-select-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-selection.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-short-text-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-shortcut-card.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-url-cell.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-utils.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid-virtualizer.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/data-grid.svelte.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/data-grid/types.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
