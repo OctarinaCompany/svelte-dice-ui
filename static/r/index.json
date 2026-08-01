@@ -557,5 +557,20 @@
 			"checkbox-group"
 		],
 		"relativeUrl": "listbox.json"
+	},
+	{
+		"name": "mention",
+		"title": "Mention",
+		"type": "registry:ui",
+		"description": "A text field that suggests and inserts mentions when a trigger character is typed.",
+		"dependencies": [
+			"bits-ui"
+		],
+		"registryDependencies": [
+			"combobox",
+			"direction-provider",
+			"checkbox-group"
+		],
+		"relativeUrl": "mention.json"
 	}
 ]

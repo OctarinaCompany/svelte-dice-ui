@@ -2045,6 +2045,56 @@
 					"type": "registry:ui"
 				}
 			]
+		},
+		{
+			"name": "mention",
+			"type": "registry:ui",
+			"title": "Mention",
+			"description": "A text field that suggests and inserts mentions when a trigger character is typed.",
+			"registryDependencies": ["combobox", "direction-provider", "checkbox-group"],
+			"dependencies": ["bits-ui"],
+			"files": [
+				{
+					"path": "src/lib/components/ui/mention/index.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mention/mention.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mention/mention-label.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mention/mention-input.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mention/mention-highlighter.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mention/mention-portal.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mention/mention-content.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mention/mention-item.svelte",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mention/mention-caret.ts",
+					"type": "registry:ui"
+				},
+				{
+					"path": "src/lib/components/ui/mention/mention.svelte.ts",
+					"type": "registry:ui"
+				}
+			]
 		}
 	]
 }
