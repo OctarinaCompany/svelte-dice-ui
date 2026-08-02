@@ -11,6 +11,7 @@
 
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
 
+	import DataGridCellEditor from './data-grid-cell-editor.svelte';
 	import DataGridCellWrapper from './data-grid-cell-wrapper.svelte';
 	import { formatDateForDisplay, formatDateToString, parseLocalDate } from './data-grid-utils.js';
 	import { useDataGridContext } from './data-grid.svelte.js';
@@ -31,6 +32,8 @@
 
 	const contextGrid = useDataGridContext<TData>(() => gridProp, '<DataGrid.Cell>');
 	const grid = $derived(gridProp ?? contextGrid!);
+
+	let cellRef = $state<HTMLDivElement | null>(null);
 
 	const rawValue = $derived(cell.getValue());
 	const selectedDate = $derived(parseLocalDate(rawValue));
@@ -54,20 +57,14 @@
 		grid.stopEditing();
 	}
 
-	function handleWrapperKeydown(event: KeyboardEvent): void {
-		if (isEditing && event.key === 'Escape') {
-			event.preventDefault();
-			event.stopPropagation();
-			grid.stopEditing();
-			return;
-		}
-
-		// Tab on a resting cell is plain navigation: the grid's own handler owns it, so it must be
-		// allowed to bubble.
-	}
+	// Escape and outside presses are the editor layer's job — its listeners are on the document, so
+	// they fire wherever focus sits. Nothing is pending here: `handleSelect()` writes immediately.
+	//
+	// Tab on a resting cell is plain navigation: the grid's own handler owns it, so it must bubble.
 </script>
 
 <DataGridCellWrapper
+	bind:ref={cellRef}
 	{grid}
 	{cell}
 	{rowIndex}
@@ -80,14 +77,14 @@
 	{isActiveSearchMatch}
 	{readOnly}
 	data-slot="data-grid-date-cell"
-	onkeydown={handleWrapperKeydown}
 >
 	<span data-slot="data-grid-cell-content">{formatDateForDisplay(rawValue)}</span>
 	{#if isEditing}
-		<div
-			data-grid-cell-editor=""
-			data-slot="data-grid-cell-editor"
-			class="absolute inset-x-0 top-0 z-50 w-auto rounded-md border bg-popover text-popover-foreground shadow-md"
+		<DataGridCellEditor
+			open={isEditing}
+			anchor={cellRef}
+			onDismiss={() => grid.stopEditing()}
+			class="w-auto"
 		>
 			<Calendar
 				type="single"
@@ -95,6 +92,6 @@
 				value={calendarValue}
 				onValueChange={handleSelect}
 			/>
-		</div>
+		</DataGridCellEditor>
 	{/if}
 </DataGridCellWrapper>

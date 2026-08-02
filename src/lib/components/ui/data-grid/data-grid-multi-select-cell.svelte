@@ -14,6 +14,7 @@
 	import * as Command from '$lib/components/ui/command/index.js';
 	import { cn } from '$lib/utils.js';
 
+	import DataGridCellEditor from './data-grid-cell-editor.svelte';
 	import DataGridCellWrapper from './data-grid-cell-wrapper.svelte';
 	import { getLineCount } from './data-grid-utils.js';
 	import { useDataGridContext } from './data-grid.svelte.js';
@@ -34,6 +35,8 @@
 
 	const contextGrid = useDataGridContext<TData>(() => gridProp, '<DataGrid.Cell>');
 	const grid = $derived(gridProp ?? contextGrid!);
+
+	let cellRef = $state<HTMLDivElement | null>(null);
 
 	const cellOpts = $derived(cell.column.columnDef.meta?.cell);
 	const options = $derived(cellOpts?.variant === 'multi-select' ? cellOpts.options : []);
@@ -56,20 +59,15 @@
 		);
 	}
 
-	function handleWrapperKeydown(event: KeyboardEvent): void {
-		if (isEditing && event.key === 'Escape') {
-			event.preventDefault();
-			event.stopPropagation();
-			grid.stopEditing();
-			return;
-		}
-
-		// Tab on a resting cell is plain navigation: the grid's own handler owns it, so it must be
-		// allowed to bubble.
-	}
+	// Escape and outside presses are the editor layer's job — its listeners are on the document, so
+	// they fire wherever focus sits. Every toggle is written the moment it is clicked, so like
+	// upstream neither dismissal path rolls anything back.
+	//
+	// Tab on a resting cell is plain navigation: the grid's own handler owns it, so it must bubble.
 </script>
 
 <DataGridCellWrapper
+	bind:ref={cellRef}
 	{grid}
 	{cell}
 	{rowIndex}
@@ -82,7 +80,6 @@
 	{isActiveSearchMatch}
 	{readOnly}
 	data-slot="data-grid-multi-select-cell"
-	onkeydown={handleWrapperKeydown}
 >
 	{#if labels.length > 0}
 		<BadgeOverflow
@@ -96,10 +93,11 @@
 		</BadgeOverflow>
 	{/if}
 	{#if isEditing}
-		<div
-			data-grid-cell-editor=""
-			data-slot="data-grid-cell-editor"
-			class="absolute inset-x-0 top-0 z-50 w-[260px] rounded-md border bg-popover text-popover-foreground shadow-md"
+		<DataGridCellEditor
+			open={isEditing}
+			anchor={cellRef}
+			onDismiss={() => grid.stopEditing()}
+			class="w-[260px]"
 		>
 			<Command.Root>
 				<Command.Input placeholder="Search..." aria-label="Search options" />
@@ -132,6 +130,6 @@
 					{/if}
 				</Command.List>
 			</Command.Root>
-		</div>
+		</DataGridCellEditor>
 	{/if}
 </DataGridCellWrapper>

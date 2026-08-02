@@ -99,9 +99,10 @@
 	});
 
 	/**
-	 * Whether an event came from the inline editor this cell renders over itself. The editor is a
-	 * descendant of the wrapper, so without this every click inside it would also read as a click
-	 * on the cell — and re-open the editor the moment a choice closed it.
+	 * Whether an event came from an editor the cell renders over itself. The built-in overlay
+	 * editors portal out of the grid (`<DataGridCellEditor>`), so their events never reach here —
+	 * but a custom variant may render one inline, and then every click inside it would also read as
+	 * a click on the cell, re-opening the editor the moment a choice closed it.
 	 */
 	function isFromEditor(event: Event): boolean {
 		return (

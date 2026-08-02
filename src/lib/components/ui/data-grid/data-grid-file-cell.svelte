@@ -15,6 +15,7 @@
 	import { BadgeOverflow } from '$lib/components/ui/badge-overflow/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 
+	import DataGridCellEditor from './data-grid-cell-editor.svelte';
 	import DataGridCellWrapper from './data-grid-cell-wrapper.svelte';
 	import { formatFileSize, getFileIcon, getLineCount } from './data-grid-utils.js';
 	import { useDataGridContext } from './data-grid.svelte.js';
@@ -50,6 +51,7 @@
 
 	const files = $derived((cell.getValue() as FileCellData[] | null | undefined) ?? []);
 
+	let cellRef = $state<HTMLDivElement | null>(null);
 	let inputRef = $state<HTMLInputElement | null>(null);
 	let isPending = $state(false);
 	let error = $state<string | null>(null);
@@ -142,18 +144,24 @@
 		}
 	}
 
+	/**
+	 * Dismissal — `Escape` and outside presses — belongs to the editor layer, whose listeners are on
+	 * the document and so fire wherever focus sits. Space and Tab stay here: they only ever arrive
+	 * while focus is still on the cell wrapper, before the user has reached into the panel.
+	 *
+	 * Files are written the moment they are added or removed, so like upstream neither dismissal
+	 * path rolls anything back; only the transient `error` is cleared.
+	 */
 	function handleWrapperKeydown(event: KeyboardEvent): void {
 		if (isEditing) {
-			event.stopPropagation();
-			if (event.key === 'Escape') {
+			if (event.key === ' ') {
 				event.preventDefault();
-				error = null;
-				grid.stopEditing();
-			} else if (event.key === ' ') {
-				event.preventDefault();
+				event.stopPropagation();
 				inputRef?.click();
 			} else if (event.key === 'Tab') {
 				event.preventDefault();
+				event.stopPropagation();
+				error = null;
 				grid.stopEditing({ direction: grid.getTabDirection(event.shiftKey) });
 			}
 			return;
@@ -165,6 +173,7 @@
 </script>
 
 <DataGridCellWrapper
+	bind:ref={cellRef}
 	{grid}
 	{cell}
 	{rowIndex}
@@ -196,11 +205,15 @@
 		</BadgeOverflow>
 	{/if}
 	{#if isEditing}
-		<div
-			data-grid-cell-editor=""
-			data-slot="data-grid-cell-editor"
+		<DataGridCellEditor
+			open={isEditing}
+			anchor={cellRef}
+			onDismiss={() => {
+				error = null;
+				grid.stopEditing();
+			}}
 			data-invalid={error ? '' : undefined}
-			class="absolute inset-x-0 top-0 z-50 flex w-[400px] flex-col gap-2 rounded-md border bg-popover p-3 shadow-md"
+			class="flex w-[400px] flex-col gap-2 p-3"
 		>
 			<button
 				type="button"
@@ -271,6 +284,6 @@
 					{/each}
 				</ul>
 			{/if}
-		</div>
+		</DataGridCellEditor>
 	{/if}
 </DataGridCellWrapper>

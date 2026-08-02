@@ -11,6 +11,7 @@
 
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 
+	import DataGridCellEditor from './data-grid-cell-editor.svelte';
 	import DataGridCellWrapper from './data-grid-cell-wrapper.svelte';
 	import { useDataGridContext } from './data-grid.svelte.js';
 
@@ -34,6 +35,7 @@
 	const initialValue = $derived(String(cell.getValue() ?? ''));
 
 	let draft = $state('');
+	let cellRef = $state<HTMLDivElement | null>(null);
 	let textareaRef = $state<HTMLTextAreaElement | null>(null);
 	/** A printable character typed on the focused cell, seeded once the editor opens. */
 	let pendingChar: string | null = null;
@@ -100,6 +102,7 @@
 </script>
 
 <DataGridCellWrapper
+	bind:ref={cellRef}
 	{grid}
 	{cell}
 	{rowIndex}
@@ -116,10 +119,16 @@
 >
 	<span data-slot="data-grid-cell-content">{initialValue}</span>
 	{#if isEditing}
-		<div
-			data-grid-cell-editor=""
-			data-slot="data-grid-cell-editor"
-			class="absolute inset-x-0 top-0 z-50 w-[400px] rounded-md border bg-popover shadow-md"
+		<DataGridCellEditor
+			open={isEditing}
+			anchor={cellRef}
+			onDismiss={() => {
+				// Upstream flushes the pending draft when the layer closes and only reverts on Escape —
+				// which `handleEditorKeydown` owns, having already reset `draft` before this runs.
+				commit();
+				grid.stopEditing();
+			}}
+			class="w-[400px]"
 		>
 			<Textarea
 				bind:ref={textareaRef}
@@ -133,6 +142,6 @@
 				}}
 				onkeydown={handleEditorKeydown}
 			/>
-		</div>
+		</DataGridCellEditor>
 	{/if}
 </DataGridCellWrapper>

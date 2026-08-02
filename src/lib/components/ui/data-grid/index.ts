@@ -1,4 +1,5 @@
 import Cell from './data-grid-cell.svelte';
+import CellEditor from './data-grid-cell-editor.svelte';
 import CellWrapper from './data-grid-cell-wrapper.svelte';
 import CheckboxCell from './data-grid-checkbox-cell.svelte';
 import ColumnHeader from './data-grid-column-header.svelte';
@@ -26,6 +27,7 @@ export type {
 	DataGridCellVariantProps,
 	DataGridCellWrapperProps
 } from './data-grid-cell-wrapper.svelte';
+export type { DataGridCellEditorProps } from './data-grid-cell-editor.svelte';
 export type { DataGridShortTextCellProps } from './data-grid-short-text-cell.svelte';
 export type { DataGridLongTextCellProps } from './data-grid-long-text-cell.svelte';
 export type { DataGridNumberCellProps } from './data-grid-number-cell.svelte';
@@ -140,6 +142,7 @@ export {
 	Row,
 	Cell,
 	CellWrapper,
+	CellEditor,
 	ShortTextCell,
 	LongTextCell,
 	NumberCell,
@@ -161,6 +164,7 @@ export {
 	Row as DataGridRow,
 	Cell as DataGridCell,
 	CellWrapper as DataGridCellWrapper,
+	CellEditor as DataGridCellEditor,
 	ShortTextCell as DataGridShortTextCell,
 	LongTextCell as DataGridLongTextCell,
 	NumberCell as DataGridNumberCell,

@@ -158,6 +158,16 @@ function queryCellWrapper(rowIndex: number, columnId: string): HTMLElement | nul
 	return document.querySelector<HTMLElement>(`[data-cell-key="${rowIndex}:${columnId}"]`);
 }
 
+/**
+ * The open overlay editor. It is portalled to the body — the grid scrolls with `overflow: auto`,
+ * so an editor rendered inside the cell would be clipped by it — and only one is ever open.
+ */
+function cellEditor(): HTMLElement {
+	const element = document.querySelector<HTMLElement>('[data-grid-cell-editor]');
+	if (!element) throw new Error('No cell editor is open.');
+	return element;
+}
+
 /** Click a cell and wait for the focus/selection state it produces to settle. */
 async function focusCell(
 	user: ReturnType<typeof setupUser>,
@@ -1817,12 +1827,87 @@ describe('DataGrid — cell variants', () => {
 		await user.keyboard('{Enter}');
 		await tick();
 
-		const editor = within(cellWrapper(0, 'status')).getByRole('listbox');
+		const editor = within(cellEditor()).getByRole('listbox', inLayer);
 		await user.click(within(editor).getByText('Done'));
 		await tick();
 
 		expect(grid.rows[0]?.original.status).toBe('done');
 		expect(grid.editingCell).toBeNull();
+	});
+
+	it('portals the overlay editor out of the scrolling grid', async () => {
+		const user = setupUser();
+		renderHarness();
+
+		await focusCell(user, 0, 'status');
+		await user.keyboard('{Enter}');
+		await tick();
+
+		// The grid is an `overflow: auto` viewport, so an editor left inside it is clipped instead of
+		// floating over the table. `inLayer` because an open layer marks the grid behind it hidden.
+		const editor = cellEditor();
+		expect(screen.getByRole('grid', inLayer).contains(editor)).toBe(false);
+		expect(document.body.contains(editor)).toBe(true);
+	});
+
+	it.each([
+		['status', 'select'],
+		['tags', 'multi-select'],
+		['dueDate', 'date'],
+		['files', 'file']
+	])('closes the %s editor on an outside press, leaving the value alone', async (columnId) => {
+		const user = setupUser();
+		const { grid } = renderHarness();
+		const before = grid.rows[0]?.original[columnId as keyof DataGridHarnessRow];
+
+		await focusCell(user, 0, columnId);
+		await user.keyboard('{Enter}');
+		await tick();
+		expect(cellEditor()).toBeInTheDocument();
+
+		await user.click(document.body);
+
+		// The dismissable layer debounces its outside callback, so this cannot be a bare `tick()`.
+		await waitFor(() => expect(grid.editingCell).toBeNull());
+		expect(document.querySelector('[data-grid-cell-editor]')).toBeNull();
+		expect(grid.rows[0]?.original[columnId as keyof DataGridHarnessRow]).toEqual(before);
+	});
+
+	it('closes the editor on Escape pressed from inside the portalled content', async () => {
+		const user = setupUser();
+		const { grid } = renderHarness();
+
+		await focusCell(user, 0, 'status');
+		await user.keyboard('{Enter}');
+		await tick();
+
+		// Focus moves off the cell wrapper the moment the user reaches into the editor. The wrapper's
+		// keydown handler is unreachable from there — only a document-level layer still hears Escape.
+		const search = within(cellEditor()).getByLabelText('Search options');
+		search.focus();
+		expect(cellEditor().contains(document.activeElement)).toBe(true);
+
+		await user.keyboard('{Escape}');
+
+		await waitFor(() => expect(grid.editingCell).toBeNull());
+		expect(grid.rows[0]?.original.status).toBe('todo');
+	});
+
+	it('closes an open editor and focuses the clicked cell in a single press', async () => {
+		const user = setupUser();
+		const { grid } = renderHarness();
+
+		await focusCell(user, 0, 'status');
+		await user.keyboard('{Enter}');
+		await tick();
+		expect(cellEditor()).toBeInTheDocument();
+
+		// Upstream's popovers are non-modal and never `preventDefault()` the outside interaction, so
+		// the dismissing press is not swallowed — one click both closes and moves the focus.
+		await user.click(cellWrapper(1, 'name'));
+
+		await waitFor(() => expect(grid.editingCell).toBeNull());
+		expect(grid.focusedCell).toEqual({ rowIndex: 1, columnId: 'name' });
 	});
 
 	it('toggles multi-select values and clears them all', async () => {
@@ -1833,12 +1918,12 @@ describe('DataGrid — cell variants', () => {
 		await user.keyboard('{Enter}');
 		await tick();
 
-		const editor = within(cellWrapper(0, 'tags')).getByRole('listbox');
+		const editor = within(cellEditor()).getByRole('listbox', inLayer);
 		await user.click(within(editor).getByText('Beta'));
 		await tick();
 		expect(grid.rows[0]?.original.tags).toEqual(['alpha', 'beta']);
 
-		await user.click(within(cellWrapper(0, 'tags')).getByText('Clear all'));
+		await user.click(within(cellEditor()).getByText('Clear all'));
 		await tick();
 		expect(grid.rows[0]?.original.tags).toEqual([]);
 	});
@@ -1851,7 +1936,7 @@ describe('DataGrid — cell variants', () => {
 		await user.keyboard('{Enter}');
 		await tick();
 
-		const editor = within(cellWrapper(0, 'dueDate')).getByRole('application');
+		const editor = within(cellEditor()).getByRole('application', inLayer);
 		await user.click(within(editor).getByText('15'));
 		await tick();
 
@@ -1867,7 +1952,7 @@ describe('DataGrid — cell variants', () => {
 		await user.keyboard('{Enter}');
 		await tick();
 
-		const textarea = within(cellWrapper(0, 'description')).getByRole('textbox');
+		const textarea = within(cellEditor()).getByRole('textbox', inLayer);
 		await user.type(textarea, '!');
 		await user.keyboard('{Control>}{Enter}{/Control}');
 		await tick();
@@ -1884,7 +1969,7 @@ describe('DataGrid — cell variants', () => {
 		await user.keyboard('{Enter}');
 		await tick();
 
-		const textarea = within(cellWrapper(0, 'description')).getByRole('textbox');
+		const textarea = within(cellEditor()).getByRole('textbox', inLayer);
 		await user.type(textarea, 'nope');
 		await user.keyboard('{Escape}');
 		await tick();
@@ -1901,9 +1986,8 @@ describe('DataGrid — cell variants', () => {
 		await user.keyboard('{Enter}');
 		await tick();
 
-		await user.click(
-			within(cellWrapper(1, 'files')).getByRole('button', { name: 'Remove report.pdf' })
-		);
+		// By label, not by accessible name: a name computes to empty inside a layer under jsdom.
+		await user.click(within(cellEditor()).getByLabelText('Remove report.pdf'));
 		await tick();
 
 		expect(onFilesDelete).toHaveBeenCalledWith({

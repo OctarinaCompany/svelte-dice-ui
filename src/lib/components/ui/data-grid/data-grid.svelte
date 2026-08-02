@@ -45,7 +45,11 @@
 	import DataGridPasteDialog from './data-grid-paste-dialog.svelte';
 	import DataGridRow from './data-grid-row.svelte';
 	import DataGridSearch from './data-grid-search.svelte';
-	import { getColumnBorderVisibility, getColumnPinningStyle } from './data-grid-utils.js';
+	import {
+		getColumnBorderVisibility,
+		getColumnPinningStyle,
+		getIsInPopover
+	} from './data-grid-utils.js';
 	import { setDataGridContext } from './data-grid.svelte.js';
 
 	let {
@@ -104,6 +108,38 @@
 		const onPointerUp = () => grid.handleCellPointerUp();
 		document.addEventListener('pointerup', onPointerUp);
 		return () => document.removeEventListener('pointerup', onPointerUp);
+	});
+
+	/**
+	 * Pressing outside the grid drops focus and the selection, the way clicking off a spreadsheet
+	 * does. An open editor closes itself through its own dismissable layer; this is the outer layer,
+	 * and it must not fire for presses that land in one of those floating layers — they are
+	 * portalled out of the grid, so `contains()` alone would read them as outside.
+	 */
+	$effect(() => {
+		const onPointerDown = (event: PointerEvent) => {
+			// Right-clicks open the context menu, which must not clear what it is acting on.
+			if (event.button === 2) return;
+
+			const container = gridRef;
+			if (!container || container.contains(event.target as Node)) return;
+
+			if (getIsInPopover(event.target)) return;
+
+			// A layer can render a wrapper the press actually lands on, so the target alone is not
+			// conclusive: test the whole stack under the pointer too. jsdom has no `elementsFromPoint`,
+			// and there the target is always the real element anyway.
+			if (typeof document.elementsFromPoint === 'function') {
+				const stack = document.elementsFromPoint(event.clientX, event.clientY);
+				if (stack.some((element) => getIsInPopover(element))) return;
+			}
+
+			grid.blurCell();
+			if (grid.selection.size > 0) grid.clearSelection();
+		};
+
+		document.addEventListener('pointerdown', onPointerDown);
+		return () => document.removeEventListener('pointerdown', onPointerDown);
 	});
 </script>
 

@@ -2131,6 +2131,10 @@
 					"type": "registry:ui"
 				},
 				{
+					"path": "src/lib/components/ui/data-grid/data-grid-cell-editor.svelte",
+					"type": "registry:ui"
+				},
+				{
 					"path": "src/lib/components/ui/data-grid/data-grid-cell-wrapper.svelte",
 					"type": "registry:ui"
 				},
