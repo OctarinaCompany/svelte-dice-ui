@@ -12,15 +12,158 @@
 		trickName: string;
 		skaterName: string;
 		difficulty: string;
-		variants: string[];
+		variant: string;
 		landed: boolean;
 		attempts: number | null;
 		bestScore: number | null;
-		notes: string;
-		clip: string;
+		location: string;
 		dateAttempted: string | null;
-		footage: FileCellData[];
 	};
+
+	const SKATE_SPOTS = [
+		'Venice Beach Skate Park',
+		'Burnside Skate Park',
+		'Love Park (Philadelphia)',
+		'MACBA (Barcelona)',
+		'Southbank (London)',
+		'FDR Skate Park',
+		'Brooklyn Banks',
+		'El Toro High School',
+		'Hubba Hideout',
+		'Wallenberg High School',
+		'EMB (Embarcadero)',
+		'Pier 7 (San Francisco)'
+	] as const;
+
+	const SKATE_TRICKS = {
+		flip: [
+			'Kickflip',
+			'Heelflip',
+			'Tre Flip',
+			'Hardflip',
+			'Inward Heelflip',
+			'Frontside Flip',
+			'Backside Flip',
+			'Varial Flip',
+			'Varial Heelflip',
+			'Double Flip',
+			'Laser Flip',
+			'Anti-Casper Flip',
+			'Casper Flip',
+			'Impossible',
+			'360 Flip',
+			'Big Spin',
+			'Bigspin Flip'
+		],
+		grind: [
+			'50-50 Grind',
+			'5-0 Grind',
+			'Nosegrind',
+			'Crooked Grind',
+			'Feeble Grind',
+			'Smith Grind',
+			'Lipslide',
+			'Boardslide',
+			'Tailslide',
+			'Noseslide',
+			'Bluntslide',
+			'Nollie Backside Lipslide',
+			'Switch Frontside Boardslide'
+		],
+		grab: [
+			'Indy Grab',
+			'Melon Grab',
+			'Stalefish',
+			'Tail Grab',
+			'Nose Grab',
+			'Method',
+			'Mute Grab',
+			'Crail Grab',
+			'Seatbelt Grab',
+			'Roast Beef',
+			'Chicken Wing',
+			'Tweaked Indy',
+			'Japan Air'
+		],
+		transition: [
+			'Frontside Air',
+			'Backside Air',
+			'McTwist',
+			'540',
+			'720',
+			'900',
+			'Frontside 180',
+			'Backside 180',
+			'Frontside 360',
+			'Backside 360',
+			'Alley-Oop',
+			'Fakie',
+			'Revert',
+			'Carve',
+			'Pump',
+			'Drop In'
+		],
+		manual: [
+			'Manual',
+			'Nose Manual',
+			'Casper',
+			'Rail Stand',
+			'Pogo',
+			'Handstand',
+			'One Foot Manual',
+			'Spacewalk',
+			'Truckstand',
+			'Primo'
+		],
+		slide: [
+			'Powerslide',
+			'Bert Slide',
+			'Coleman Slide',
+			'Pendulum Slide',
+			'Stand-up Slide',
+			'Toeside Slide',
+			'Heelside Slide'
+		]
+	} as const;
+
+	const SKATER_NAMES = [
+		'Rodney Mullen',
+		'Elissa Steamer',
+		'Nyjah Huston',
+		'Daewon Song',
+		'Leticia Bufoni',
+		'Eric Koston',
+		'Lizzie Armanto',
+		'Mark Gonzales',
+		'Alexis Sablone',
+		'Chris Joslin',
+		'Sky Brown',
+		'Andrew Reynolds',
+		'Rayssa Leal',
+		'Guy Mariano',
+		'Aori Nishimura',
+		'Tony Hawk',
+		'Samarria Brevard',
+		'Paul Rodriguez',
+		'Nora Vasconcellos',
+		'Ishod Wair'
+	] as const;
+
+	const EXPERT_TRICKS = ['Tre Flip', '900', 'McTwist', 'Laser Flip', 'Impossible'];
+	const ADVANCED_TRICKS = [
+		'Hardflip',
+		'720',
+		'540',
+		'Crooked Grind',
+		'Switch Frontside Boardslide'
+	];
+	const INTERMEDIATE_TRICKS = [
+		'Kickflip',
+		'Heelflip',
+		'Frontside 180',
+		'50-50 Grind',
+		'Boardslide'
+	];
 
 	const DIFFICULTY_OPTIONS = [
 		{ label: 'Beginner', value: 'beginner' },
@@ -38,74 +181,84 @@
 		{ label: 'Slide', value: 'slide' }
 	];
 
-	let nextId = $state(5);
-	let nextFileId = $state(2);
-	let deletedFileCount = $state(0);
+	const LOCATION_OPTIONS = SKATE_SPOTS.map((spot) => ({ label: spot, value: spot }));
 
-	let tricks = $state.raw<SkateTrick[]>([
-		{
-			id: 'trick-1',
-			trickName: 'Kickflip',
-			skaterName: 'Rodney Mullen',
-			difficulty: 'intermediate',
-			variants: ['flip'],
-			landed: true,
-			attempts: 12,
-			bestScore: 92,
-			notes: 'Pop straight up, flick off the corner of the nose, catch with the back foot first.',
-			clip: 'https://svelte.dev',
-			dateAttempted: '2024-05-14',
-			footage: [{ id: 'file-1', name: 'kickflip-line.mp4', size: 4_718_592, type: 'video/mp4' }]
-		},
-		{
-			id: 'trick-2',
-			trickName: 'Smith Grind',
-			skaterName: 'Elissa Steamer',
-			difficulty: 'advanced',
-			variants: ['grind'],
+	/**
+	 * Upstream generates its thirty rows with faker, in the browser. This page is prerendered, so
+	 * the same rows have to come out on the server and on the client — hence a seeded generator
+	 * rather than `Math.random()`, which would hydrate into a mismatch.
+	 */
+	function createRandom(seed: number): () => number {
+		let current = seed;
+		return () => {
+			current = (current + 0x6d2b79f5) | 0;
+			let t = Math.imul(current ^ (current >>> 15), 1 | current);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+
+	function generateTrickData(): SkateTrick[] {
+		const random = createRandom(20240514);
+		const pick = <T,>(items: readonly T[]): T => items[Math.floor(random() * items.length)]!;
+		const intBetween = (min: number, max: number) => min + Math.floor(random() * (max - min + 1));
+
+		const getDifficulty = (trick: string): string => {
+			if (EXPERT_TRICKS.some((name) => trick.includes(name))) return 'expert';
+			if (ADVANCED_TRICKS.some((name) => trick.includes(name))) return 'advanced';
+			if (INTERMEDIATE_TRICKS.some((name) => trick.includes(name))) return 'intermediate';
+			return 'beginner';
+		};
+
+		// A fixed window rather than "up to today", for the same prerendering reason.
+		const firstDay = Date.UTC(2023, 0, 1);
+		const dayCount = 1000;
+		const dayMs = 86_400_000;
+
+		return Array.from({ length: 30 }, (_, index) => {
+			const variant = pick(Object.keys(SKATE_TRICKS) as (keyof typeof SKATE_TRICKS)[]);
+			const trickName = pick(SKATE_TRICKS[variant]);
+			const landed = random() < 0.6;
+
+			return {
+				id: `trick-${index + 1}`,
+				trickName,
+				skaterName: pick(SKATER_NAMES),
+				difficulty: getDifficulty(trickName),
+				variant,
+				landed,
+				attempts: intBetween(1, 50),
+				bestScore: landed ? intBetween(6, 10) : intBetween(1, 5),
+				location: pick(SKATE_SPOTS),
+				dateAttempted:
+					new Date(firstDay + intBetween(0, dayCount) * dayMs).toISOString().split('T')[0] ?? null
+			};
+		});
+	}
+
+	function createEmptyTrick(id: string): SkateTrick {
+		return {
+			id,
+			trickName: '',
+			skaterName: '',
+			difficulty: '',
+			variant: '',
 			landed: false,
-			attempts: 27,
-			bestScore: 71,
-			notes: 'Back truck locks, front truck hangs below the coping.',
-			clip: 'diceui.com',
-			dateAttempted: '2024-06-02',
-			footage: []
-		},
-		{
-			id: 'trick-3',
-			trickName: 'Tre Flip',
-			skaterName: 'Nyjah Huston',
-			difficulty: 'expert',
-			variants: ['flip', 'slide'],
-			landed: true,
-			attempts: 40,
-			bestScore: 98,
-			notes: 'A 360 shuvit and a kickflip at once — the scoop and the flick have to be equal.',
-			clip: '',
-			dateAttempted: '2024-06-21',
-			footage: []
-		},
-		{
-			id: 'trick-4',
-			trickName: 'Manual',
-			skaterName: 'Daewon Song',
-			difficulty: 'beginner',
-			variants: ['manual'],
-			landed: true,
-			attempts: 5,
-			bestScore: 60,
-			notes: 'Balance over the back truck without letting the tail scrape.',
-			clip: '',
-			dateAttempted: null,
-			footage: []
-		}
-	]);
+			attempts: null,
+			bestScore: null,
+			location: '',
+			dateAttempted: null
+		};
+	}
+
+	let nextTrickId = $state(31);
+	let tricks = $state.raw<SkateTrick[]>(generateTrickData());
 
 	const columns: DataGridColumnDef<SkateTrick>[] = [
 		{
 			id: 'trickName',
 			accessorKey: 'trickName',
-			meta: { label: 'Trick', cell: { variant: 'short-text' } },
+			meta: { label: 'Trick name', cell: { variant: 'short-text' } },
 			size: 180
 		},
 		{
@@ -121,46 +274,134 @@
 			size: 150
 		},
 		{
-			id: 'variants',
-			accessorKey: 'variants',
-			meta: { label: 'Variants', cell: { variant: 'multi-select', options: VARIANT_OPTIONS } },
-			size: 180
+			id: 'variant',
+			accessorKey: 'variant',
+			meta: { label: 'Category', cell: { variant: 'select', options: VARIANT_OPTIONS } },
+			size: 140
 		},
 		{
 			id: 'landed',
 			accessorKey: 'landed',
 			meta: { label: 'Landed', cell: { variant: 'checkbox' } },
-			size: 90
+			size: 110
 		},
 		{
 			id: 'attempts',
 			accessorKey: 'attempts',
-			meta: { label: 'Attempts', cell: { variant: 'number', min: 0, step: 1 } },
+			meta: { label: 'Attempts', cell: { variant: 'number', min: 1, max: 100 } },
 			size: 110
 		},
 		{
 			id: 'bestScore',
 			accessorKey: 'bestScore',
-			meta: { label: 'Best score', cell: { variant: 'number', min: 0, max: 100 } },
-			size: 120
+			meta: { label: 'Score', cell: { variant: 'number', min: 1, max: 10 } },
+			size: 110
+		},
+		{
+			id: 'location',
+			accessorKey: 'location',
+			meta: { label: 'Location', cell: { variant: 'select', options: LOCATION_OPTIONS } },
+			size: 220
+		},
+		{
+			id: 'dateAttempted',
+			accessorKey: 'dateAttempted',
+			meta: { label: 'Attempted at', cell: { variant: 'date' } },
+			size: 150
+		}
+	];
+
+	const grid = createDataGrid<SkateTrick>({
+		data: () => tricks,
+		columns: () => columns,
+		getRowId: (row) => row.id,
+		initialState: { columnPinning: { left: ['trickName'], right: [] } },
+		enableSearch: true,
+		enablePaste: true,
+		onDataChange: (next) => {
+			tricks = next;
+		},
+		onRowAdd: () => {
+			tricks = [...tricks, createEmptyTrick(`trick-${nextTrickId++}`)];
+			return { rowIndex: tricks.length - 1, columnId: 'trickName' };
+		},
+		onRowsAdd: (count) => {
+			tricks = [
+				...tricks,
+				...Array.from({ length: count }, () => createEmptyTrick(`trick-${nextTrickId++}`))
+			];
+		},
+		onRowsDelete: (rows) => {
+			const removed = new Set(rows.map((row) => row.id));
+			tricks = tricks.filter((row) => !removed.has(row.id));
+		}
+	});
+
+	// --- The cell variants upstream's own demo does not exercise -------------------------------
+
+	type TrickNote = {
+		id: string;
+		trickName: string;
+		variants: string[];
+		notes: string;
+		clip: string;
+		footage: FileCellData[];
+	};
+
+	let nextFileId = $state(2);
+	let deletedFileCount = $state(0);
+
+	let notes = $state.raw<TrickNote[]>([
+		{
+			id: 'note-1',
+			trickName: 'Kickflip',
+			variants: ['flip'],
+			notes: 'Pop straight up, flick off the corner of the nose, catch with the back foot first.',
+			clip: 'https://svelte.dev',
+			footage: [{ id: 'file-1', name: 'kickflip-line.mp4', size: 4_718_592, type: 'video/mp4' }]
+		},
+		{
+			id: 'note-2',
+			trickName: 'Smith Grind',
+			variants: ['grind'],
+			notes: 'Back truck locks, front truck hangs below the coping.',
+			clip: 'diceui.com',
+			footage: []
+		},
+		{
+			id: 'note-3',
+			trickName: 'Tre Flip',
+			variants: ['flip', 'slide'],
+			notes: 'A 360 shuvit and a kickflip at once — the scoop and the flick have to be equal.',
+			clip: '',
+			footage: []
+		}
+	]);
+
+	const noteColumns: DataGridColumnDef<TrickNote>[] = [
+		{
+			id: 'trickName',
+			accessorKey: 'trickName',
+			meta: { label: 'Trick name', cell: { variant: 'short-text' } },
+			size: 170
+		},
+		{
+			id: 'variants',
+			accessorKey: 'variants',
+			meta: { label: 'Variants', cell: { variant: 'multi-select', options: VARIANT_OPTIONS } },
+			size: 190
 		},
 		{
 			id: 'notes',
 			accessorKey: 'notes',
 			meta: { label: 'Notes', cell: { variant: 'long-text' } },
-			size: 240
+			size: 260
 		},
 		{
 			id: 'clip',
 			accessorKey: 'clip',
 			meta: { label: 'Clip', cell: { variant: 'url' } },
 			size: 180
-		},
-		{
-			id: 'dateAttempted',
-			accessorKey: 'dateAttempted',
-			meta: { label: 'Attempted', cell: { variant: 'date' } },
-			size: 150
 		},
 		{
 			id: 'footage',
@@ -179,57 +420,12 @@
 		}
 	];
 
-	const grid = createDataGrid<SkateTrick>({
-		data: () => tricks,
-		columns: () => columns,
+	const noteGrid = createDataGrid<TrickNote>({
+		data: () => notes,
+		columns: () => noteColumns,
 		getRowId: (row) => row.id,
-		initialState: { columnPinning: { left: ['trickName'], right: [] } },
-		enableSearch: true,
-		enablePaste: true,
 		onDataChange: (next) => {
-			tricks = next;
-		},
-		onRowAdd: () => {
-			const id = `trick-${nextId++}`;
-			tricks = [
-				...tricks,
-				{
-					id,
-					trickName: '',
-					skaterName: '',
-					difficulty: 'beginner',
-					variants: [],
-					landed: false,
-					attempts: null,
-					bestScore: null,
-					notes: '',
-					clip: '',
-					dateAttempted: null,
-					footage: []
-				}
-			];
-			return { rowIndex: tricks.length - 1, columnId: 'trickName' };
-		},
-		onRowsAdd: (count) => {
-			const added: SkateTrick[] = Array.from({ length: count }, () => ({
-				id: `trick-${nextId++}`,
-				trickName: '',
-				skaterName: '',
-				difficulty: 'beginner',
-				variants: [],
-				landed: false,
-				attempts: null,
-				bestScore: null,
-				notes: '',
-				clip: '',
-				dateAttempted: null,
-				footage: []
-			}));
-			tricks = [...tricks, ...added];
-		},
-		onRowsDelete: (rows) => {
-			const removed = new Set(rows.map((row) => row.id));
-			tricks = tricks.filter((row) => !removed.has(row.id));
+			notes = next;
 		},
 		// A demo upload: the files never leave the page, they are just described back to the grid,
 		// which writes the returned metadata into the row. A real handler would POST them first.
@@ -265,11 +461,20 @@
 
 	<ComponentPreview
 		title="Default"
-		description="Mirrors data-grid-demo.tsx — click a cell to focus it, click again or press Enter to edit, Ctrl/Cmd+F to search, Ctrl/Cmd+/ for the shortcut list."
+		description="Mirrors data-grid-demo.tsx — thirty skate tricks. Click a cell to focus it, click again or press Enter to edit, Ctrl/Cmd+F to search, Ctrl/Cmd+/ for the shortcut list."
 		class="items-stretch justify-stretch p-0"
 	>
-		<DataGrid.Root {grid} height={420}>
+		<DataGrid.Root {grid} height={340}>
 			<DataGrid.KeyboardShortcuts enableSearch enablePaste enableRowAdd enableRowsDelete />
+		</DataGrid.Root>
+	</ComponentPreview>
+
+	<ComponentPreview
+		title="Cell variants"
+		description="The four variants upstream's demo does not show: multi-select, long text, URL and file."
+		class="items-stretch justify-stretch p-0"
+	>
+		<DataGrid.Root grid={noteGrid} height={260}>
 			<p class="px-1 pt-2 text-xs text-muted-foreground">
 				The Footage column accepts up to 3 videos or images of 8 MB each, uploaded through
 				<code>onFilesUpload</code>. {deletedFileCount}
