@@ -962,6 +962,11 @@ describe('Tour dismissal paths', () => {
 		setup({ defaultOpen: true, onSkip, onPointerDownOutside, onInteractOutside });
 		await settle();
 
+		// The dismissible layer only arms once the card is mounted and open. `settle()`'s fixed delay
+		// is not a guarantee of that on a loaded runner, and a press that lands first is simply never
+		// reported as an outside interaction.
+		await waitFor(() => expect(queryCard()).toHaveAttribute('data-state', 'open'));
+
 		await user.click(screen.getByTestId('outside-button'));
 
 		// `bits-ui`'s dismissible layer debounces its outside handler by 10ms.

@@ -357,8 +357,10 @@ describe('DataTable — keyboard', () => {
 		const user = setupUser();
 		const { state } = renderHarness();
 
-		await user.click(filterTrigger('Status'));
-		await settleLayer();
+		// `openFilterPopover`, not `settleLayer`: a fixed delay races bits-ui's open-auto-focus, which
+		// takes back any focus this spec sets before it has landed — and then the keys below go to the
+		// wrong element. Slow CI loses that race far more often than a dev machine does.
+		await openFilterPopover(user, 'Status');
 		expect(layerItems('option')).toHaveLength(3);
 
 		within(popoverContent()).getByPlaceholderText('Status').focus();
