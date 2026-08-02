@@ -6,6 +6,8 @@
 	import SkipForwardIcon from '@lucide/svelte/icons/skip-forward';
 	import { toast } from 'svelte-sonner';
 
+	import { asset } from '$app/paths';
+
 	import { ComponentPreview } from '$lib/components/docs/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as MediaPlayer from '$lib/components/ui/media-player/index.js';
@@ -20,8 +22,10 @@
 	// Upstream self-hosts its two primary samples under `docs/public/assets`, and so do we: a demo
 	// whose media 404s teaches nothing, and third-party sample URLs rot. Upstream's own Mux and
 	// media-chrome URLs are kept for the chaptered/HLS demos because the credits section names them.
-	const VIDEO_SRC = '/assets/cloud.mp4';
-	const AUDIO_SRC = '/assets/lofi.mp3';
+	// Through `asset()` so they survive a base path — GitHub Pages serves this site from a
+	// subdirectory, where a root-relative `/assets/...` would 404.
+	const VIDEO_SRC = asset('/assets/cloud.mp4');
+	const AUDIO_SRC = asset('/assets/lofi.mp3');
 	const CHAPTERED_SRC =
 		'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008/low.mp4';
 	const VTT_BASE = 'https://media-chrome.mux.dev/examples/vanilla/vtt/elephantsdream';
