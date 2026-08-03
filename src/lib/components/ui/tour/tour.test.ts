@@ -957,10 +957,12 @@ describe('Tour dismissal paths', () => {
 	 * Retried because of an upstream race, not a flaky assertion: `bits-ui` re-registers a layer
 	 * after its component is destroyed and never removes it (huntabyte/bits-ui#2080), and
 	 * `isResponsibleLayer()` consults only the topmost entry. When a dead layer wins that race the
-	 * live one's outside handler returns silently, so nothing fires. `tests/setup.ts` drops the
-	 * entries a previous spec left behind, which is not enough on its own: the tour mounts a layer
-	 * per step, and which of those lands last is timing-dependent under load. Every assertion below
-	 * still has to pass — a genuine regression fails all three attempts.
+	 * live one's outside handler returns silently, so nothing fires, and which entry lands last is
+	 * timing-dependent under load.
+	 *
+	 * Emptying that global registry between specs is not an option: `isResponsibleLayer()` reads
+	 * `layersArr[0]` without a length check and throws on an empty stack. Every assertion below still
+	 * has to pass — a genuine regression fails all three attempts.
 	 */
 	it(
 		'closes on an outside pointer interaction, reporting both outside callbacks',
