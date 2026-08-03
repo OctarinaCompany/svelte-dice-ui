@@ -953,28 +953,41 @@ describe('Tour dismissal paths', () => {
 		expect(onComplete).not.toHaveBeenCalled();
 	});
 
-	it('closes on an outside pointer interaction, reporting both outside callbacks', async () => {
-		const user = userEvent.setup();
-		const onSkip = vi.fn();
-		const onPointerDownOutside = vi.fn();
-		const onInteractOutside = vi.fn();
-		stubRects(TARGET_RECTS);
-		setup({ defaultOpen: true, onSkip, onPointerDownOutside, onInteractOutside });
-		await settle();
+	/**
+	 * Retried because of an upstream race, not a flaky assertion: `bits-ui` re-registers a layer
+	 * after its component is destroyed and never removes it (huntabyte/bits-ui#2080), and
+	 * `isResponsibleLayer()` consults only the topmost entry. When a dead layer wins that race the
+	 * live one's outside handler returns silently, so nothing fires. `tests/setup.ts` drops the
+	 * entries a previous spec left behind, which is not enough on its own: the tour mounts a layer
+	 * per step, and which of those lands last is timing-dependent under load. Every assertion below
+	 * still has to pass — a genuine regression fails all three attempts.
+	 */
+	it(
+		'closes on an outside pointer interaction, reporting both outside callbacks',
+		{ retry: 2 },
+		async () => {
+			const user = userEvent.setup();
+			const onSkip = vi.fn();
+			const onPointerDownOutside = vi.fn();
+			const onInteractOutside = vi.fn();
+			stubRects(TARGET_RECTS);
+			setup({ defaultOpen: true, onSkip, onPointerDownOutside, onInteractOutside });
+			await settle();
 
-		// The dismissible layer only arms once the card is mounted and open. `settle()`'s fixed delay
-		// is not a guarantee of that on a loaded runner, and a press that lands first is simply never
-		// reported as an outside interaction.
-		await waitFor(() => expect(queryCard()).toHaveAttribute('data-state', 'open'));
+			// The dismissible layer only arms once the card is mounted and open. `settle()`'s fixed delay
+			// is not a guarantee of that on a loaded runner, and a press that lands first is simply never
+			// reported as an outside interaction.
+			await waitFor(() => expect(queryCard()).toHaveAttribute('data-state', 'open'));
 
-		await user.click(screen.getByTestId('outside-button'));
+			await user.click(screen.getByTestId('outside-button'));
 
-		// `bits-ui`'s dismissible layer debounces its outside handler by 10ms.
-		await waitFor(() => expect(onPointerDownOutside).toHaveBeenCalledTimes(1));
-		expect(onInteractOutside).toHaveBeenCalledTimes(1);
-		expect(onSkip).toHaveBeenCalledTimes(1);
-		await waitFor(() => expect(queryCard()).not.toBeInTheDocument());
-	});
+			// `bits-ui`'s dismissible layer debounces its outside handler by 10ms.
+			await waitFor(() => expect(onPointerDownOutside).toHaveBeenCalledTimes(1));
+			expect(onInteractOutside).toHaveBeenCalledTimes(1);
+			expect(onSkip).toHaveBeenCalledTimes(1);
+			await waitFor(() => expect(queryCard()).not.toBeInTheDocument());
+		}
+	);
 
 	it('stays open when `onInteractOutside` prevents the default', async () => {
 		const user = userEvent.setup();
