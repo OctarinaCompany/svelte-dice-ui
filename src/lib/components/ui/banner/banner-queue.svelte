@@ -67,7 +67,12 @@
 			data-side={side}
 			data-strategy={strategy}
 			class={cn(
-				'pointer-events-none right-0 left-0 isolate z-50',
+				'pointer-events-none isolate z-50',
+				// `left-0 right-0` stretch a box only while it is out of flow. The in-flow strategies
+				// need a real width instead: every banner inside is absolutely positioned, so none of
+				// them contributes intrinsic width, and the container would otherwise collapse to zero
+				// wherever its parent sizes children to their content — a flex or grid item, say.
+				strategy === 'fixed' || strategy === 'absolute' ? 'right-0 left-0' : 'w-full',
 				strategy === 'fixed' && 'fixed',
 				strategy === 'static' && 'relative',
 				strategy === 'sticky' && 'sticky',

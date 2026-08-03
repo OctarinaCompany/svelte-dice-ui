@@ -554,6 +554,35 @@ describe('Banner queue positioning and rendering (T007a/T008, US2/US3)', () => {
 		expect(container.contains(stack)).toBe(true);
 	});
 
+	it.each([
+		['static', 'relative'],
+		['sticky', 'sticky']
+	])('sizes the %s container with a width, not with insets', (strategy) => {
+		const { container } = render(Harness, {
+			props: { mode: 'queue', strategy: strategy as 'static' | 'sticky', specs: [{ key: 'a' }] }
+		});
+		settle();
+
+		// `left-0 right-0` stretch a box only while it is out of flow. An in-flow container holding
+		// nothing but absolutely positioned banners has no intrinsic width, so without `w-full` it
+		// collapses to zero inside any parent that sizes children to their content.
+		const stack = bySlot(container, 'banner-container');
+		expect(stack.className).toContain('w-full');
+		expect(stack.className).not.toContain('left-0');
+		expect(stack.className).not.toContain('right-0');
+	});
+
+	it('stretches the fixed container with insets instead of a width', () => {
+		render(Harness, {
+			props: { mode: 'queue', strategy: 'fixed', specs: [{ key: 'a' }] }
+		});
+		settle();
+
+		const stack = document.body.querySelector('[data-slot="banner-container"]');
+		expect(stack?.className).toContain('left-0');
+		expect(stack?.className).toContain('right-0');
+	});
+
 	it('portals the container to document.body for the fixed strategy', () => {
 		const { container } = render(Harness, {
 			props: { mode: 'queue', strategy: 'fixed', specs: [{ key: 'a' }] }

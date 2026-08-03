@@ -12,15 +12,13 @@
 	const queue = getBannersContext('<BannerControls>');
 </script>
 
-{#snippet infoContent({ onClose }: BannerRenderProps)}
+{#snippet infoContent()}
 	<Banner.Icon><InfoIcon /></Banner.Icon>
 	<Banner.Content>
 		<Banner.Title>Information</Banner.Title>
 		<Banner.Description>This is an informational message.</Banner.Description>
 	</Banner.Content>
-	<Banner.Actions>
-		<Button size="sm" variant="ghost" onclick={onClose}>Skip</Button>
-	</Banner.Actions>
+	<Banner.Close />
 {/snippet}
 
 {#snippet successContent()}

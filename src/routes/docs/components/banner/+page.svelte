@@ -163,11 +163,16 @@
 		</div>
 	</ComponentPreview>
 
+	<!--
+		The preview canvas is a centred flex row by default, which would sit the stack beside the
+		controls rather than above them.
+	-->
 	<ComponentPreview
 		title="Stacked Banners"
 		description="Mirrors banner-stacked-demo.tsx. Uses strategy=&quot;static&quot; and maxVisible={3} here so the
 			stack renders inside the preview instead of upstream's default fixed / maxVisible=1, which would
 			overlay the docs chrome."
+		class="flex-col items-stretch justify-start gap-6"
 	>
 		<Banner.Queue maxVisible={3} side="top" strategy="static">
 			<BannerControls />
