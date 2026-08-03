@@ -45,12 +45,16 @@ export function resolveBannerVariant(value?: string): BannerVariant {
 export const bannerVariants = tv({
 	base: 'pointer-events-auto relative flex w-full items-center gap-3 border-b px-4 py-3 text-sm motion-reduce:transition-none',
 	variants: {
+		// Upstream's status surfaces are opaque (`bg-blue-50` / `dark:bg-blue-950`). A bare `/10` token
+		// is not: harmless on a card, but the page reads straight through a banner once the queue pins
+		// one over the viewport. `bg-card` paints an opaque base and the flat gradient lays the tint on
+		// top of it, which is the only way to get two background layers out of one element.
 		variant: {
 			default: 'bg-card text-card-foreground',
-			info: 'bg-info/10 text-info',
-			success: 'bg-success/10 text-success',
-			warning: 'bg-warning/10 text-warning',
-			destructive: 'bg-destructive/10 text-destructive'
+			info: 'bg-card bg-linear-to-r from-info/10 to-info/10 text-info',
+			success: 'bg-card bg-linear-to-r from-success/10 to-success/10 text-success',
+			warning: 'bg-card bg-linear-to-r from-warning/10 to-warning/10 text-warning',
+			destructive: 'bg-card bg-linear-to-r from-destructive/10 to-destructive/10 text-destructive'
 		}
 	},
 	defaultVariants: {
