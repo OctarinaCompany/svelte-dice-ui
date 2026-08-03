@@ -83,18 +83,23 @@
 	}
 </script>
 
-<div class="inline-flex items-center gap-1">
+<div class="inline-flex items-center">
 	{#if selectedValues.length > 0}
 		<!--
 			Upstream nests this affordance inside the trigger `<button>` as a
 			`div role="button" tabIndex={0}` with a click handler only — it is not keyboard-operable
-			and nests interactive content inside a button. Here it is a sibling `<button>` with the
-			same icon, position and `aria-label` (plan.md Divergence 14, FR-014).
+			and nests interactive content inside a button. Here it stays a real sibling `<button>`
+			(plan.md Divergence 14, FR-014), styled as the leading half of the trigger's pill: the two
+			share one dashed outline with no seam between them, so it reads as upstream's single
+			control while remaining focusable and operable from the keyboard.
 		-->
 		<button
 			type="button"
 			aria-label={`Clear ${title} filter`}
-			class="rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none [&_svg]:size-3.5"
+			class={cn(
+				buttonVariants({ variant: 'outline', size: 'sm' }),
+				'rounded-e-none border-e-0 border-dashed px-2 text-muted-foreground opacity-70 transition-opacity hover:opacity-100 [&_svg]:size-3.5'
+			)}
 			onclick={onReset}
 		>
 			<XCircleIcon />
@@ -109,6 +114,7 @@
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
 				'border-dashed font-normal',
+				selectedValues.length > 0 && 'rounded-s-none border-s-0',
 				className
 			)}
 			{...restProps}
@@ -145,10 +151,14 @@
 					<Command.Group class="max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto">
 						{#each options as option (option.value)}
 							{@const isSelected = selectedValues.includes(option.value)}
+							<!--
+								No `data-checked`: the leading checkbox is upstream's affordance, and the class
+								the attribute unhides — `Command.Item`'s own trailing indicator, which React's
+								`CommandItem` has no equivalent of — would draw a second tick on the same row.
+							-->
 							<Command.Item
 								value={option.value}
 								keywords={[option.label]}
-								data-checked={isSelected ? 'true' : undefined}
 								onSelect={() => onItemSelect(option, isSelected)}
 							>
 								<div

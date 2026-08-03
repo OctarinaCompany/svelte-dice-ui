@@ -865,6 +865,59 @@ describe('DataTable — RTL', () => {
 // 6. Guard rails and edge cases
 // ---------------------------------------------------------------------------
 
+describe('DataTable — upstream parity', () => {
+	it('marks a visible column with a single check, not two', async () => {
+		const user = setupUser();
+		renderHarness();
+
+		await user.click(screen.getByRole('combobox', { name: 'Toggle columns' }));
+
+		// `Command.Item` ships its own trailing indicator, revealed by `data-checked`. Rendering a
+		// check of our own as well — which upstream must, its `CommandItem` having none — put two
+		// ticks on every row.
+		const item = layerItem('option', 'Title');
+		expect(item).toHaveAttribute('data-checked', 'true');
+		expect(item.querySelectorAll('svg')).toHaveLength(1);
+	});
+
+	it('leaves the faceted option to its checkbox, with no trailing indicator', async () => {
+		const user = setupUser();
+		renderHarness();
+
+		await openFilterPopover(user, 'Status');
+		// A multi-select popover stays open through a selection, so the item can be read in place.
+		await user.click(layerItem('option', 'Todo'));
+
+		// The leading checkbox is upstream's affordance; `data-checked` would unhide a second tick.
+		const item = layerItem('option', 'Todo');
+		expect(item).not.toHaveAttribute('data-checked');
+	});
+
+	it('renders one view options trigger when the toolbar is reorderable', async () => {
+		renderHarness({ reorderable: true });
+
+		const triggers = screen.getAllByRole('combobox', { name: 'Toggle columns' });
+		expect(triggers).toHaveLength(1);
+		expect(triggers[0]).toHaveAttribute('data-reorderable', '');
+	});
+
+	it('joins the clear affordance to its trigger as one pill', async () => {
+		const user = setupUser();
+		renderHarness();
+
+		await openFilterPopover(user, 'Status');
+		await user.click(layerItem('option', 'Todo'));
+		await user.keyboard('{Escape}');
+
+		// Upstream nests the clear control inside the trigger button. Ours stays a real button, so it
+		// carries the leading half of the shared dashed outline instead.
+		const clear = screen.getByRole('button', { name: 'Clear Status filter' });
+		expect(clear.className).toContain('rounded-e-none');
+		expect(clear.className).toContain('border-e-0');
+		expect(filterTrigger('Status').className).toContain('rounded-s-none');
+	});
+});
+
 describe('DataTable — guard rails and edge cases', () => {
 	it('suppresses the view options popover while disabled', async () => {
 		const user = setupUser();

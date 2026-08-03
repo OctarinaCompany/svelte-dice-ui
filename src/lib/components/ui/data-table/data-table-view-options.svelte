@@ -48,7 +48,6 @@
 </script>
 
 <script lang="ts" generics="TData extends RowData">
-	import CheckIcon from '@lucide/svelte/icons/check';
 	import GripVerticalIcon from '@lucide/svelte/icons/grip-vertical';
 	import Settings2Icon from '@lucide/svelte/icons/settings-2';
 
@@ -154,12 +153,6 @@
 													<GripVerticalIcon />
 												</Sortable.ItemHandle>
 												<span class="truncate">{labelFor(id)}</span>
-												<CheckIcon
-													class={cn(
-														'ml-auto size-4 shrink-0',
-														isVisible(id) ? 'opacity-100' : 'opacity-0'
-													)}
-												/>
 											</Command.Item>
 										{/snippet}
 									</Sortable.Item>
@@ -175,12 +168,6 @@
 								onSelect={() => column.toggleVisibility(!column.getIsVisible())}
 							>
 								<span class="truncate">{column.columnDef.meta?.label ?? column.id}</span>
-								<CheckIcon
-									class={cn(
-										'ml-auto size-4 shrink-0',
-										column.getIsVisible() ? 'opacity-100' : 'opacity-0'
-									)}
-								/>
 							</Command.Item>
 						{/each}
 					{/if}

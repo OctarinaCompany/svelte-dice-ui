@@ -99,13 +99,19 @@
 	}
 </script>
 
-<div class="inline-flex items-center gap-1">
+<div class="inline-flex items-center">
 	{#if hasValue}
-		<!-- Sibling, keyboard-operable clear affordance — plan.md Divergence 14, FR-014. -->
+		<!--
+			Sibling, keyboard-operable clear affordance — plan.md Divergence 14, FR-014 — styled as the
+			leading half of the trigger's pill so the pair reads as upstream's single control.
+		-->
 		<button
 			type="button"
 			aria-label={`Clear ${title} filter`}
-			class="rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none [&_svg]:size-3.5"
+			class={cn(
+				buttonVariants({ variant: 'outline', size: 'sm' }),
+				'rounded-e-none border-e-0 border-dashed px-2 text-muted-foreground opacity-70 transition-opacity hover:opacity-100 [&_svg]:size-3.5'
+			)}
 			onclick={onReset}
 		>
 			<XCircleIcon />
@@ -120,6 +126,7 @@
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
 				'border-dashed font-normal',
+				hasValue && 'rounded-s-none border-s-0',
 				className
 			)}
 			{...restProps}

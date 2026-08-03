@@ -597,7 +597,7 @@
 
 	<ComponentPreview
 		title="Toolbar, filters and row selection"
-		description="Mirrors data-table-demo.tsx: a text filter, a multi-select facet, a single-select facet, a number filter with a unit suffix, the View menu, and an action bar that appears only while rows are selected."
+		description="A text filter, a multi-select facet, a single-select facet, a number filter with a unit suffix, the View menu, and an action bar that appears only while rows are selected. Upstream's own demo covers fewer of these — it filters on text and one facet only — so this example carries the extra variants."
 		class="items-start"
 	>
 		<div class="w-full">
@@ -614,9 +614,7 @@
 	>
 		<div class="w-full">
 			<DataTable.Root table={advanced.table}>
-				<DataTable.Toolbar>
-					<DataTable.ViewOptions table={advanced.table} reorderable />
-				</DataTable.Toolbar>
+				<DataTable.Toolbar reorderable />
 			</DataTable.Root>
 		</div>
 	</ComponentPreview>

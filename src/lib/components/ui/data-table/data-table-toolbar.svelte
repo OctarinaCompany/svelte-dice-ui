@@ -11,6 +11,13 @@
 		 * (plan.md Divergence 9).
 		 */
 		table?: Table<TData>;
+		/**
+		 * Let the view menu's list be dragged to reorder columns. Forwarded to the
+		 * `<DataTable.ViewOptions>` this toolbar already renders — passing a second one through
+		 * `children` would show two identical triggers.
+		 * @default false
+		 */
+		reorderable?: boolean;
 	};
 </script>
 
@@ -27,6 +34,7 @@
 	let {
 		ref = $bindable(null),
 		table: tableProp,
+		reorderable = false,
 		class: className,
 		children,
 		...restProps
@@ -67,6 +75,6 @@
 	</div>
 	<div class="flex items-center gap-2">
 		{@render children?.()}
-		<DataTableViewOptions {table} align="end" />
+		<DataTableViewOptions {table} {reorderable} align="end" />
 	</div>
 </div>

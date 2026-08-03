@@ -133,14 +133,14 @@
 		/** Pass an `actionBar` snippet to the root. @default true */
 		withActionBar?: boolean;
 		/**
-		 * Render a standalone `<DataTable.ViewOptions>` instead of the toolbar, so `disabled` and
-		 * `reorderable` can be driven without the toolbar rendering a second one.
+		 * Render a standalone `<DataTable.ViewOptions>` instead of the toolbar, so `disabled` can be
+		 * driven on its own.
 		 * @default false
 		 */
 		withStandaloneViewOptions?: boolean;
 		/** Forwarded to the standalone `<DataTable.ViewOptions>`. @default false */
 		viewOptionsDisabled?: boolean;
-		/** Forwarded to the standalone `<DataTable.ViewOptions>`. @default false */
+		/** Forwarded to whichever of the toolbar or the standalone view options is rendered. */
 		reorderable?: boolean;
 		/** Drop the `select`, `archived`, `notes` and `actions` columns, for the minimal cases. */
 		minimalColumns?: boolean;
@@ -422,7 +422,7 @@
 {#snippet table()}
 	<DataTable.Root table={dataTable.table} actionBar={withActionBar ? actionBar : undefined}>
 		{#if withToolbar}
-			<DataTable.Toolbar>
+			<DataTable.Toolbar {reorderable}>
 				<span data-testid="toolbar-child">extra</span>
 			</DataTable.Toolbar>
 		{:else if withStandaloneViewOptions}
