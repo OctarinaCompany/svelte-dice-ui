@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ComponentPreview } from '$lib/components/docs/index.js';
 	import * as CircularProgress from '$lib/components/ui/circular-progress/index.js';
+	import CircularProgressColorTile from './circular-progress-color-tile.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 
@@ -76,24 +77,16 @@
 			textClass: 'text-destructive'
 		},
 		{ name: 'Info', trackClass: 'text-info/20', rangeClass: 'text-info', textClass: 'text-info' },
+		// The last three are the decorative hues (CLAUDE.md §6). The theme is zinc, so without them
+		// four of these eight tiles would land on the same grey and two would be pixel-identical.
 		{
-			name: 'Muted',
-			trackClass: 'text-muted-foreground/10',
-			rangeClass: 'text-muted-foreground',
-			textClass: 'text-muted-foreground'
+			name: 'Violet',
+			trackClass: 'text-violet/20',
+			rangeClass: 'text-violet',
+			textClass: 'text-violet'
 		},
-		{
-			name: 'Secondary',
-			trackClass: 'text-secondary/40',
-			rangeClass: 'text-secondary-foreground',
-			textClass: 'text-secondary-foreground'
-		},
-		{
-			name: 'Accent',
-			trackClass: 'text-accent-foreground/10',
-			rangeClass: 'text-accent-foreground',
-			textClass: 'text-accent-foreground'
-		}
+		{ name: 'Teal', trackClass: 'text-teal/20', rangeClass: 'text-teal', textClass: 'text-teal' },
+		{ name: 'Rose', trackClass: 'text-rose/20', rangeClass: 'text-rose', textClass: 'text-rose' }
 	];
 
 	const rootProps = [
@@ -287,22 +280,14 @@
 		</div>
 	</ComponentPreview>
 
-	<ComponentPreview title="Colors" description="Mirrors circular-progress-colors-demo.tsx.">
-		<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
-			{#each themes as theme (theme.name)}
-				<div class="flex flex-col items-center gap-3">
-					<CircularProgress.Root value={75} size={80} thickness={6}>
-						<CircularProgress.Indicator>
-							<CircularProgress.Track class={theme.trackClass} />
-							<CircularProgress.Range class={theme.rangeClass} />
-						</CircularProgress.Indicator>
-						<CircularProgress.ValueText class={`text-sm font-semibold ${theme.textClass}`} />
-					</CircularProgress.Root>
-					<div class="flex flex-col items-center gap-1 text-center">
-						<h4 class="text-sm font-medium">{theme.name}</h4>
-						<p class="text-xs text-muted-foreground">75% complete</p>
-					</div>
-				</div>
+	<ComponentPreview
+		title="Colors"
+		description="Mirrors circular-progress-colors-demo.tsx — each ring eases to 75% once the row scrolls into
+			view, one after the next."
+	>
+		<div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+			{#each themes as theme, index (theme.name)}
+				<CircularProgressColorTile {theme} {index} />
 			{/each}
 		</div>
 	</ComponentPreview>

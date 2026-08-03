@@ -27,6 +27,14 @@
 	--warning-foreground: oklch(0.145 0 0);
 	--info: oklch(0.623 0.214 259.815);
 	--info-foreground: oklch(0.985 0 0);
+	/*
+	 * Decorative hues, not statuses: the four status tokens above carry meaning, these only exist so
+	 * a demo can show several visually distinct colour treatments side by side. The base theme is
+	 * zinc, so nothing else in it supplies a hue.
+	 */
+	--violet: oklch(0.606 0.25 292.717);
+	--teal: oklch(0.6 0.118 184.704);
+	--rose: oklch(0.645 0.246 16.439);
 	--border: oklch(0.922 0 0);
 	--input: oklch(0.922 0 0);
 	--ring: oklch(0.708 0 0);
@@ -68,6 +76,9 @@
 	--warning-foreground: oklch(0.145 0 0);
 	--info: oklch(0.707 0.165 254.624);
 	--info-foreground: oklch(0.145 0 0);
+	--violet: oklch(0.702 0.183 293.541);
+	--teal: oklch(0.704 0.14 182.503);
+	--rose: oklch(0.712 0.194 13.428);
 	--border: oklch(1 0 0 / 10%);
 	--input: oklch(1 0 0 / 15%);
 	--ring: oklch(0.556 0 0);
@@ -111,6 +122,9 @@
 	--color-warning-foreground: var(--warning-foreground);
 	--color-info: var(--info);
 	--color-info-foreground: var(--info-foreground);
+	--color-violet: var(--violet);
+	--color-teal: var(--teal);
+	--color-rose: var(--rose);
 	--color-accent-foreground: var(--accent-foreground);
 	--color-accent: var(--accent);
 	--color-muted-foreground: var(--muted-foreground);

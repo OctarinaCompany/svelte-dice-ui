@@ -320,6 +320,12 @@ module script is acceptable, but a Symbol key plus the throwing getter is the de
   colour that is not one of these four, add the token to `src/app.css` **and** to this table —
   do not reach for the palette.
 
+- **Decorative hues.** `violet`, `teal` and `rose` are theme tokens too, declared the same way, but
+  they carry no meaning. They exist only so a demo can show several visually distinct colour
+  treatments at once — the base theme is zinc, so nothing else in it supplies a hue. Reach for them
+  when an upstream demo's subject _is_ colour variety (`circular-progress`'s Colors example); never
+  to signal state, which is what the four status tokens are for.
+
 - **No manual `dark:`** — tokens already flip via CSS variables in `src/app.css`.
 - **No `space-x-*` / `space-y-*`** — use `flex`/`grid` with `gap-*`.
 - Use `size-*` when width and height match; use `truncate` over the three-property spelling.
