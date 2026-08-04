@@ -53,7 +53,12 @@ export const actionBarSeparatorVariants = tv({
 
 export type ActionBarRootStateProps = {
 	readonly getOpen: () => boolean;
-	/** Writes the caller's binding **and** calls `onOpenChange` — the only path that changes `open`. */
+	/**
+	 * Writes the caller's binding **and** calls `onOpenChange` — the only path that changes `open`.
+	 * The write is skipped when the caller's `open` already reads as `open`, so a controlled prop
+	 * passed without `bind:` is never shadowed by a redundant local override; `onOpenChange` still
+	 * fires on every request (FR-002).
+	 */
 	readonly setOpen: (open: boolean) => void;
 	readonly getDir: () => Direction;
 	readonly getOrientation: () => ActionBarOrientation;

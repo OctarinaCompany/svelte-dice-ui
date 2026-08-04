@@ -147,7 +147,14 @@
 		new ActionBarRootState({
 			getOpen: () => open ?? false,
 			setOpen: (next) => {
-				open = next;
+				// Settle `open` against the caller's current value *before* writing it. A caller that
+				// passes `open` one-way — upstream's contract, a plain controlled prop — gets a local
+				// override from any assignment: Svelte marks the prop's derived clean and stamps it with
+				// a fresh write version, so a value the caller has already reached pins the override and
+				// the caller's expression can never move the bar again. That is exactly what an item's
+				// `onSelect` does when it empties the state feeding `open` before the bar closes.
+				// Writing only a genuine change keeps the caller authoritative.
+				if ((open ?? false) !== next) open = next;
 				onOpenChange?.(next);
 			},
 			getDir: () => direction.current,

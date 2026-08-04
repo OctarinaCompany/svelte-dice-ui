@@ -31,8 +31,11 @@
 	 * - `open` — `bind:open`, the parent accepts every change.
 	 * - `function` — `bind:open={() => authoritativeOpen, (next) => …}`, the parent stays
 	 *   authoritative and declines the write. That is upstream's plain-`open`-prop semantics.
+	 * - `controlled` — `open={…}` with no `bind:`, the shape of the docs demo and of upstream's
+	 *   React demo: the parent owns a selection and derives `open` from it, and the item's action
+	 *   empties that selection before the bar closes.
 	 */
-	export type ActionBarHarnessBinding = 'none' | 'open' | 'function';
+	export type ActionBarHarnessBinding = 'none' | 'open' | 'function' | 'controlled';
 
 	/** One `<ActionBar.Item>` rendered inside the group. */
 	export type ActionBarHarnessItem = {
@@ -183,6 +186,11 @@
 	// provider, which must throw during that part's own initialisation.
 	const bareMode = $derived(mode.startsWith('bare-'));
 
+	// `binding: 'controlled'` only — the parent's own selection, and the one-way `open` derived from
+	// it. The bar must follow this expression even after the root has asked to close.
+	let controlledSelection = $state(1);
+	const controlledOpen = $derived(controlledSelection > 0);
+
 	let rootRef = $state<HTMLDivElement | null>(null);
 	let selectionRef = $state<HTMLDivElement | null>(null);
 	let separatorRef = $state<HTMLDivElement | null>(null);
@@ -268,7 +276,12 @@
 				disabled={item.disabled}
 				variant={item.variant}
 				size={item.size}
-				onSelect={item.onSelect}
+				onSelect={(event) => {
+					// The controlled parent's action empties its selection *before* the bar closes,
+					// exactly as `duplicateSelected` does in the docs demo.
+					if (binding === 'controlled') controlledSelection = 0;
+					item.onSelect?.(event);
+				}}
 				onclick={item.onclick}
 				onfocus={item.onfocus}
 				onkeydown={item.onkeydown}
@@ -373,6 +386,20 @@
 				<ActionBar.Root
 					bind:ref={rootRef}
 					bind:open={() => authoritativeOpen, (next) => onDeclinedOpen?.(next)}
+					{...rootProps}
+					data-testid="root"
+					class={rootClass}
+					style={rootStyle}
+				>
+					{@render rootContent()}
+				</ActionBar.Root>
+			{:else if binding === 'controlled'}
+				<button type="button" data-testid="select-row" onclick={() => (controlledSelection += 1)}>
+					Select
+				</button>
+				<ActionBar.Root
+					bind:ref={rootRef}
+					open={controlledOpen}
 					{...rootProps}
 					data-testid="root"
 					class={rootClass}

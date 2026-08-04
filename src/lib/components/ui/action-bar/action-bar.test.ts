@@ -379,6 +379,28 @@ describe('ActionBar open state (T005, FR-002)', () => {
 		expect(toolbar()).toBeInTheDocument();
 	});
 
+	it('reopens when a one-way open prop is raised again after an item emptied the selection', async () => {
+		const user = userEvent.setup();
+		const onOpenChange = vi.fn();
+		renderBar({ binding: 'controlled', onOpenChange });
+
+		expect(toolbar()).toBeInTheDocument();
+
+		// The item's action empties the parent's selection during the `actionbar.itemSelect`
+		// dispatch, so the caller's `open={…}` expression has already resolved to `false` by the
+		// time the root handles the close request.
+		await user.click(button('Duplicate'));
+
+		expect(onOpenChange).toHaveBeenCalledWith(false);
+		expect(screen.queryByRole('toolbar')).toBeNull();
+
+		// The caller raises `open` again: a controlled prop passed without `bind:` must stay
+		// authoritative, so the bar comes back.
+		await user.click(screen.getByTestId('select-row'));
+
+		expect(toolbar()).toBeInTheDocument();
+	});
+
 	it('reports the selection through onSelect before closing', async () => {
 		const user = userEvent.setup();
 		const onSelect = vi.fn();
