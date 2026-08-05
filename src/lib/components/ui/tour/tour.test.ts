@@ -812,6 +812,25 @@ describe('Tour spotlight styling and offsets', () => {
 		expect(ring).not.toHaveClass('ring-[3px]');
 	});
 
+	it('stacks the step card in front of the spotlight: equal z-50 and later DOM position', () => {
+		stubRects(TARGET_RECTS);
+		setup({ defaultOpen: true });
+
+		// `bits-ui` mirrors the card's computed z-index onto its floating wrapper, so this class
+		// token is the input that decides the wrapper's stacking in a real browser (jsdom resolves
+		// no Tailwind stylesheet, so the computed value itself cannot be asserted here).
+		expect(card()).toHaveClass('z-50');
+		expect(bySlot('tour-spotlight')).toHaveClass('z-50');
+
+		// With equal z-index the later sibling paints on top — the wrapper must follow the spotlight.
+		const wrapper = floatingWrapper();
+		expect(
+			Boolean(
+				bySlot('tour-spotlight').compareDocumentPosition(wrapper) & Node.DOCUMENT_POSITION_FOLLOWING
+			)
+		).toBe(true);
+	});
+
 	it('applies the root `spotlightPadding` symmetrically on all four edges', () => {
 		stubRects(TARGET_RECTS);
 		setup({ defaultOpen: true, spotlightPadding: 12 });

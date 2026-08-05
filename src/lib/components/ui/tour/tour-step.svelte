@@ -107,9 +107,14 @@
 		child?: Snippet<[{ props: TourStepChildProps }]>;
 	};
 
-	/** Upstream's class list (tour.tsx:1243-1246), minus the `fixed`/`z-50` the floating layer owns. */
+	/**
+	 * Upstream's class list (tour.tsx:1256), minus the `fixed` that `bits-ui`'s floating wrapper
+	 * owns. `z-50` stays on the card: the floating layer mirrors the content's computed z-index onto
+	 * that wrapper (`contentZIndex`, exactly as `popover-content.svelte` relies on), so without it
+	 * the wrapper stacks at `auto` and the `z-50` spotlight paints over the card.
+	 */
 	const STEP_CLASSES =
-		'flex w-80 flex-col gap-4 rounded-lg border bg-popover p-4 text-popover-foreground shadow-md outline-none';
+		'z-50 flex w-80 flex-col gap-4 rounded-lg border bg-popover p-4 text-popover-foreground shadow-md outline-none';
 </script>
 
 <script lang="ts">
