@@ -644,6 +644,13 @@ describe('SpeedDial roles and accessible names (T006, US1/US3, V-7)', () => {
 		expect(label).not.toHaveClass('px-2');
 	});
 
+	it('shows a pointer cursor on the trigger and each action', () => {
+		renderDial({ defaultOpen: true });
+
+		expect(screen.getByTestId('trigger')).toHaveClass('cursor-pointer');
+		expect(screen.getByTestId('action-home')).toHaveClass('cursor-pointer');
+	});
+
 	it('omits data-disabled unless the dial is disabled', async () => {
 		const { rerender } = renderDial();
 
@@ -671,7 +678,7 @@ describe('SpeedDial child snippets (T006, US3, V-7)', () => {
 		const triggerChild = screen.getByTestId('trigger-child');
 		expect(triggerChild).toHaveAttribute('data-slot', 'speed-dial-trigger');
 		expect(triggerChild).toHaveAttribute('aria-haspopup', 'menu');
-		expect(triggerChild).toHaveClass('rounded-full');
+		expect(triggerChild).toHaveClass('rounded-full', 'cursor-pointer');
 	});
 
 	it('renders the content onto the caller element', () => {

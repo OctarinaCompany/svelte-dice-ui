@@ -144,7 +144,7 @@
 		'data-state': getDataState(state.open),
 		disabled: isDisabled,
 		...restProps,
-		class: cn(buttonVariants({ variant, size }), 'size-11 rounded-full', className),
+		class: cn(buttonVariants({ variant, size }), 'size-11 cursor-pointer rounded-full', className),
 		onclick,
 		onmouseenter,
 		onmouseleave
@@ -168,7 +168,7 @@
 		{variant}
 		{size}
 		{...restProps}
-		class={cn('size-11 rounded-full', className)}
+		class={cn('size-11 cursor-pointer rounded-full', className)}
 		{onclick}
 		{onmouseenter}
 		{onmouseleave}
