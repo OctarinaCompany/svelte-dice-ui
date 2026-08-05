@@ -300,7 +300,7 @@
 
 	<ComponentPreview
 		title="Default"
-		description="Mirrors phone-input-demo.tsx. The root's placeholder wins over the field's own, which is why upstream's demo shows “Enter phone number” rather than its own placeholder."
+		description="Mirrors phone-input-demo.tsx. The root's placeholder wins over the field's own, which is why upstream's demo shows “Enter phone number” rather than its own placeholder. Selecting a country seeds an empty field with its calling code and replaces any value under a different calling code; only a number already under the selected code is kept — a divergence from upstream, which leaves the value untouched."
 	>
 		<div class="w-full max-w-sm">
 			<PhoneInput.Root>

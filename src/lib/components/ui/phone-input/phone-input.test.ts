@@ -523,7 +523,7 @@ describe('PhoneInput controlled mode (T007)', () => {
 		expect(trigger()).toHaveTextContent('🇺🇸');
 	});
 
-	it('never changes the phone digits when a country is selected', async () => {
+	it('seeds an empty field with the dial code of a selected country', async () => {
 		const user = userEvent.setup();
 		const onValueChange = vi.fn();
 		renderPhone({ onValueChange });
@@ -532,6 +532,80 @@ describe('PhoneInput controlled mode (T007)', () => {
 		await user.click(option('Mexico'));
 
 		await waitFor(() => expect(trigger()).toHaveTextContent('🇲🇽'));
+		expect(field()).toHaveValue('+52');
+		expect(onValueChange).toHaveBeenLastCalledWith('+52');
+	});
+
+	it('replaces a value holding only the old dial code, and the selection sticks', async () => {
+		const user = userEvent.setup();
+		const onValueChange = vi.fn();
+		const onCountryChange = vi.fn();
+		renderPhone({ onValueChange, onCountryChange });
+
+		await user.type(field(), '+55');
+		await waitFor(() => expect(trigger()).toHaveTextContent('🇧🇷'));
+
+		await openList(user);
+		await user.click(option('Mexico'));
+
+		// Before the replacement existed, the detection effect saw the stale `+55` and snapped the
+		// country straight back to Brazil — the selection could never be kept.
+		await waitFor(() => expect(trigger()).toHaveTextContent('🇲🇽'));
+		expect(field()).toHaveValue('+52');
+		expect(onValueChange).toHaveBeenLastCalledWith('+52');
+		expect(onCountryChange).toHaveBeenLastCalledWith('MX');
+	});
+
+	it('clears a full number under a different dial code, and the selection sticks', async () => {
+		const user = userEvent.setup();
+		const onValueChange = vi.fn();
+		renderPhone({ defaultValue: '+14085551234', onValueChange });
+
+		await waitFor(() => expect(trigger()).toHaveTextContent('🇺🇸'));
+
+		await openList(user);
+		await user.click(option('Brazil'));
+
+		// The stale US number would otherwise pull detection straight back to US — the whole value
+		// is replaced by the selected country's dial code so the manual selection always sticks.
+		await waitFor(() => expect(trigger()).toHaveTextContent('🇧🇷'));
+		expect(field()).toHaveValue('+55');
+		expect(onValueChange).toHaveBeenLastCalledWith('+55');
+	});
+
+	it('keeps a number already under the selected dial code', async () => {
+		const user = userEvent.setup();
+		const onValueChange = vi.fn();
+		renderPhone({ defaultValue: '+14085551234', onValueChange });
+
+		await waitFor(() => expect(trigger()).toHaveTextContent('🇺🇸'));
+
+		await openList(user);
+		await user.click(option('Canada'));
+
+		// US → Canada shares +1: the number survives, and the detection effect then snaps the
+		// detectable value's own country back (research R-05, pinned in T009).
+		await waitFor(() => expect(trigger()).toHaveTextContent('🇺🇸'));
+		expect(field()).toHaveValue('+1 408 555 123 4');
+		expect(onValueChange).not.toHaveBeenCalled();
+	});
+
+	it('never prefills when an authoritative parent declines the selection', async () => {
+		const user = userEvent.setup();
+		const onDeclinedCountry = vi.fn();
+		const onValueChange = vi.fn();
+		renderPhone({
+			mode: 'function-binding',
+			authoritativeCountry: 'US',
+			onDeclinedCountry,
+			onValueChange
+		});
+
+		await openList(user);
+		await user.click(option('Mexico'));
+
+		await waitFor(() => expect(onDeclinedCountry).toHaveBeenLastCalledWith('MX'));
+		expect(trigger()).toHaveTextContent('🇺🇸');
 		expect(field()).toHaveValue('');
 		expect(onValueChange).not.toHaveBeenCalled();
 	});
@@ -849,6 +923,20 @@ describe('PhoneInput guard rails (T010)', () => {
 		// Not `toHaveBeenLastCalledWith`: `+1408` is detectable, so upstream's effect re-runs and snaps
 		// the country back to US afterwards (research R-05 quirk 2, pinned in T009).
 		await waitFor(() => expect(onCountryChange).toHaveBeenCalledWith('MX'));
+	});
+
+	it('never prefills a read-only field, while the country stays selectable', async () => {
+		const user = userEvent.setup();
+		const onValueChange = vi.fn();
+		const onCountryChange = vi.fn();
+		renderPhone({ readOnly: true, onValueChange, onCountryChange });
+
+		await openList(user);
+		await user.click(option('Mexico'));
+
+		await waitFor(() => expect(onCountryChange).toHaveBeenLastCalledWith('MX'));
+		expect(field()).toHaveValue('');
+		expect(onValueChange).not.toHaveBeenCalled();
 	});
 
 	it('hides every flag when showFlag is false', async () => {

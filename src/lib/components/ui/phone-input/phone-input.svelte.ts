@@ -92,8 +92,39 @@ export class PhoneInputRootState {
 	/** Upstream's `CommandItem.onSelect`: set the country, close, and hand focus to the field. */
 	selectCountry(code: string): void {
 		this.#props.setCountry(code);
+		// Prefill only when the selection actually landed — an authoritative parent that declines
+		// the country write keeps the value where it was too.
+		if (this.country === code) this.#prefillDialCode(code);
 		this.#closedBySelection = true;
 		this.open = false;
+	}
+
+	/**
+	 * Divergence from upstream, which leaves the value untouched on a manual selection: seed an
+	 * empty field with the selected country's dial code, and replace any value whose dial code
+	 * differs from the selected country's — dropping its national digits — so a manual selection
+	 * always sticks. Only a number already under the selected dial code is kept (e.g. a US number
+	 * when Canada is picked, both `+1`): there the country alone moves. Without the replacement
+	 * the detection effect would snap the stale value straight back to its own country, making
+	 * the selection impossible to keep. `startsWithPlus` stays as-is: marking the seeded value as
+	 * typed would let the `+1` tie-break override an explicit Canada selection with US.
+	 */
+	#prefillDialCode(code: string): void {
+		if (this.disabled || this.readOnly) return;
+
+		const next = this.countries.find((country) => country.code === code);
+		if (!next) return;
+
+		const value = this.value;
+		if (value === next.dialCode) return;
+
+		// Same dial code as the selection: only the country moved — the number stays.
+		const isEmpty = value === '' || value === '+';
+		if (!isEmpty && detectCountryFromNumber(value, this.countries)?.dialCode === next.dialCode) {
+			return;
+		}
+
+		this.#props.setValue(next.dialCode);
 	}
 
 	/**
