@@ -5,11 +5,16 @@
 	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
 	import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import ChevronLeftIcon from '@lucide/svelte/icons/chevron-left';
+	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
 	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
 	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
 	import CircleDashedIcon from '@lucide/svelte/icons/circle-dashed';
 	import DollarSignIcon from '@lucide/svelte/icons/dollar-sign';
+	import EyeIcon from '@lucide/svelte/icons/eye';
 	import MoreHorizontalIcon from '@lucide/svelte/icons/more-horizontal';
+	import PencilIcon from '@lucide/svelte/icons/pencil';
+	import Trash2Icon from '@lucide/svelte/icons/trash-2';
 	import XCircleIcon from '@lucide/svelte/icons/x-circle';
 
 	import { ComponentPreview } from '$lib/components/docs/index.js';
@@ -19,6 +24,7 @@
 	import * as DataTable from '$lib/components/ui/data-table/index.js';
 	import { createDataTable, type DataTableColumnDef } from '$lib/components/ui/data-table/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 
 	type Project = {
@@ -311,6 +317,116 @@
 			columnPinning: { right: ['actions'] },
 			pagination: { pageSize: 4 }
 		}
+	});
+
+	// --- Example 5: selectable rows with a numbered pager -------------------------
+
+	// Mirrors blocks.so's table-05 (github.com/ephraimduncan/blocks/blob/main/content/components/
+	// tables/table-05.tsx), minus its search input: checkbox selection, status badges, a row
+	// actions menu and a numbered pager with a per-page count. `DataTable.Root` always renders the
+	// shared `DataTable.Pagination` footer, so this composes `Table.Root` and `DataTable.FlexRender`
+	// directly — the same pieces `data-table.svelte` renders internally — to swap in the numbered
+	// footer without touching the shared component.
+	type OrderStatus = 'completed' | 'processing' | 'pending' | 'cancelled';
+
+	type Order = {
+		id: string;
+		name: string;
+		date: string;
+		status: OrderStatus;
+		amount: number;
+	};
+
+	const orders: Order[] = [
+		{ id: '1', name: 'Project Alpha', date: 'Jan 15, 2024', status: 'completed', amount: 2500 },
+		{ id: '2', name: 'Website Redesign', date: 'Feb 3, 2024', status: 'processing', amount: 4200 },
+		{ id: '3', name: 'Mobile App MVP', date: 'Feb 18, 2024', status: 'pending', amount: 8750 },
+		{ id: '4', name: 'Brand Identity', date: 'Mar 5, 2024', status: 'completed', amount: 1800 },
+		{
+			id: '5',
+			name: 'Marketing Campaign',
+			date: 'Mar 22, 2024',
+			status: 'cancelled',
+			amount: 3400
+		},
+		{
+			id: '6',
+			name: 'Analytics Dashboard',
+			date: 'Apr 8, 2024',
+			status: 'processing',
+			amount: 5600
+		},
+		{
+			id: '7',
+			name: 'E-commerce Platform',
+			date: 'Apr 25, 2024',
+			status: 'pending',
+			amount: 12000
+		},
+		{ id: '8', name: 'API Integration', date: 'May 10, 2024', status: 'completed', amount: 3200 }
+	];
+
+	// Upstream's emerald/amber/blue/rose classes, mapped onto the repo's status tokens
+	// (CLAUDE.md §6) — "cancelled" reads as a failure state, so it takes `destructive` rather than
+	// the meaningless decorative `rose` hue.
+	const orderStatusConfig: Record<OrderStatus, { label: string; class: string }> = {
+		completed: { label: 'Completed', class: 'border-0 bg-success/15 text-success' },
+		processing: { label: 'Processing', class: 'border-0 bg-info/15 text-info' },
+		pending: { label: 'Pending', class: 'border-0 bg-warning/15 text-warning' },
+		cancelled: { label: 'Cancelled', class: 'border-0 bg-destructive/15 text-destructive' }
+	};
+
+	const orderPageSizeOptions = [5, 10, 20];
+
+	const ordersColumns: DataTableColumnDef<Order>[] = [
+		{
+			id: 'select',
+			header: orderSelectHeader,
+			cell: orderSelectCell,
+			size: 32,
+			enableSorting: false,
+			enableHiding: false
+		},
+		{
+			id: 'name',
+			accessorKey: 'name',
+			header: 'Name',
+			cell: orderNameCell
+		},
+		{
+			id: 'date',
+			accessorKey: 'date',
+			header: 'Date'
+		},
+		{
+			id: 'status',
+			accessorKey: 'status',
+			header: 'Status',
+			cell: orderStatusCell
+		},
+		{
+			id: 'amount',
+			accessorKey: 'amount',
+			header: orderAmountHeader,
+			cell: orderAmountCell
+		},
+		{
+			id: 'actions',
+			// Blank, like upstream's header-less actions column — `DataTable.FlexRender` would
+			// otherwise fall back to the column id ("actions") as visible text.
+			header: '',
+			cell: orderActionsCell,
+			size: 32,
+			enableSorting: false,
+			enableHiding: false
+		}
+	];
+
+	const ordersTable = createDataTable<Order>({
+		data: () => orders,
+		columns: () => ordersColumns,
+		getRowId: (row) => row.id,
+		initialState: { pagination: { pageSize: 5 } }
 	});
 
 	// --- Props tables ------------------------------------------------------------
@@ -616,6 +732,155 @@
 	/>
 {/snippet}
 
+{#snippet orderSelectHeader(ctx: HeaderContext<Order, unknown>)}
+	<Checkbox
+		aria-label="Select all"
+		bind:checked={
+			() => ctx.table.getIsAllPageRowsSelected(),
+			(next) => ctx.table.toggleAllPageRowsSelected(next)
+		}
+		bind:indeterminate={() => ctx.table.getIsSomePageRowsSelected(), () => {}}
+	/>
+{/snippet}
+
+{#snippet orderSelectCell(ctx: CellContext<Order, unknown>)}
+	<Checkbox
+		aria-label="Select row"
+		bind:checked={() => ctx.row.getIsSelected(), (next) => ctx.row.toggleSelected(next)}
+	/>
+{/snippet}
+
+{#snippet orderNameCell(ctx: CellContext<Order, unknown>)}
+	<span class="font-medium">{ctx.row.original.name}</span>
+{/snippet}
+
+{#snippet orderStatusCell(ctx: CellContext<Order, unknown>)}
+	{@const config = orderStatusConfig[ctx.row.original.status]}
+	<Badge variant="outline" class={config.class}>{config.label}</Badge>
+{/snippet}
+
+{#snippet orderAmountHeader()}
+	<div class="text-right">Amount</div>
+{/snippet}
+
+{#snippet orderAmountCell(ctx: CellContext<Order, unknown>)}
+	<div class="text-right font-medium">
+		{ctx.row.original.amount.toLocaleString('en-US', {
+			style: 'currency',
+			currency: 'USD',
+			maximumFractionDigits: 0
+		})}
+	</div>
+{/snippet}
+
+{#snippet orderActionsCell(ctx: CellContext<Order, unknown>)}
+	<div class="text-right">
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger>
+				{#snippet child({ props })}
+					<Button
+						{...props}
+						variant="ghost"
+						size="icon"
+						aria-label={`Open ${ctx.row.original.name} menu`}
+					>
+						<MoreHorizontalIcon />
+					</Button>
+				{/snippet}
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content align="end">
+				<DropdownMenu.Item>
+					<EyeIcon />
+					View details
+				</DropdownMenu.Item>
+				<DropdownMenu.Item>
+					<PencilIcon />
+					Edit
+				</DropdownMenu.Item>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item variant="destructive">
+					<Trash2Icon />
+					Delete
+				</DropdownMenu.Item>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+	</div>
+{/snippet}
+
+<!-- "Show N entries" — blocks.so's page-size control, without its neighbouring search input
+	(dropped per review). -->
+{#snippet ordersPageSizeSelect()}
+	{@const pageSize = ordersTable.table.getState().pagination.pageSize}
+	<div class="flex items-center gap-2">
+		<span class="text-sm text-muted-foreground">Show</span>
+		<Select.Root
+			type="single"
+			value={String(pageSize)}
+			onValueChange={(value) => ordersTable.table.setPageSize(Number(value))}
+		>
+			<Select.Trigger class="h-8 w-16" aria-label="Rows per page">
+				{pageSize}
+			</Select.Trigger>
+			<Select.Content>
+				<Select.Group>
+					{#each orderPageSizeOptions as size (size)}
+						<Select.Item value={String(size)} label={String(size)} />
+					{/each}
+				</Select.Group>
+			</Select.Content>
+		</Select.Root>
+		<span class="text-sm text-muted-foreground">entries</span>
+	</div>
+{/snippet}
+
+<!-- A numbered pager — "Showing X to Y of Z entries" plus one button per page — instead of
+	`DataTable.Pagination`'s "Page X of Y" and first/prev/next/last chevrons. -->
+{#snippet ordersFooter()}
+	{@const pagination = ordersTable.table.getState().pagination}
+	{@const filteredCount = ordersTable.filteredRowCount}
+	{@const from = filteredCount === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1}
+	{@const to = Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredCount)}
+	{@const currentPage = pagination.pageIndex + 1}
+	<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+		<p class="text-sm text-muted-foreground">
+			Showing {from} to {to} of {filteredCount} entries
+		</p>
+		<div class="flex items-center gap-1">
+			<Button
+				aria-label="Previous page"
+				variant="outline"
+				size="icon"
+				class="size-8"
+				disabled={!ordersTable.table.getCanPreviousPage()}
+				onclick={() => ordersTable.table.previousPage()}
+			>
+				<ChevronLeftIcon />
+			</Button>
+			{#each Array.from({ length: ordersTable.pageCount }, (_, i) => i + 1) as page (page)}
+				<Button
+					aria-label={`Go to page ${page}`}
+					variant={currentPage === page ? 'default' : 'outline'}
+					size="icon"
+					class="size-8"
+					onclick={() => ordersTable.table.setPageIndex(page - 1)}
+				>
+					{page}
+				</Button>
+			{/each}
+			<Button
+				aria-label="Next page"
+				variant="outline"
+				size="icon"
+				class="size-8"
+				disabled={!ordersTable.table.getCanNextPage()}
+				onclick={() => ordersTable.table.nextPage()}
+			>
+				<ChevronRightIcon />
+			</Button>
+		</div>
+	</div>
+{/snippet}
+
 {#snippet selectionActionBar()}
 	<div
 		class="flex items-center justify-between gap-3 rounded-lg border bg-background p-2 text-sm shadow-sm"
@@ -686,6 +951,64 @@
 			<DataTable.Root table={advanced.table}>
 				<DataTable.Toolbar reorderable />
 			</DataTable.Root>
+		</div>
+	</ComponentPreview>
+
+	<ComponentPreview
+		title="Selectable rows with a numbered pager"
+		description="Mirrors blocks.so's table-05 (github.com/ephraimduncan/blocks) — checkbox selection, status badges, a row actions menu and a numbered pager with a per-page count, without its search input. DataTable.Root always renders the shared Pagination footer, so this composes Table.Root and DataTable.FlexRender directly to swap in the numbered one."
+		class="items-start"
+	>
+		<div class="w-full max-w-3xl space-y-4">
+			{@render ordersPageSizeSelect()}
+			<div class="overflow-hidden rounded-lg border">
+				<Table.Root>
+					<Table.Header>
+						{#each ordersTable.headerGroups as headerGroup (headerGroup.id)}
+							<Table.Row>
+								{#each headerGroup.headers as header (header.id)}
+									<Table.Head colspan={header.colSpan}>
+										{#if !header.isPlaceholder}
+											<DataTable.FlexRender
+												template={header.column.columnDef.header}
+												context={header.getContext()}
+												fallback={header.column.id}
+											/>
+										{/if}
+									</Table.Head>
+								{/each}
+							</Table.Row>
+						{/each}
+					</Table.Header>
+					<Table.Body>
+						{#if ordersTable.rows.length}
+							{#each ordersTable.rows as row (row.id)}
+								<Table.Row data-state={row.getIsSelected() ? 'selected' : undefined}>
+									{#each row.getVisibleCells() as cell (cell.id)}
+										<Table.Cell>
+											<DataTable.FlexRender
+												template={cell.column.columnDef.cell}
+												context={cell.getContext()}
+												fallback={String(cell.renderValue() ?? '')}
+											/>
+										</Table.Cell>
+									{/each}
+								</Table.Row>
+							{/each}
+						{:else}
+							<Table.Row>
+								<Table.Cell
+									colspan={ordersTable.table.getAllColumns().length}
+									class="h-24 text-center"
+								>
+									No results.
+								</Table.Cell>
+							</Table.Row>
+						{/if}
+					</Table.Body>
+				</Table.Root>
+			</div>
+			{@render ordersFooter()}
 		</div>
 	</ComponentPreview>
 
