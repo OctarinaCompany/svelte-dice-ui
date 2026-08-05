@@ -99,23 +99,38 @@
 	}
 </script>
 
-<div class="inline-flex items-center">
+<!--
+	The wrapper wears the whole pill's chrome at all times and both halves paint transparent, so
+	background, border, hover and open-state read as one control and selecting a value repaints
+	nothing (the variant's `transition-all` would flash the swap) — see
+	`data-table-faceted-filter.svelte` for the full rationale.
+-->
+<div
+	class={cn(
+		buttonVariants({ variant: 'outline', size: 'sm' }),
+		'gap-0 border-dashed p-0 font-normal active:not-aria-[haspopup]:translate-y-0 has-data-[state=open]:bg-muted has-data-[state=open]:text-foreground'
+	)}
+>
 	{#if hasValue}
 		<!--
-			Sibling, keyboard-operable clear affordance — plan.md Divergence 14, FR-014 — styled as the
-			leading half of the trigger's pill so the pair reads as upstream's single control.
+			Sibling, keyboard-operable clear affordance — plan.md Divergence 14, FR-014 — rendered as
+			the leading half of the wrapper's pill. The `hover:`/`dark:` transparents only cancel the
+			outline variant's per-element state layers so the wrapper alone paints; the icon alone
+			dims. `ps-2.5` puts the X exactly where the resting calendar icon sits, and the `pe-1.5`
+			and trigger `ps-1.5` give the rule below the same 6px flanks as the label↔badges one.
 		-->
 		<button
 			type="button"
 			aria-label={`Clear ${title} filter`}
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
-				'rounded-e-none border-e-0 border-dashed px-2 text-muted-foreground opacity-70 transition-opacity hover:opacity-100 [&_svg]:size-3.5'
+				'rounded-s-[inherit] rounded-e-none border-0 bg-transparent px-0 ps-2.5 pe-1.5 text-muted-foreground hover:bg-transparent active:not-aria-[haspopup]:translate-y-0 dark:bg-transparent dark:hover:bg-transparent [&_svg]:size-3.5 [&_svg]:opacity-70 [&_svg]:transition-opacity hover:[&_svg]:opacity-100'
 			)}
 			onclick={onReset}
 		>
 			<XCircleIcon />
 		</button>
+		<Separator orientation="vertical" class="data-[orientation=vertical]:h-4" />
 	{/if}
 	<Popover.Root bind:open {onOpenChange}>
 		<Popover.Trigger
@@ -125,8 +140,8 @@
 			data-selected={hasValue ? '' : undefined}
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
-				'border-dashed font-normal',
-				hasValue && 'rounded-s-none border-s-0',
+				'border-0 bg-transparent font-normal transition-colors hover:bg-transparent aria-expanded:bg-transparent dark:bg-transparent dark:hover:bg-transparent',
+				hasValue && 'rounded-s-none rounded-e-[inherit] ps-1.5',
 				className
 			)}
 			{...restProps}

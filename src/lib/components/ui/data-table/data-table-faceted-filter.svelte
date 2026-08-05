@@ -83,27 +83,58 @@
 	}
 </script>
 
-<div class="inline-flex items-center">
+<!--
+	The wrapper wears the whole pill's chrome (the outline button variant, dashed) at all times:
+	both halves inside it paint transparent, so background, border, hover and open-state highlights
+	are one uniform surface — upstream's single `<button>` — even though the clear affordance stays
+	a sibling element. The chrome is unconditional on purpose: were it added only while a value is
+	selected, the variant base's `transition-all` would tween the wrapper's background and border up
+	from transparent on first selection — a visible flicker. For the same reason the trigger swaps
+	`transition-all` for `transition-colors`, so its start padding (10px resting → 6px selected)
+	snaps instead of sliding the title. `has-data-[state=open]:` mirrors the variant's
+	`aria-expanded:` highlight, which bits-ui only ever sets on the trigger half, and
+	`active:…translate-y-0` cancels the press nudge the wrapper `<div>` would otherwise add on top
+	of its children's own. Consumers overriding background or border via `class` now target a
+	transparent trigger — such overrides belong on upstream's single button, which this wrapper
+	plays.
+-->
+<div
+	class={cn(
+		buttonVariants({ variant: 'outline', size: 'sm' }),
+		'gap-0 border-dashed p-0 font-normal active:not-aria-[haspopup]:translate-y-0 has-data-[state=open]:bg-muted has-data-[state=open]:text-foreground'
+	)}
+>
 	{#if selectedValues.length > 0}
 		<!--
 			Upstream nests this affordance inside the trigger `<button>` as a
 			`div role="button" tabIndex={0}` with a click handler only — it is not keyboard-operable
 			and nests interactive content inside a button. Here it stays a real sibling `<button>`
-			(plan.md Divergence 14, FR-014), styled as the leading half of the trigger's pill: the two
-			share one dashed outline with no seam between them, so it reads as upstream's single
-			control while remaining focusable and operable from the keyboard.
+			(plan.md Divergence 14, FR-014), rendered as the leading half of the wrapper's pill while
+			remaining focusable and operable from the keyboard. The `hover:`/`dark:` transparents add
+			no colour of their own — they only cancel the outline variant's per-element state layers
+			so the wrapper alone paints, and only the icon dims, exactly like upstream. `ps-2.5` puts
+			the X exactly where the resting plus icon sits (upstream swaps them in place), and
+			`active:…translate-y-0` keeps the half from nudging on press — upstream's X never moves.
 		-->
 		<button
 			type="button"
 			aria-label={`Clear ${title} filter`}
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
-				'rounded-e-none border-e-0 border-dashed px-2 text-muted-foreground opacity-70 transition-opacity hover:opacity-100 [&_svg]:size-3.5'
+				'rounded-s-[inherit] rounded-e-none border-0 bg-transparent px-0 ps-2.5 pe-1.5 text-muted-foreground hover:bg-transparent active:not-aria-[haspopup]:translate-y-0 dark:bg-transparent dark:hover:bg-transparent [&_svg]:size-3.5 [&_svg]:opacity-70 [&_svg]:transition-opacity hover:[&_svg]:opacity-100'
 			)}
 			onclick={onReset}
 		>
 			<XCircleIcon />
 		</button>
+		<!--
+			Upstream draws no rule here — inside its single button only the 4px gap separates the
+			clear icon from the title. Ours marks where the keyboard-operable clear half ends, in the
+			label↔badges separator's look *and spacing*: that rule breathes `gap-1` + `mx-0.5` = 6px
+			on each side, so the clear's `pe-1.5` and the trigger's `ps-1.5` give this one the same
+			6px flanks. Symmetry costs the title a one-off 9px step when the clear half mounts.
+		-->
+		<Separator orientation="vertical" class="data-[orientation=vertical]:h-4" />
 	{/if}
 	<Popover.Root bind:open {onOpenChange}>
 		<Popover.Trigger
@@ -113,8 +144,8 @@
 			data-selected={selectedValues.length > 0 ? '' : undefined}
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
-				'border-dashed font-normal',
-				selectedValues.length > 0 && 'rounded-s-none border-s-0',
+				'border-0 bg-transparent font-normal transition-colors hover:bg-transparent aria-expanded:bg-transparent dark:bg-transparent dark:hover:bg-transparent',
+				selectedValues.length > 0 && 'rounded-s-none rounded-e-[inherit] ps-1.5',
 				className
 			)}
 			{...restProps}

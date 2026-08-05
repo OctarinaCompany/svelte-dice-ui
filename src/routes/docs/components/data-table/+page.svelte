@@ -4,6 +4,9 @@
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
 	import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
+	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
 	import CircleDashedIcon from '@lucide/svelte/icons/circle-dashed';
 	import DollarSignIcon from '@lucide/svelte/icons/dollar-sign';
 	import MoreHorizontalIcon from '@lucide/svelte/icons/more-horizontal';
@@ -152,7 +155,42 @@
 		initialState: { sorting: [{ id: 'title', desc: false }], pagination: { pageSize: 3 } }
 	});
 
-	// --- Example 2: filter, hide columns and select rows ------------------------
+	// --- Example 2: plain sortable headers ---------------------------------------
+
+	// Upstream ships no dropdown-free header demo; this is the classic shadcn/ui data-table
+	// recipe — a ghost button in the header snippet that cycles the sort — composed in the page
+	// only, so the column header part stays untouched.
+	const plainColumns: DataTableColumnDef<Project>[] = [
+		{
+			id: 'title',
+			accessorKey: 'title',
+			header: plainSortHeader,
+			meta: { label: 'Title' }
+		},
+		{
+			id: 'status',
+			accessorKey: 'status',
+			header: plainSortHeader,
+			cell: statusCell,
+			meta: { label: 'Status' }
+		},
+		{
+			id: 'budget',
+			accessorKey: 'budget',
+			header: plainSortHeader,
+			cell: budgetCell,
+			meta: { label: 'Budget' }
+		}
+	];
+
+	const plain = createDataTable<Project>({
+		data: () => projects,
+		columns: () => plainColumns,
+		getRowId: (row) => row.id,
+		initialState: { sorting: [{ id: 'title', desc: false }], pagination: { pageSize: 3 } }
+	});
+
+	// --- Example 3: filter, hide columns and select rows ------------------------
 
 	const toolbarColumns: DataTableColumnDef<Project>[] = [
 		{
@@ -210,7 +248,7 @@
 		initialState: { pagination: { pageSize: 4 } }
 	});
 
-	// --- Example 3: range and date filters, pinning and reordering ---------------
+	// --- Example 4: range and date filters, pinning and reordering ---------------
 
 	const advancedColumns: DataTableColumnDef<Project>[] = [
 		{
@@ -454,6 +492,28 @@
 	<DataTable.ColumnHeader column={ctx.column} label="Status" />
 {/snippet}
 
+<!-- A dropdown-free sortable header: clicking it cycles ascending <-> descending directly.
+	The label comes from the column's `meta.label`, so one snippet serves every column. -->
+{#snippet plainSortHeader(ctx: HeaderContext<Project, unknown>)}
+	{@const sorted = ctx.column.getIsSorted()}
+	<Button
+		variant="ghost"
+		size="sm"
+		class="-ms-2.5 [&_svg]:text-muted-foreground"
+		data-sorted={sorted || undefined}
+		onclick={() => ctx.column.toggleSorting(sorted === 'asc')}
+	>
+		{ctx.column.columnDef.meta?.label}
+		{#if sorted === 'desc'}
+			<ChevronDownIcon />
+		{:else if sorted === 'asc'}
+			<ChevronUpIcon />
+		{:else}
+			<ChevronsUpDownIcon />
+		{/if}
+	</Button>
+{/snippet}
+
 {#snippet statusCell(ctx: CellContext<Project, unknown>)}
 	{@const status = ctx.row.original.status}
 	{@const Icon = statusIcons[status]}
@@ -592,6 +652,16 @@
 	>
 		<div class="w-full">
 			<DataTable.Root table={basic.table} />
+		</div>
+	</ComponentPreview>
+
+	<ComponentPreview
+		title="Plain sortable headers"
+		description="Headers without the dropdown menu — clicking a header cycles the sort between ascending and descending. Upstream ships no such demo; this composes a ghost Button in the header snippet, leaving the column header part untouched."
+		class="items-start"
+	>
+		<div class="w-full">
+			<DataTable.Root table={plain.table} />
 		</div>
 	</ComponentPreview>
 

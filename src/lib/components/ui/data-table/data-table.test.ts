@@ -909,13 +909,126 @@ describe('DataTable — upstream parity', () => {
 		await user.click(layerItem('option', 'Todo'));
 		await user.keyboard('{Escape}');
 
-		// Upstream nests the clear control inside the trigger button. Ours stays a real button, so it
-		// carries the leading half of the shared dashed outline instead.
+		// Upstream nests the clear control inside the trigger button. Ours stays a real button, so
+		// the wrapper wears the shared pill chrome and both halves paint transparent over it —
+		// background, border, hover and open-state cannot diverge between the halves.
 		const clear = screen.getByRole('button', { name: 'Clear Status filter' });
 		expect(clear.className).toContain('rounded-e-none');
-		expect(clear.className).toContain('border-e-0');
-		expect(filterTrigger('Status').className).toContain('rounded-s-none');
+		expect(clear.className).toContain('border-0');
+		expect(clear.className).toContain('bg-transparent');
+		expect(clear.parentElement?.className).toContain('border-dashed');
+		// Only the icon dims — dimming the whole half painted its background darker than the
+		// trigger's, leaving a visible seam after the circled-X.
+		expect(clear.className).toContain('[&_svg]:opacity-70');
+		expect(clear.className).not.toMatch(/(?:^|\s)opacity-70(?:\s|$)/);
+		const trigger = filterTrigger('Status');
+		expect(trigger.className).toContain('rounded-s-none');
+		expect(trigger.className).toContain('bg-transparent');
+		// `transition-colors` must have displaced the variant base's `transition-all`: with it, the
+		// trigger's 10px → 1px start-padding change would animate and slide the title sideways.
+		expect(trigger.className).toContain('transition-colors');
+		expect(trigger.className).not.toContain('transition-all');
 	});
+
+	it('separates the filter label from the selected badges with a vertical rule', async () => {
+		const user = setupUser();
+		renderHarness();
+
+		await openFilterPopover(user, 'Status');
+		await user.click(layerItem('option', 'Todo'));
+		await user.keyboard('{Escape}');
+
+		// Upstream renders a vertical Separator between the trigger label and the selected-count
+		// badges; the pill must keep it while a value is selected.
+		expect(
+			filterTrigger('Status').querySelector('[data-slot="separator"][data-orientation="vertical"]')
+		).not.toBeNull();
+	});
+
+	// The same pill treatment is applied to all three filter variants, so the pins below run once
+	// per variant, selecting a value straight through the column (the popover flows above already
+	// cover the interactive path).
+	const pillVariants: ReadonlyArray<{
+		title: string;
+		select: (state: DataTableState<DataTableHarnessRow>) => void;
+	}> = [
+		{
+			title: 'Status',
+			select: (state) => state.table.getColumn('status')?.setFilterValue(['todo'])
+		},
+		{
+			title: 'Est. Hours',
+			select: (state) => state.table.getColumn('estimatedHours')?.setFilterValue([4, 12])
+		},
+		{
+			title: 'Due',
+			select: (state) =>
+				state.table
+					.getColumn('dueAt')
+					?.setFilterValue([HARNESS_ROWS[0].dueAt, HARNESS_ROWS[2].dueAt])
+		}
+	];
+
+	for (const { title, select } of pillVariants) {
+		it(`wears the ${title} pill chrome before any value is selected so selection never repaints it`, async () => {
+			const { state } = renderHarness();
+
+			// `Popover.Root` renders no DOM of its own, so the trigger's parent is the pill wrapper.
+			const trigger = filterTrigger(title);
+			const wrapper = trigger.parentElement;
+			expect(wrapper?.className).toContain('border-dashed');
+			expect(trigger.className).toContain('bg-transparent');
+			expect(trigger).not.toHaveAttribute('data-selected');
+
+			const restingClasses = wrapper?.className;
+			select(state);
+			await tick();
+
+			expect(trigger).toHaveAttribute('data-selected', '');
+			// The no-flicker invariant: the chrome-bearing wrapper's classes never change across a
+			// selection, so its `transition-all` has no background/border swap to cross-fade.
+			expect(wrapper?.className).toBe(restingClasses);
+		});
+
+		it(`draws a vertical rule between the ${title} clear affordance and its trigger`, async () => {
+			const { state } = renderHarness();
+
+			const wrapper = filterTrigger(title).parentElement;
+			expect(wrapper?.querySelector(':scope > [data-slot="separator"]')).toBeNull();
+
+			select(state);
+			await tick();
+
+			// The user-facing seam of the FR-014 divergence: a 1px, h-4 rule — the label↔badges
+			// separator's look — marks where the keyboard-operable clear half ends.
+			const clear = screen.getByRole('button', { name: `Clear ${title} filter` });
+			const rule = clear.nextElementSibling;
+			expect(rule?.matches('[data-slot="separator"][data-orientation="vertical"]')).toBe(true);
+			expect(rule?.className).toContain('h-4');
+			// The label↔badges separator inside the trigger is a distinct rule and must survive.
+			expect(
+				filterTrigger(title).querySelector('[data-slot="separator"][data-orientation="vertical"]')
+			).not.toBeNull();
+		});
+
+		it(`gives the ${title} clear rule the same 6px flanks as the label↔badges one`, async () => {
+			const { state } = renderHarness();
+
+			select(state);
+			await tick();
+
+			// jsdom performs no layout, so the symmetric spacing is pinned as the class recipe: the
+			// label↔badges rule breathes gap-1 + mx-0.5 = 6px per side, and the clear rule matches it
+			// through the clear half's 6px end padding and the trigger's 6px start padding. ps-2.5
+			// still puts the X exactly where the resting leading icon sits.
+			const clear = screen.getByRole('button', { name: `Clear ${title} filter` });
+			expect(clear.className).toContain('ps-2.5');
+			expect(clear.className).toContain('pe-1.5');
+			expect(clear.className).not.toContain('px-2');
+			const trigger = filterTrigger(title);
+			expect(trigger.className).toContain('ps-1.5');
+		});
+	}
 });
 
 describe('DataTable — guard rails and edge cases', () => {
