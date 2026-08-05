@@ -278,7 +278,7 @@ describe('size/thickness/theming', () => {
 		}
 	});
 
-	it('both circles carry the verbatim geometry chrome attributes in default and custom renders', () => {
+	it('both circles carry the documented geometry chrome attributes in default and custom renders', () => {
 		for (const props of [{ value: 50 }, { value: 50, size: 80, thickness: 6 }]) {
 			const { container, unmount } = render(Harness, { props });
 			const track = bySlot(container, 'circular-progress-track');
@@ -288,7 +288,9 @@ describe('size/thickness/theming', () => {
 				expect(circle).toHaveAttribute('fill', 'none');
 				expect(circle).toHaveAttribute('stroke', 'currentColor');
 				expect(circle).toHaveAttribute('stroke-linecap', 'round');
-				expect(circle).toHaveAttribute('vector-effect', 'non-scaling-stroke');
+				// Deliberate divergence from upstream: non-scaling-stroke makes the user-unit dash
+				// pattern repeat at devicePixelRatio != 1, painting a phantom second arc.
+				expect(circle).not.toHaveAttribute('vector-effect');
 			}
 			unmount();
 		}

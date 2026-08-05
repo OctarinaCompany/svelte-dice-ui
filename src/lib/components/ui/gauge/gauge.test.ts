@@ -504,6 +504,16 @@ describe('every prop', () => {
 		});
 	});
 
+	it('track and range render without vector-effect (deliberate divergence from upstream)', () => {
+		// Upstream sets vector-effect="non-scaling-stroke", but browsers apply that effect in
+		// screen space: at devicePixelRatio != 1 the user-unit dash pattern stops covering the
+		// on-screen path and repeats, painting a phantom second arc.
+		const { container } = render(Harness, { props: { value: 50 } });
+
+		expect(bySlot(container, 'gauge-track')).not.toHaveAttribute('vector-effect');
+		expect(bySlot(container, 'gauge-range')).not.toHaveAttribute('vector-effect');
+	});
+
 	it('a custom getValueText drives both the rendered text and aria-valuetext', () => {
 		const { container } = render(Harness, {
 			props: {

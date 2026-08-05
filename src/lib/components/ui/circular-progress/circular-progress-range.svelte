@@ -22,6 +22,12 @@
 	const state = getCircularProgressContext('CircularProgressRange');
 </script>
 
+<!--
+	Deliberate divergence from upstream: no vector-effect="non-scaling-stroke". Browsers apply
+	that effect in screen space, so at any effective scale other than 1 (OS display scaling,
+	browser zoom) the user-unit stroke-dasharray stops covering the on-screen path and the dash
+	pattern repeats, painting a phantom second arc.
+-->
 <circle
 	bind:this={ref}
 	cx={state.center}
@@ -33,7 +39,6 @@
 	stroke-linecap="round"
 	stroke-dasharray={state.strokeDasharray}
 	stroke-dashoffset={state.strokeDashoffset}
-	vector-effect="non-scaling-stroke"
 	data-slot="circular-progress-range"
 	data-state={state.state}
 	data-value={state.value ?? undefined}

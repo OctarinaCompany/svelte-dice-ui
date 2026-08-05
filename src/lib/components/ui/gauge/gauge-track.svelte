@@ -18,6 +18,11 @@
 	const state = getGaugeContext('GaugeTrack');
 </script>
 
+<!--
+	No vector-effect="non-scaling-stroke" (deliberate divergence from upstream): it renders the
+	stroke at width/devicePixelRatio and must match the Range, whose dash math requires
+	user-space stroking.
+-->
 <path
 	bind:this={ref}
 	d={state.arcPath}
@@ -25,7 +30,6 @@
 	stroke="currentColor"
 	stroke-width={state.thickness}
 	stroke-linecap="round"
-	vector-effect="non-scaling-stroke"
 	data-slot="gauge-track"
 	data-state={state.state}
 	{...restProps}

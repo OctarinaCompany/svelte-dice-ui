@@ -22,6 +22,11 @@
 	const state = getCircularProgressContext('CircularProgressTrack');
 </script>
 
+<!--
+	No vector-effect="non-scaling-stroke" (deliberate divergence from upstream): it renders the
+	stroke at width/devicePixelRatio and must match the Range, whose dash math requires
+	user-space stroking.
+-->
 <circle
 	bind:this={ref}
 	cx={state.center}
@@ -31,7 +36,6 @@
 	stroke="currentColor"
 	stroke-width={state.thickness}
 	stroke-linecap="round"
-	vector-effect="non-scaling-stroke"
 	data-slot="circular-progress-track"
 	data-state={state.state}
 	{...restProps}
