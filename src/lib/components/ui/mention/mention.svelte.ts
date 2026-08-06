@@ -1,4 +1,3 @@
-import { ComboboxFilterStore, normalizeWithGaps } from '$lib/components/ui/combobox/index.js';
 import type { Direction } from '$lib/components/ui/direction-provider/index.js';
 import { getContext, hasContext, setContext, tick, untrack } from 'svelte';
 
@@ -13,6 +12,7 @@ import {
 	type MentionField,
 	type MentionSpan
 } from './mention-caret.js';
+import { MentionFilterStore, normalizeWithGaps } from './mention-filter.js';
 
 /** The four moves {@link MentionRootState.highlightMove} understands. */
 export type MentionHighlightDirection = 'next' | 'prev' | 'first' | 'last';
@@ -48,8 +48,7 @@ function compareNodePosition(a: Node, b: Node): number {
 }
 
 /**
- * Upstream's `useCollection` — a DOM-ordered item registry, shaped exactly like
- * `ComboboxCollection` (`combobox.svelte.ts:66-102`).
+ * Upstream's `useCollection` — a DOM-ordered item registry.
  *
  * A filtered-out `<Mention.Item>` renders nothing but stays registered with a `null` element, which
  * is what lets it come back when the search clears: {@link entries} feeds the filter and includes
@@ -183,8 +182,8 @@ export class MentionRootState {
 	 * Upstream's explicit `onItemsFilter()` call, made automatic — which is also why the
 	 * "no items left" check can run synchronously instead of in `useFilterStore`'s callback.
 	 */
-	readonly filter: ComboboxFilterStore = $derived.by(() =>
-		new ComboboxFilterStore(this.search).run(this.collection.entries, {
+	readonly filter: MentionFilterStore = $derived.by(() =>
+		new MentionFilterStore(this.search).run(this.collection.entries, {
 			exactMatch: this.exactMatch,
 			onFilter: this.#props.getOnFilter()
 		})
@@ -225,7 +224,7 @@ export class MentionRootState {
 		if (this.collection.entries.length > 0) return this.filter.itemCount;
 		if (this.#knownEntries.length === 0) return -1;
 
-		return new ComboboxFilterStore(this.search).run(this.#knownEntries, {
+		return new MentionFilterStore(this.search).run(this.#knownEntries, {
 			exactMatch: this.exactMatch,
 			onFilter: this.#props.getOnFilter()
 		}).itemCount;

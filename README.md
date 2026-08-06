@@ -15,7 +15,7 @@ Every component ships as **source you own**, not as a dependency. You install it
 
 ## Highlights
 
-- **43 components**, ported one by one from the upstream React source.
+- **41 components**, ported one by one from the upstream React source.
 - **Svelte 5 runes throughout** — `$state`, `$derived`, `$props`, `$bindable`. No stores, no
   `export let`, no `createEventDispatcher`, no legacy slots.
 - **Controlled _and_ uncontrolled** out of the box: every value-bearing prop is `$bindable` and also
@@ -54,8 +54,8 @@ Or skip the CLI entirely: copy a component folder straight out of `src/lib/compo
 with anything its `registryDependencies` lists. There is nothing clever in the packaging — the files
 are the product.
 
-Dependencies resolve automatically — installing `data-table` also pulls in `combobox`,
-`badge-overflow`, `checkbox-group` and `sortable`.
+Dependencies resolve automatically — installing `data-table` also pulls in `sortable` and
+`direction-provider`.
 
 ## Usage
 
@@ -95,7 +95,6 @@ Run the docs site (`pnpm dev`) for a live demo page per component, mirroring eve
 | `circular-progress`  | A ring progress indicator, determinate or indeterminate.         |
 | `color-picker`       | Colour selection across several input methods.                   |
 | `color-swatch`       | Displays a colour value, including transparency.                 |
-| `combobox`           | An input with a filtering popover.                               |
 | `data-grid`          | An editable grid: cell selection, clipboard, nine cell variants. |
 | `data-table`         | Filtering, sorting and pagination over tabular data.             |
 | `direction-provider` | Publishes RTL/LTR to descendants, with a DOM `dir` fallback.     |
@@ -127,7 +126,6 @@ Run the docs site (`pnpm dev`) for a live demo page per component, mirroring eve
 | `stepper`            | Multi-step progress.                                             |
 | `swap`               | Swaps between two states on click or hover.                      |
 | `tags-input`         | Tags with add, edit and remove.                                  |
-| `time-picker`        | Editable segments plus a dropdown, 12h or 24h.                   |
 | `timeline`           | Chronological events, both orientations.                         |
 | `tour`               | A guided tour that highlights elements.                          |
 

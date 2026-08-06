@@ -2,9 +2,12 @@
  * The matcher, the scorer and the filter store, ported from `@diceui/shared`'s `use-filter.ts` and
  * `use-filter-store.ts`.
  *
+ * Originated in the (since-removed) `combobox` port, which shared it with `mention` — its only
+ * other consumer. `mention` is now its sole owner.
+ *
  * Deliberately rune-free: the scoring contract is observable API (`2` exact, `1.5` prefix, `1`/`0`
  * from the matcher, sorted descending, batched at 250 items), and keeping it out of `.svelte.ts`
- * means `data-table` and `faceted` can reuse it without a component and without a reactive context.
+ * needs no component and no reactive context to exercise.
  */
 
 /** Least-recently-used cache — upstream's `LRUCache` (`use-filter.ts:3-58`), same eviction order. */
@@ -102,7 +105,7 @@ export function normalizeWithGaps(value: string): string {
 	return normalized;
 }
 
-export type ComboboxFilterOptions = {
+export type MentionFilterOptions = {
 	/**
 	 * Whether to match strings with gaps between words, ignoring case, punctuation and separators.
 	 *
@@ -118,7 +121,7 @@ export type ComboboxFilterOptions = {
 };
 
 /** The four matchers `createFilter` returns. Every one answers `true` for an empty needle. */
-export type ComboboxFilter = {
+export type MentionFilter = {
 	/** Whether `value` begins with `term`. */
 	startsWith(value: string, term: string): boolean;
 	/** Whether `value` ends with `term`. */
@@ -133,7 +136,7 @@ export type ComboboxFilter = {
  * Upstream's `useFilter` (`use-filter.ts:107-259`) as a plain factory. The collator is memoised on
  * the serialised options, so repeated calls with the same options share one `Intl.Collator`.
  */
-export function createFilter(options?: ComboboxFilterOptions): ComboboxFilter {
+export function createFilter(options?: MentionFilterOptions): MentionFilter {
 	const cacheKey = options
 		? Object.entries(options)
 				.sort((a, b) => (a[0] < b[0] ? -1 : 1))
@@ -268,7 +271,7 @@ export function scoreItem(value: string, term: string, options?: ScoreItemOption
 	return Number(matcher(value, term));
 }
 
-export type ComboboxFilterRunOptions = ScoreItemOptions & {
+export type MentionFilterRunOptions = ScoreItemOptions & {
 	/**
 	 * Whether the consumer filters the list itself. When `true` the store scores nothing and every
 	 * item stays visible.
@@ -279,7 +282,7 @@ export type ComboboxFilterRunOptions = ScoreItemOptions & {
 };
 
 /** One registered item, as the store needs to see it. */
-export type ComboboxFilterItem = {
+export type MentionFilterItem = {
 	readonly value: string;
 	readonly groupId?: string;
 };
@@ -291,7 +294,7 @@ export type ComboboxFilterItem = {
  * instance in a `$derived.by` keyed on `(search, items, options)` — there is never a partially
  * updated store to observe.
  */
-export class ComboboxFilterStore {
+export class MentionFilterStore {
 	/** The trimmed input text driving the filter. `''` means "show everything". */
 	search = '';
 	/** How many items survived the last pass. */
@@ -312,7 +315,7 @@ export class ComboboxFilterStore {
 	 * which groups survived. A blank search or `manualFiltering` short-circuits to "everything is
 	 * visible", which is also what leaves `items` empty.
 	 */
-	run(items: readonly ComboboxFilterItem[], options: ComboboxFilterRunOptions = {}): this {
+	run(items: readonly MentionFilterItem[], options: MentionFilterRunOptions = {}): this {
 		this.#manualFiltering = options.manualFiltering ?? false;
 		this.items.clear();
 		this.groups.clear();
@@ -324,7 +327,7 @@ export class ComboboxFilterStore {
 
 		const term = this.search;
 		let itemCount = 0;
-		let pendingBatch: ComboboxFilterItem[] = [];
+		let pendingBatch: MentionFilterItem[] = [];
 		const BATCH_SIZE = 250;
 
 		const processBatch = () => {
