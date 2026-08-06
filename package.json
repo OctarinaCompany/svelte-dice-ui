@@ -14,7 +14,8 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test:unit": "vitest",
-		"registry:build": "shadcn-svelte registry build && node tools/registry-postbuild.mjs"
+		"registry:build": "shadcn-svelte registry build && node tools/registry-postbuild.mjs",
+		"audit:style": "node tools/style-audit.mjs"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

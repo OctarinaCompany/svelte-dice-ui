@@ -55,5 +55,23 @@ export default ts.config(
 		rules: {
 			'svelte/no-navigation-without-resolve': 'off'
 		}
+	},
+	{
+		// Workflow scripts run inside Claude Code's Workflow sandbox, which injects its
+		// orchestration hooks as globals — declaring them here is describing that runtime,
+		// exactly as `globals.browser` describes a browser.
+		files: ['tools/*-workflow.js'],
+		languageOptions: {
+			globals: {
+				agent: 'readonly',
+				pipeline: 'readonly',
+				parallel: 'readonly',
+				phase: 'readonly',
+				log: 'readonly',
+				args: 'readonly',
+				budget: 'readonly',
+				workflow: 'readonly'
+			}
+		}
 	}
 );

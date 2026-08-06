@@ -34,6 +34,7 @@ jobs:
       # The gates run here too: a red build must not reach the published site.
       - run: pnpm run check
       - run: pnpm run lint
+      - run: pnpm run audit:style
       - run: pnpm run test:unit -- --run
 
       - name: Build the static site
