@@ -521,3 +521,24 @@ re-implementing the shared hook. Only port `@diceui/shared` logic when bits-ui h
 
 Do not touch `.reference/`, `.specify/`, `.claude/`, `scripts/`, `.port-state.json` or `.port-logs/`, and do
 not run git commands — the orchestrator owns the working tree.
+
+---
+
+## 12. Committing and pushing
+
+These steps apply to interactive sessions where the user asks for a commit or a push (the automated
+port orchestrator never runs git, per §11).
+
+1. **Keep the Claude Code skill in sync.** `skills/svelte-dice-ui/SKILL.md` is the consumer-facing
+   description of this registry: the install command, the component catalogue with one-line
+   descriptions, the not-ported list, the theme-token notes and the usage conventions. Before
+   pushing, check whether the change makes any of that stale — a component added, removed or
+   renamed, a registry description changed, a theme token added, the install flow altered — and
+   update the skill in the same push. Most component-internal fixes need no skill change; adding or
+   removing a component always does.
+2. **The docs site deploys from `main`.** `.github/workflows/deploy.yml` runs on every push to
+   `main`, replays the quality gates and publishes the static site to GitHub Pages. A push is not
+   done until that run is green: watch it (`gh run watch`, or
+   `gh run list --workflow=deploy.yml --limit 1`) and fix a red run immediately — Pages keeps
+   serving the previous build until a run succeeds, so a red run silently leaves the published site
+   and `static/r/` payloads stale.
