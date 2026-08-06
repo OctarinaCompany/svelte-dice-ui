@@ -65,7 +65,7 @@
 			{/each}
 		</div>
 		{#if withViewOptions}
-			<Skeleton class="ml-auto hidden h-7 w-18 lg:flex" />
+			<Skeleton class="ml-auto hidden h-8 w-18 lg:flex" />
 		{/if}
 	</div>
 	<div class="rounded-md border">
@@ -98,16 +98,16 @@
 			<div class="flex items-center gap-4 sm:gap-6 lg:gap-8">
 				<div class="flex items-center gap-2">
 					<Skeleton class="h-7 w-24" />
-					<Skeleton class="h-7 w-18" />
+					<Skeleton class="h-8 w-18" />
 				</div>
 				<div class="flex items-center justify-center text-sm font-medium">
 					<Skeleton class="h-7 w-20" />
 				</div>
 				<div class="flex items-center gap-2">
-					<Skeleton class="hidden size-7 lg:block" />
-					<Skeleton class="size-7" />
-					<Skeleton class="size-7" />
-					<Skeleton class="hidden size-7 lg:block" />
+					<Skeleton class="hidden size-8 lg:block" />
+					<Skeleton class="size-8" />
+					<Skeleton class="size-8" />
+					<Skeleton class="hidden size-8 lg:block" />
 				</div>
 			</div>
 		</div>

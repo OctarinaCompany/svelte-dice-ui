@@ -164,7 +164,7 @@
 		onpointerup: handlePointerUp,
 		onkeydown: handleKeydown,
 		class: cn(
-			'relative h-40 w-full cursor-crosshair touch-none rounded-sm border outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-disabled:pointer-events-none data-disabled:opacity-50',
+			'relative h-40 w-full cursor-crosshair touch-none rounded-sm border outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 data-disabled:pointer-events-none data-disabled:opacity-50',
 			className
 		)
 	} as ColorPickerAreaChildProps);

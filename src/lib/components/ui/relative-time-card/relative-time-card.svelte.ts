@@ -36,12 +36,14 @@ export function resolveRelativeTimeCardVariant(value?: string): RelativeTimeCard
 }
 
 /**
- * Upstream `triggerVariants` (lines 107-121), verbatim except `focus-visible:outline-none`, which
- * is dropped so the focus indicator is never suppressed (research R-12). The ring utilities it was
- * paired with are kept.
+ * Upstream `triggerVariants` (lines 107-121), with upstream's focus treatment
+ * (`focus-visible:outline-none` plus a hard `ring-2 ring-ring ring-offset-2`) re-mapped to this
+ * repo's focus family — `outline-none` paired with `focus-visible:ring-3
+ * focus-visible:ring-ring/50`, as `button.svelte` and every conforming port use — so the trigger
+ * always shows the kit's soft ring instead of the UA outline.
  */
 export const relativeTimeCardTriggerVariants = tv({
-	base: 'inline-flex w-fit items-center justify-center text-sm text-foreground/70 transition-colors hover:text-foreground/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+	base: 'inline-flex w-fit items-center justify-center text-sm text-foreground/70 transition-colors outline-none hover:text-foreground/90 focus-visible:ring-3 focus-visible:ring-ring/50',
 	variants: {
 		variant: {
 			default: '',

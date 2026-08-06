@@ -153,7 +153,7 @@ describe('segment-navigation pure helpers (T005, V-43/V-44/V-45)', () => {
 		expect(segmentedInputItemVariants({ position: 'last', orientation: 'vertical' })).toContain(
 			'rounded-s-lg'
 		);
-		expect(segmentedInputItemVariants({ size: 'lg' })).toContain('h-11');
+		expect(segmentedInputItemVariants({ size: 'lg' })).toContain('h-9');
 	});
 });
 
@@ -369,9 +369,9 @@ describe('SegmentedInput position assignment (T006, V-5/V-6/V-7/V-8/V-9)', () =>
 
 describe('SegmentedInput sizes (T006, V-10)', () => {
 	it.each([
-		['sm', 'h-8'],
-		['default', 'h-9'],
-		['lg', 'h-11']
+		['sm', 'h-7'],
+		['default', 'h-8'],
+		['lg', 'h-9']
 	] as const)('applies the %s size to every item', async (size, height) => {
 		const { rerender } = renderGroup({ size });
 		await tick();

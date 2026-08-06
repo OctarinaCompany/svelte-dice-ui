@@ -94,8 +94,14 @@
 			{#if children}
 				{@render children()}
 			{:else}
-				<!-- The wrapper is the live region; the spinner must not announce a second one. -->
-				<Spinner role="presentation" aria-hidden="true" class="size-20 stroke-[0.0938rem]" />
+				<!-- The wrapper is the live region; the spinner must not announce a second one.
+					`text-primary` keeps it visible over the dark media surface in both page themes,
+					as upstream tints it — the Spinner primitive itself inherits `currentColor`. -->
+				<Spinner
+					role="presentation"
+					aria-hidden="true"
+					class="size-20 stroke-[0.0938rem] text-primary"
+				/>
 			{/if}
 		</div>
 	{/if}

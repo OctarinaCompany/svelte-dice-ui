@@ -50,7 +50,7 @@
 		id: root.labelId,
 		for: root.inputId,
 		class: cn(
-			"text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 data-required:after:ml-0.5 data-required:after:text-destructive data-required:after:content-['*']",
+			"text-sm leading-none font-medium data-disabled:cursor-not-allowed data-disabled:opacity-50 data-required:after:ml-0.5 data-required:after:text-destructive data-required:after:content-['*']",
 			className
 		)
 	} as EditableLabelChildProps);

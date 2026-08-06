@@ -42,7 +42,7 @@
 		'data-slot': 'speed-dial-label',
 		...restProps,
 		class: cn(
-			'pointer-events-none rounded-md bg-popover px-2 py-1 text-sm whitespace-nowrap text-popover-foreground shadow-md',
+			'pointer-events-none rounded-md bg-popover px-2 py-1 text-sm whitespace-nowrap text-popover-foreground shadow-md ring-1 ring-foreground/10',
 			className
 		)
 	} as SpeedDialLabelChildProps);

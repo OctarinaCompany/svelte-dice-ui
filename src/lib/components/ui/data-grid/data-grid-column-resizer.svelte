@@ -138,7 +138,7 @@
 	tabindex={0}
 	class={cn(
 		"absolute -end-px top-0 z-50 h-full w-0.5 cursor-ew-resize touch-none bg-border transition-opacity select-none after:absolute after:inset-y-0 after:start-1/2 after:h-full after:w-[18px] after:-translate-x-1/2 after:content-[''] hover:bg-primary focus:bg-primary focus:outline-none",
-		column.getIsResizing() ? 'bg-primary' : 'opacity-0 hover:opacity-100',
+		column.getIsResizing() ? 'bg-primary' : 'opacity-0 hover:opacity-100 focus-visible:opacity-100',
 		className
 	)}
 	onfocus={() => {

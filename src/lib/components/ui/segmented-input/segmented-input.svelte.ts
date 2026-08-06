@@ -19,7 +19,7 @@ export type SegmentedInputOrientation = (typeof SEGMENTED_INPUT_ORIENTATIONS)[nu
 
 /**
  * Upstream `segmentedInputItemVariants` (radix/ui/segmented-input.tsx:128-168), translated from
- * `cva` to `tv()`, with two deliberate corrections:
+ * `cva` to `tv()`, with three deliberate corrections:
  *
  * - **Logical borders (D-06).** Upstream mixes logical and physical properties in one rule
  *   (`-ms-px … border-l-0`), so under `dir="rtl"` every seam renders a doubled border and the
@@ -28,6 +28,9 @@ export type SegmentedInputOrientation = (typeof SEGMENTED_INPUT_ORIENTATIONS)[nu
  * - **`rounded-*-lg` (D-05).** This repo's `Input` uses `rounded-lg` where upstream's uses
  *   `rounded-md`, so the vertical compounds that *restore* a corner must restore it at the group's
  *   own radius.
+ * - **Size scale re-anchored.** Upstream's scale sits on its `h-9 px-3` base input; this repo's
+ *   `Input` is `h-8 px-2.5`, so every step shifts down one to stay on the repo's control ramp
+ *   (`sm` h-7, `default` h-8, `lg` h-9 — matching the select-trigger and button height steps).
  *
  * Colour, focus and invalid styling all come from the composed `Input`; these variants add geometry
  * only (Principle VIII).
@@ -46,9 +49,9 @@ export const segmentedInputItemVariants = tv({
 			vertical: ''
 		},
 		size: {
-			sm: 'h-8 px-2 text-xs',
-			default: 'h-9 px-3',
-			lg: 'h-11 px-4'
+			sm: 'h-7 px-2 text-xs',
+			default: 'h-8 px-2.5',
+			lg: 'h-9 px-3'
 		}
 	},
 	compoundVariants: [

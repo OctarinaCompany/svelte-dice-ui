@@ -111,7 +111,7 @@
 	required={isRequired}
 	{...restProps}
 	class={cn(
-		'h-full flex-1 rounded-s-none rounded-e-lg border-0 bg-transparent shadow-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:bg-transparent aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20',
+		'h-full flex-1 rounded-s-none rounded-e-lg border-0 bg-transparent shadow-none ring-0 focus-visible:ring-0 disabled:bg-transparent aria-invalid:ring-0 dark:bg-transparent dark:disabled:bg-transparent',
 		className
 	)}
 	placeholder={root.placeholder}

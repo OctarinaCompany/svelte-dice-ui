@@ -140,14 +140,17 @@
 			{onValueChange}
 			{onValueCommit}
 			class={cn(
-				'relative flex h-1 touch-none items-center overflow-hidden rounded-full bg-muted-foreground/60 select-none data-disabled:pointer-events-none data-disabled:opacity-50',
+				'relative flex h-1 touch-none items-center select-none data-disabled:pointer-events-none data-disabled:opacity-50',
 				expandable
 					? 'w-0 opacity-0 transition-[width,opacity] duration-200 ease-in-out group-focus-within:w-16 group-focus-within:opacity-100 group-hover:w-16 group-hover:opacity-100'
 					: 'w-16'
 			)}
 		>
 			{#snippet children({ thumbItems })}
-				<Slider.Range class="absolute h-full bg-primary will-change-[width]" />
+				<!-- The track owns the clipping so the thumb and its rings stay visible (seek's R-03 note). -->
+				<div class="relative h-1 w-full grow overflow-hidden rounded-full bg-muted-foreground/60">
+					<Slider.Range class="absolute h-full bg-primary will-change-[width]" />
+				</div>
 				{#each thumbItems as thumb (thumb.index)}
 					<!-- `bits-ui` puts `role="slider"` on the thumb, so the name and value text live there. -->
 					<Slider.Thumb

@@ -61,7 +61,7 @@
 		'data-slot': 'tour-title',
 		dir: root.dir,
 		...restProps,
-		class: cn('text-lg leading-none font-semibold tracking-tight', className)
+		class: cn('text-base leading-none font-medium', className)
 	} as TourTitleChildProps);
 </script>
 

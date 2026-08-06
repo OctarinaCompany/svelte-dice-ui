@@ -139,7 +139,7 @@
 	data-invalid={root.isInvalid ? '' : undefined}
 	{...restProps}
 	class={cn(
-		'flex w-fit items-center gap-2 rounded-sm text-sm leading-none select-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden data-invalid:text-destructive data-disabled:cursor-not-allowed data-disabled:opacity-50',
+		'flex w-fit items-center gap-2 rounded-sm text-sm leading-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-hidden data-invalid:text-destructive data-disabled:cursor-not-allowed data-disabled:opacity-50',
 		className
 	)}
 	{onclick}
@@ -150,7 +150,7 @@
 		data-state={item.dataState}
 		data-disabled={item.disabled ? '' : undefined}
 		data-invalid={root.isInvalid ? '' : undefined}
-		class="flex size-4 shrink-0 items-center justify-center rounded-sm border border-primary shadow-sm data-invalid:border-destructive data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:data-invalid:bg-destructive data-[state=checked]:data-invalid:text-primary-foreground data-[state=unchecked]:data-invalid:bg-transparent"
+		class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-input data-invalid:border-destructive data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:data-invalid:bg-destructive data-[state=checked]:data-invalid:text-primary-foreground data-[state=unchecked]:data-invalid:bg-transparent dark:bg-input/30 dark:data-[state=checked]:bg-primary dark:data-[state=checked]:data-invalid:bg-destructive"
 	>
 		{#if indicator}
 			{@render indicator()}

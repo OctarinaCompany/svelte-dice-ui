@@ -194,13 +194,15 @@
 							>
 								<div
 									class={cn(
-										'flex size-4 items-center justify-center rounded-sm border border-primary',
+										'flex size-4 items-center justify-center rounded-[4px] border border-input',
 										isSelected
-											? 'bg-primary text-primary-foreground'
-											: 'opacity-50 [&_svg]:invisible'
+											? 'border-primary bg-primary text-primary-foreground'
+											: 'dark:bg-input/30 [&_svg]:invisible'
 									)}
 								>
-									<CheckIcon />
+									<!-- Explicit size so Command.Item's [&_svg:not([class*='size-'])]:size-4 rule
+										does not inflate the tick to fill the box (checkbox.svelte draws size-3.5). -->
+									<CheckIcon class="size-3.5" />
 								</div>
 								{#if option.icon}
 									{@const Icon = option.icon}

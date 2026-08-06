@@ -850,13 +850,19 @@ describe('RelativeTimeCard styling', () => {
 		expect(element.classList.contains('text-foreground/70')).toBe(false);
 	});
 
-	it('never suppresses the focus outline on any rendered part', () => {
+	it('pairs any suppressed focus outline with the focus-visible ring family', () => {
 		render(RelativeTimeCard.Root, { props: { date: FIVE_MINUTES_AGO, defaultOpen: true } });
 
-		for (const element of document.body.querySelectorAll('*')) {
-			for (const className of element.classList) {
-				expect(className).not.toMatch(/(^|:)outline-none$/);
-			}
+		const suppressed = [...document.body.querySelectorAll('*')].filter((element) =>
+			[...element.classList].some((className) => /(^|:)outline-none$/.test(className))
+		);
+
+		// The trigger swaps the UA outline for the kit ring (button.svelte's focus family); any
+		// part that suppresses the outline must supply that replacement.
+		expect(suppressed).toContain(bySlot('relative-time-card-trigger'));
+		for (const element of suppressed) {
+			expect(element.classList.contains('focus-visible:ring-3')).toBe(true);
+			expect(element.classList.contains('focus-visible:ring-ring/50')).toBe(true);
 		}
 	});
 

@@ -101,7 +101,7 @@
 		tabindex: root.disabled || root.readOnly ? undefined : 0,
 		...restProps,
 		class: cn(
-			'cursor-text truncate rounded-sm border border-transparent py-1 text-base focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden data-disabled:cursor-not-allowed data-disabled:opacity-50 data-empty:text-muted-foreground data-readonly:cursor-default md:text-sm',
+			'cursor-text truncate rounded-sm border border-transparent py-1 text-base focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden aria-invalid:border-destructive data-disabled:cursor-not-allowed data-disabled:opacity-50 data-empty:text-muted-foreground data-readonly:cursor-default md:text-sm dark:aria-invalid:border-destructive/50',
 			className
 		),
 		onclick,

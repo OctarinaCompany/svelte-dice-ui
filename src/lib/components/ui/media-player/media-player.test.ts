@@ -343,7 +343,7 @@ describe('rendering & composition', () => {
 		['media-player', 'relative'],
 		['media-player-controls', 'absolute'],
 		['media-player-play-button', 'size-8'],
-		['media-player-seek', 'rounded-full'],
+		['media-player-seek', 'touch-none'],
 		['media-player-volume-container', 'items-center'],
 		['media-player-time', 'text-sm']
 	])('keeps %s own layout classes alongside the caller class', async (slot, ownClass) => {

@@ -60,6 +60,7 @@
 			sideOffset={sideOffset ?? root.tooltipSideOffset}
 			portalProps={{ to: root.portalContainer ?? undefined }}
 			class="flex items-center gap-2 border bg-popover px-2 py-1 font-medium text-popover-foreground data-[side=top]:mb-3.5"
+			arrowClasses="hidden"
 		>
 			{#if tooltip}
 				<p>{tooltip}</p>

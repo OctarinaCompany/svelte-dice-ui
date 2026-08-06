@@ -92,7 +92,7 @@
 		'aria-hidden': 'true' as const,
 		...restProps,
 		style: overlayStyle,
-		class: cn('pointer-events-none', !root.flatCursor && 'cursor-grabbing', className)
+		class: cn('pointer-events-none z-50', !root.flatCursor && 'cursor-grabbing', className)
 	});
 </script>
 

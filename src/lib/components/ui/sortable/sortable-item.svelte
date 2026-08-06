@@ -160,7 +160,7 @@
 			: {}),
 		style: itemStyle,
 		class: cn(
-			'focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1',
+			'focus-visible:outline-hidden focus-visible:ring-3 focus-visible:ring-ring/50',
 			asHandle && 'touch-none select-none',
 			root.flatCursor ? 'cursor-default' : 'data-dragging:cursor-grabbing',
 			!item.isDragging && asHandle && !root.flatCursor && 'cursor-grab',

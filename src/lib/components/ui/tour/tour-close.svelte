@@ -22,9 +22,12 @@
 		child?: Snippet<[{ props: TourCloseChildProps }]>;
 	};
 
-	/** Upstream's class list (tour.tsx:1512-1515). */
+	/**
+	 * Upstream's class list (tour.tsx:1512-1515), with the legacy `focus:` offset ring replaced by
+	 * this repo's focus-visible ring family (button.svelte) and disabled dimming added.
+	 */
 	const CLOSE_CLASSES =
-		"absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+		"absolute top-4 right-4 rounded-xs opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 </script>
 
 <script lang="ts">

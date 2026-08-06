@@ -746,20 +746,26 @@ describe('BadgeOverflow custom rendering', () => {
 		expect(samples[0]).toHaveAttribute('data-count', '99');
 	});
 
-	it('renders the default indicator with upstream’s class set when no snippet is given', async () => {
+	it('renders the default indicator with the outline-badge class set when no snippet is given', async () => {
 		const { container } = await renderHarness({ items: TAGS }, 256);
 		const badge = indicator(visibleContainer(container));
 
 		expect(badge).toHaveClass(
 			'inline-flex',
 			'h-5',
+			'w-fit',
 			'shrink-0',
 			'items-center',
-			'rounded-md',
+			'justify-center',
+			'rounded-4xl',
 			'border',
-			'px-1.5',
+			'border-border',
+			'px-2',
+			'py-0.5',
 			'text-xs',
-			'font-semibold'
+			'font-medium',
+			'whitespace-nowrap',
+			'text-foreground'
 		);
 	});
 

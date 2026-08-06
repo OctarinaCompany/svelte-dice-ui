@@ -53,7 +53,7 @@
 		role="search"
 		data-slot="data-grid-search"
 		class={cn(
-			'absolute end-4 top-4 z-50 flex flex-col gap-2 rounded-lg border bg-background p-2 shadow-lg',
+			'absolute end-4 top-4 z-50 flex flex-col gap-2 rounded-lg bg-popover p-2 text-popover-foreground shadow-md ring-1 ring-foreground/10',
 			className
 		)}
 		{...restProps}

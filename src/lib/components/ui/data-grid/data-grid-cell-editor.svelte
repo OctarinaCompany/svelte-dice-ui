@@ -72,7 +72,7 @@
 			onCloseAutoFocus={preventAutoFocus}
 			{...restProps}
 			class={cn(
-				'z-50 min-w-(--bits-floating-anchor-width) rounded-md border bg-popover text-popover-foreground shadow-md',
+				'z-50 min-w-(--bits-floating-anchor-width) rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10',
 				className
 			)}
 		>

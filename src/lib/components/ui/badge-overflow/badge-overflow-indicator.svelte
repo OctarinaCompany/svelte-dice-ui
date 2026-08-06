@@ -44,7 +44,7 @@
 		'data-count': String(count),
 		...restProps,
 		class: cn(
-			'inline-flex h-5 shrink-0 items-center rounded-md border px-1.5 text-xs font-semibold',
+			'inline-flex h-5 w-fit shrink-0 items-center justify-center rounded-4xl border border-border px-2 py-0.5 text-xs font-medium whitespace-nowrap text-foreground',
 			className
 		)
 	} as BadgeOverflowIndicatorChildProps);

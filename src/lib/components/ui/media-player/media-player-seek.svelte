@@ -15,9 +15,10 @@
 
 	/**
 	 * Every single-value `bits-ui` `Slider.Root` prop except the ones this part owns. `bits-ui` has
-	 * no `Slider.Track` — its `Slider.Root` *is* the track — so upstream's
-	 * `Root > Track > (buffered | Range | …)` collapses one level while keeping every documented
-	 * `data-slot` on the same visual element (research R-03).
+	 * no `Slider.Track` component, so upstream's `Root > Control > Track` anatomy is rebuilt with a
+	 * plain track div inside `Slider.Root`: the track owns the `overflow-hidden` clipping so the
+	 * thumb and its hover/focus rings render outside the 4px bar, while every documented
+	 * `data-slot` keeps its upstream element (research R-03).
 	 */
 	export type MediaPlayerSeekProps = Omit<
 		SliderPrimitive.RootProps,
@@ -469,33 +470,36 @@
 			{onpointerleave}
 			{onpointermove}
 			class={cn(
-				'relative flex h-1 w-full touch-none items-center overflow-hidden rounded-full bg-primary/40 select-none data-disabled:pointer-events-none data-disabled:opacity-50',
+				'relative flex h-1 w-full touch-none items-center select-none data-disabled:pointer-events-none data-disabled:opacity-50',
 				className
 			)}
 		>
 			{#snippet children({ thumbItems })}
-				<div
-					data-slot="media-player-seek-buffered"
-					style="width: {root.bufferedProgress * 100}%"
-					class="absolute h-full bg-primary/70 will-change-[width]"
-				></div>
-				<Slider.Range class="absolute h-full bg-primary will-change-[width]" />
-				{#if hovering && root.seekableEnd > 0}
+				<!-- The track owns the clipping so the thumb and its rings stay visible (see R-03 note). -->
+				<div class="relative h-1 w-full grow overflow-hidden rounded-full bg-primary/40">
 					<div
-						data-slot="media-player-seek-hover-range"
-						style="width: var({SEEK_HOVER_PERCENT}, 0%); transition: opacity 150ms ease-out"
-						class="absolute h-full bg-primary/70 will-change-[width,opacity]"
+						data-slot="media-player-seek-buffered"
+						style="width: {root.bufferedProgress * 100}%"
+						class="absolute h-full bg-primary/70 will-change-[width]"
 					></div>
-				{/if}
-				{#each chapterSeparators as separator (separator.key)}
-					<div
-						role="presentation"
-						aria-hidden="true"
-						data-slot="media-player-seek-chapter-separator"
-						style="width: 0.1563rem; left: {separator.position}%; transform: translateX(-50%)"
-						class="absolute top-0 h-full bg-background"
-					></div>
-				{/each}
+					<Slider.Range class="absolute h-full bg-primary will-change-[width]" />
+					{#if hovering && root.seekableEnd > 0}
+						<div
+							data-slot="media-player-seek-hover-range"
+							style="width: var({SEEK_HOVER_PERCENT}, 0%); transition: opacity 150ms ease-out"
+							class="absolute h-full bg-primary/70 will-change-[width,opacity]"
+						></div>
+					{/if}
+					{#each chapterSeparators as separator (separator.key)}
+						<div
+							role="presentation"
+							aria-hidden="true"
+							data-slot="media-player-seek-chapter-separator"
+							style="width: 0.1563rem; left: {separator.position}%; transform: translateX(-50%)"
+							class="absolute top-0 h-full bg-background"
+						></div>
+					{/each}
+				</div>
 				{#each thumbItems as thumb (thumb.index)}
 					<!--
 						`bits-ui` puts `role="slider"` on the thumb, so the accessible name and the value

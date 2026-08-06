@@ -1,4 +1,5 @@
 <script lang="ts" module>
+	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import { cn, type WithElementRef } from '$lib/utils.js';
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
@@ -70,8 +71,12 @@
 		'data-state': root.count > 0 ? 'visible' : 'invisible',
 		'data-disabled': root.disabled ? '' : undefined,
 		...restProps,
+		// Upstream's editable demo renders Clear as an outline `<Button>`, so compose the button
+		// primitive's outline anatomy; disabling is conveyed via `data-disabled` (not the `disabled`
+		// attribute), so the dimming is keyed off that.
 		class: cn(
-			'inline-flex h-9 items-center justify-center gap-2 rounded-sm border border-input bg-transparent px-3 text-sm shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground data-disabled:cursor-not-allowed data-disabled:opacity-50',
+			buttonVariants({ variant: 'outline' }),
+			'data-disabled:cursor-not-allowed data-disabled:opacity-50',
 			className
 		),
 		onclick

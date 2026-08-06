@@ -65,7 +65,10 @@ export function getViewportEdgeStyle({
 /**
  * Chrome and transition of a floating surface. Upstream's class list (action-bar.tsx:210-219),
  * with the mirrored `data-[state=closed]` half added so a consumer that keeps the surface mounted
- * while closing gets a real exit animation.
+ * while closing gets a real exit animation, and with `text-card-foreground text-sm` pairing the
+ * `bg-card` fill — the surface portals to `document.body`, so like the kit's other floating
+ * surfaces (`popover-content.svelte`) it must set its own text colour and size rather than
+ * inherit the page's.
  *
  * `ActionBar` itself never renders in the closed state — FR-001 requires a synchronous unmount —
  * so on this component the exit half is inert; it exists for the reuse contract (research R-17).
@@ -76,7 +79,7 @@ export function getViewportEdgeStyle({
  */
 export const floatingSurfaceVariants = tv({
 	base: [
-		'fixed z-50 rounded-lg border bg-card shadow-lg outline-none',
+		'fixed z-50 rounded-lg border bg-card text-sm text-card-foreground shadow-lg outline-none',
 		'animate-in fade-in-0 zoom-in-95 duration-250 [animation-timing-function:cubic-bezier(0.16,1,0.3,1)]',
 		'data-[side=bottom]:slide-in-from-bottom-4 data-[side=top]:slide-in-from-top-4',
 		'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
