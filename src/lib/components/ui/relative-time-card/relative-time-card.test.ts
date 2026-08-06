@@ -670,6 +670,154 @@ describe('RelativeTimeCard keyboard', () => {
 	});
 });
 
+/**
+ * A minimal `(hover: hover)`-only `MediaQueryList` fake. `SupportsHover` reads `.matches` once on
+ * mount and again from every `change` event it dispatches — good enough to drive the touch
+ * fallback below without reimplementing `is-mobile.test.ts`'s full query-parsing harness.
+ */
+class FakeHoverQuery {
+	matches: boolean;
+	readonly #listeners = new Set<() => void>();
+
+	constructor(matches: boolean) {
+		this.matches = matches;
+	}
+
+	addEventListener(type: string, listener: () => void): void {
+		if (type === 'change') this.#listeners.add(listener);
+	}
+
+	removeEventListener(type: string, listener: () => void): void {
+		if (type === 'change') this.#listeners.delete(listener);
+	}
+
+	set(matches: boolean): void {
+		this.matches = matches;
+		for (const listener of [...this.#listeners]) listener();
+	}
+}
+
+/** Stubs `matchMedia` so `SupportsHover` reads the given `(hover: hover)` support. */
+function stubHoverSupport(matches: boolean): FakeHoverQuery {
+	const query = new FakeHoverQuery(matches);
+	vi.stubGlobal('matchMedia', () => query as unknown as MediaQueryList);
+	return query;
+}
+
+describe('RelativeTimeCard touch fallback', () => {
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
+	it('opens immediately on a tap when the primary pointer cannot hover', async () => {
+		stubHoverSupport(false);
+		const user = setupUser();
+		render(RelativeTimeCard.Root, { props: { date: FIVE_MINUTES_AGO } });
+		await tick();
+
+		// No delay advanced: a hover-driven open would still be mid-`openDelay` here, so an
+		// already-open card proves the click path — not the pointerenter one — did it.
+		await user.click(bySlot('relative-time-card-trigger'));
+
+		expect(cardState()).toBe('open');
+	});
+
+	it('closes an already-open card on a tap', async () => {
+		stubHoverSupport(false);
+		const user = setupUser();
+		render(RelativeTimeCard.Root, { props: { date: FIVE_MINUTES_AGO, defaultOpen: true } });
+
+		await user.click(bySlot('relative-time-card-trigger'));
+
+		// The toggle is synchronous, unlike bits-ui's own `closeDelay`-gated Escape/blur paths, so
+		// the presence manager's exit teardown can finish inside the same awaited click and leave
+		// the content already unmounted — `cardState()` would then read `null`, not `'closed'`.
+		// `aria-expanded` reflects `open` directly and needs no transition to settle.
+		expect(bySlot('relative-time-card-trigger')).toHaveAttribute('aria-expanded', 'false');
+	});
+
+	it('reports the tap through onOpenChange', async () => {
+		stubHoverSupport(false);
+		const onOpenChange = vi.fn();
+		const user = setupUser();
+		render(RelativeTimeCard.Root, { props: { date: FIVE_MINUTES_AGO, onOpenChange } });
+		await tick();
+
+		await user.click(bySlot('relative-time-card-trigger'));
+
+		expect(onOpenChange).toHaveBeenCalledWith(true);
+	});
+
+	it('stays inert wherever the primary pointer already hovers', async () => {
+		stubHoverSupport(true);
+		const user = setupUser();
+		render(RelativeTimeCard.Root, { props: { date: FIVE_MINUTES_AGO } });
+		await tick();
+
+		await user.click(bySlot('relative-time-card-trigger'));
+
+		// A hover-capable click does not itself open the card — only hover/focus/Enter do — so
+		// nothing has mounted the content yet.
+		expect(cardState()).toBeNull();
+	});
+
+	it('still calls a caller onpointerup first', async () => {
+		stubHoverSupport(false);
+		const onpointerup = vi.fn();
+		const user = setupUser();
+		render(RelativeTimeCard.Root, { props: { date: FIVE_MINUTES_AGO, onpointerup } });
+		await tick();
+
+		await user.click(bySlot('relative-time-card-trigger'));
+
+		expect(onpointerup).toHaveBeenCalledTimes(1);
+		expect(cardState()).toBe('open');
+	});
+
+	it('never re-toggles a card that Enter just opened', async () => {
+		// A real keyboard-only device can still report `hover: none`; without gating the fallback
+		// to `pointerup`, the synthetic `click` a button's Enter activation also dispatches would
+		// immediately flip `open` back off (the exact regression a `click`-bound handler caused).
+		stubHoverSupport(false);
+		const user = setupUser();
+		render(RelativeTimeCard.Root, { props: { date: FIVE_MINUTES_AGO, defaultOpen: true } });
+
+		await user.tab();
+		await user.keyboard('{Escape}');
+		await advance(DEFAULT_CLOSE_DELAY);
+		expect(cardState()).toBe('closed');
+
+		await user.keyboard('{Enter}');
+		await tick();
+
+		expect(cardState()).toBe('open');
+	});
+
+	it('reacts to a mouse or trackpad being attached at runtime', async () => {
+		const query = stubHoverSupport(false);
+		const user = setupUser();
+		render(RelativeTimeCard.Root, { props: { date: FIVE_MINUTES_AGO } });
+		await tick();
+
+		query.set(true);
+		await tick();
+
+		await user.click(bySlot('relative-time-card-trigger'));
+		expect(cardState()).toBeNull();
+	});
+
+	it('opens the custom trigger from `child` mode on a tap, the reported bug', async () => {
+		stubHoverSupport(false);
+		const user = setupUser();
+		render(Harness, { props: { date: FIVE_MINUTES_AGO, useChild: true } });
+		await tick();
+
+		await user.click(screen.getByTestId('trigger-child'));
+
+		expect(cardState()).toBe('open');
+	});
+});
+
 describe('RelativeTimeCard styling', () => {
 	it('applies each documented variant row and reports it as data-variant', () => {
 		for (const variant of RELATIVE_TIME_CARD_VARIANTS) {

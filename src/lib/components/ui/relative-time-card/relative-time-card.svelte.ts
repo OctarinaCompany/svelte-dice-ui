@@ -55,6 +55,43 @@ export const relativeTimeCardTriggerVariants = tv({
 });
 
 /**
+ * A runes reader over `(hover: hover)` — whether the primary pointer can hover — SSR-safe and
+ * reactive to a mouse/trackpad being attached or detached at runtime. Seeded `true` so a
+ * server-rendered trigger behaves like a hover device until the client corrects it, mirroring
+ * `IsMobile`'s SSR seed (`$lib/hooks/is-mobile.svelte.ts`).
+ *
+ * bits-ui's `LinkPreviewTriggerState` ignores every touch-originated pointer event outright
+ * (Radix parity: `onpointerenter`/`onpointerleave` both bail on `isTouch(e)`), so a device whose
+ * only input is touch — an iPad with nothing else attached — can never open the card through
+ * hover at all. The root reads `current` to add a deliberate tap-to-open fallback (a divergence:
+ * upstream has none), gated so it stays inert on any device hover already works on.
+ */
+class SupportsHover {
+	current: boolean = $state(true);
+
+	constructor() {
+		$effect(() => {
+			if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+
+			const query = window.matchMedia('(hover: hover)');
+			const onChange = () => {
+				this.current = query.matches;
+			};
+
+			this.current = query.matches;
+			query.addEventListener('change', onChange);
+
+			return () => query.removeEventListener('change', onChange);
+		});
+	}
+}
+
+/** Must be called during component initialisation — it creates `$state` and an `$effect`. */
+export function useSupportsHover(): SupportsHover {
+	return new SupportsHover();
+}
+
+/**
  * Reactive inputs for {@link RelativeTimeCardState}. They arrive as getter functions so the class
  * keeps tracking the root's props instead of snapshotting them (CLAUDE.md §4).
  */

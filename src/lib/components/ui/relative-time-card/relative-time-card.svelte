@@ -103,7 +103,8 @@
 		DEFAULT_OPEN_DELAY,
 		DEFAULT_TIMEZONES,
 		DEFAULT_UPDATE_INTERVAL,
-		RelativeTimeCardState
+		RelativeTimeCardState,
+		useSupportsHover
 	} from './relative-time-card.svelte.js';
 	import { resolveLocale, toDate } from './relative-time-format.js';
 
@@ -145,6 +146,8 @@
 		getUpdateInterval: () => updateInterval
 	});
 
+	const hover = useSupportsHover();
+
 	// The interval is created here and cleared by this teardown — nowhere else. Changing
 	// `updateInterval` re-runs the effect, so the old timer is always cleared first (FR-007).
 	$effect(() => state.startTicker());
@@ -166,6 +169,28 @@
 		onOpenChange?.(true);
 	}
 
+	/**
+	 * Deliberate divergence from upstream (see {@link useSupportsHover}): where the primary
+	 * pointer cannot hover at all, a tap toggles the card instead of doing nothing. Wherever hover
+	 * already works this is a no-op, so a real pointer tap on the trigger never fights the
+	 * hover-open state by immediately re-closing what hover just opened.
+	 *
+	 * Bound to `pointerup` rather than `click`: activating a focused button with Enter dispatches
+	 * a `click` with no preceding pointer event (`handleKeydown`'s own Enter case already opens
+	 * it), and a `click` handler here would then immediately re-toggle that back closed.
+	 * `pointerup` only ever fires for a genuine pointer interaction, so keyboard activation can
+	 * never reach it.
+	 */
+	function handlePointerUp(
+		event: PointerEvent & { currentTarget: EventTarget & HTMLButtonElement }
+	) {
+		restProps.onpointerup?.(event);
+		if (event.defaultPrevented || hover.current) return;
+
+		open = !open;
+		onOpenChange?.(open);
+	}
+
 	const triggerAttrs: RelativeTimeCardChildProps = $derived({
 		type: 'button',
 		'data-slot': 'relative-time-card-trigger',
@@ -173,7 +198,8 @@
 		'data-invalid': state.isValid ? undefined : '',
 		...restProps,
 		class: cn(relativeTimeCardTriggerVariants({ variant: resolvedVariant }), className),
-		onkeydown: handleKeydown
+		onkeydown: handleKeydown,
+		onpointerup: handlePointerUp
 	});
 </script>
 
