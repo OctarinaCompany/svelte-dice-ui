@@ -195,7 +195,9 @@
 								<div
 									class={cn(
 										'flex size-4 items-center justify-center rounded-sm border border-primary',
-										isSelected ? 'bg-primary' : 'opacity-50 [&_svg]:invisible'
+										isSelected
+											? 'bg-primary text-primary-foreground'
+											: 'opacity-50 [&_svg]:invisible'
 									)}
 								>
 									<CheckIcon />
