@@ -15,6 +15,24 @@
 	"registryDependencies": [
 		"separator"
 	],
+	"cssVars": {
+		"light": {
+			"success": "oklch(0.627 0.194 149.214)",
+			"success-foreground": "oklch(0.985 0 0)",
+			"warning": "oklch(0.705 0.213 47.604)",
+			"warning-foreground": "oklch(0.145 0 0)",
+			"info": "oklch(0.623 0.214 259.815)",
+			"info-foreground": "oklch(0.985 0 0)"
+		},
+		"dark": {
+			"success": "oklch(0.723 0.219 149.579)",
+			"success-foreground": "oklch(0.145 0 0)",
+			"warning": "oklch(0.75 0.183 55.934)",
+			"warning-foreground": "oklch(0.145 0 0)",
+			"info": "oklch(0.707 0.165 254.624)",
+			"info-foreground": "oklch(0.145 0 0)"
+		}
+	},
 	"files": [
 		{
 			"content": "import Root from './stat.svelte';\nimport Label from './stat-label.svelte';\nimport Indicator from './stat-indicator.svelte';\nimport Value from './stat-value.svelte';\nimport Trend from './stat-trend.svelte';\nimport Separator from './stat-separator.svelte';\nimport Description from './stat-description.svelte';\n\nexport { type StatRootProps } from './stat.svelte';\nexport { type StatLabelProps } from './stat-label.svelte';\nexport {\n\tstatIndicatorVariants,\n\tSTAT_INDICATOR_VARIANTS,\n\tSTAT_INDICATOR_COLORS,\n\tresolveStatIndicatorVariant,\n\tresolveStatIndicatorColor,\n\ttype StatIndicatorProps,\n\ttype StatIndicatorVariant,\n\ttype StatIndicatorColor\n} from './stat-indicator.svelte';\nexport { type StatValueProps } from './stat-value.svelte';\nexport {\n\tstatTrendVariants,\n\tSTAT_TREND_DIRECTIONS,\n\tresolveStatTrendDirection,\n\ttype StatTrendProps,\n\ttype StatTrendDirection\n} from './stat-trend.svelte';\nexport { type StatSeparatorProps } from './stat-separator.svelte';\nexport { type StatDescriptionProps } from './stat-description.svelte';\n\nexport {\n\tRoot,\n\tLabel,\n\tIndicator,\n\tValue,\n\tTrend,\n\tSeparator,\n\tDescription,\n\t//\n\tRoot as Stat,\n\tLabel as StatLabel,\n\tIndicator as StatIndicator,\n\tValue as StatValue,\n\tTrend as StatTrend,\n\tSeparator as StatSeparator,\n\tDescription as StatDescription\n};\n",

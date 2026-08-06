@@ -10,6 +10,24 @@
 	"devDependencies": [
 		"tailwind-variants@^3.3.0"
 	],
+	"cssVars": {
+		"light": {
+			"success": "oklch(0.627 0.194 149.214)",
+			"success-foreground": "oklch(0.985 0 0)",
+			"warning": "oklch(0.705 0.213 47.604)",
+			"warning-foreground": "oklch(0.145 0 0)",
+			"info": "oklch(0.623 0.214 259.815)",
+			"info-foreground": "oklch(0.985 0 0)"
+		},
+		"dark": {
+			"success": "oklch(0.723 0.219 149.579)",
+			"success-foreground": "oklch(0.145 0 0)",
+			"warning": "oklch(0.75 0.183 55.934)",
+			"warning-foreground": "oklch(0.145 0 0)",
+			"info": "oklch(0.707 0.165 254.624)",
+			"info-foreground": "oklch(0.145 0 0)"
+		}
+	},
 	"files": [
 		{
 			"content": "import Root from './status.svelte';\nimport Indicator from './status-indicator.svelte';\nimport Label from './status-label.svelte';\n\nexport {\n\tstatusVariants,\n\tSTATUS_VARIANTS,\n\tresolveStatusVariant,\n\ttype StatusVariant,\n\ttype StatusRootProps,\n\ttype StatusChildProps\n} from './status.svelte';\nexport { type StatusIndicatorProps } from './status-indicator.svelte';\nexport { type StatusLabelProps } from './status-label.svelte';\n\nexport {\n\tRoot,\n\tIndicator,\n\tLabel,\n\t//\n\tRoot as Status,\n\tIndicator as StatusIndicator,\n\tLabel as StatusLabel\n};\n",

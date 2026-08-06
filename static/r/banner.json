@@ -18,6 +18,24 @@
 	"registryDependencies": [
 		"button"
 	],
+	"cssVars": {
+		"light": {
+			"success": "oklch(0.627 0.194 149.214)",
+			"success-foreground": "oklch(0.985 0 0)",
+			"warning": "oklch(0.705 0.213 47.604)",
+			"warning-foreground": "oklch(0.145 0 0)",
+			"info": "oklch(0.623 0.214 259.815)",
+			"info-foreground": "oklch(0.985 0 0)"
+		},
+		"dark": {
+			"success": "oklch(0.723 0.219 149.579)",
+			"success-foreground": "oklch(0.145 0 0)",
+			"warning": "oklch(0.75 0.183 55.934)",
+			"warning-foreground": "oklch(0.145 0 0)",
+			"info": "oklch(0.707 0.165 254.624)",
+			"info-foreground": "oklch(0.145 0 0)"
+		}
+	},
 	"files": [
 		{
 			"content": "import Root from './banner.svelte';\nimport Queue from './banner-queue.svelte';\nimport Icon from './banner-icon.svelte';\nimport Content from './banner-content.svelte';\nimport Title from './banner-title.svelte';\nimport Description from './banner-description.svelte';\nimport Actions from './banner-actions.svelte';\nimport Close from './banner-close.svelte';\n\nexport type { BannerChildProps, BannerProps, BannerRootProps } from './banner.svelte';\nexport type { BannerQueueProps, BannersProps } from './banner-queue.svelte';\nexport type { BannerIconChildProps, BannerIconProps } from './banner-icon.svelte';\nexport type { BannerContentChildProps, BannerContentProps } from './banner-content.svelte';\nexport type { BannerTitleProps } from './banner-title.svelte';\nexport type { BannerDescriptionProps } from './banner-description.svelte';\nexport type { BannerActionsChildProps, BannerActionsProps } from './banner-actions.svelte';\nexport type { BannerCloseProps } from './banner-close.svelte';\n\nexport {\n\tBANNER_ANIMATION_DURATION,\n\tBANNER_ANIMATION_EASING,\n\tBANNER_SIDES,\n\tBANNER_STRATEGIES,\n\tBANNER_VARIANTS,\n\tBannerState,\n\tBannersState,\n\tDEFAULT_BANNER_DISMISSIBLE,\n\tDEFAULT_BANNER_PRIORITY,\n\tDEFAULT_MAX_VISIBLE,\n\tbannerVariants,\n\tgetBannerContext,\n\tgetBannersContext,\n\thasBannerContext,\n\thasBannersContext,\n\tisPortalStrategy,\n\tresolveBannerVariant,\n\tsetBannerContext,\n\tsetBannersContext,\n\ttype BannerAddOptions,\n\ttype BannerRenderProps,\n\ttype BannerSide,\n\ttype BannerStateProps,\n\ttype BannerStrategy,\n\ttype BannerVariant,\n\ttype BannersStateProps,\n\ttype QueuedBanner\n} from './banner.svelte.js';\n\nexport {\n\tRoot,\n\tQueue,\n\tIcon,\n\tContent,\n\tTitle,\n\tDescription,\n\tActions,\n\tClose,\n\t//\n\tRoot as Banner,\n\tQueue as Banners,\n\tIcon as BannerIcon,\n\tContent as BannerContent,\n\tTitle as BannerTitle,\n\tDescription as BannerDescription,\n\tActions as BannerActions,\n\tClose as BannerClose\n};\n",
