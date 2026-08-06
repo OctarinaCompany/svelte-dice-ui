@@ -55,7 +55,28 @@ with anything its `registryDependencies` lists. There is nothing clever in the p
 are the product.
 
 Dependencies resolve automatically — installing `data-table` also pulls in `sortable` and
-`direction-provider`.
+`direction-provider`. Cross-component dependencies are published as paths relative to the item that
+declares them, so they resolve from whichever host served the first URL; shadcn primitives keep
+resolving from your own configured registry.
+
+Do **not** point `components.json`'s `registry` field at this repository: the shadcn-svelte CLI
+expects a `styles/<style>/index.json` layout there, which this registry does not publish. Install by
+URL.
+
+### Using it with Claude Code
+
+`skills/svelte-dice-ui/SKILL.md` is a [Claude Code skill](https://code.claude.com/docs/en/skills)
+that teaches an agent the catalogue, the install command, the usage conventions and the theme tokens
+to add. Drop it into a project so Claude can reach for these components on its own:
+
+```bash
+mkdir -p .claude/skills/svelte-dice-ui
+curl -o .claude/skills/svelte-dice-ui/SKILL.md \
+  https://raw.githubusercontent.com/OctarinaCompany/svelte-dice-ui/main/skills/svelte-dice-ui/SKILL.md
+```
+
+Use `~/.claude/skills/` instead of `.claude/skills/` to make it available in every project rather
+than a single one.
 
 ## Usage
 
