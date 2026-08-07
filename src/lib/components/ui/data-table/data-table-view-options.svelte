@@ -76,9 +76,13 @@
 
 	// Upstream's filter: an accessor column that may be hidden. It is what excludes the `select`
 	// and `actions` columns from the list.
+	//
+	// `getAllLeafColumns()`, not upstream's `getAllColumns()`: only the former applies `columnOrder`.
+	// Listing columns in definition order would leave the list disagreeing with the table it
+	// describes, and would make a reorder appear to snap back the moment it was written.
 	const columns = $derived(
 		table
-			.getAllColumns()
+			.getAllLeafColumns()
 			.filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())
 	);
 
@@ -96,6 +100,36 @@
 	function toggle(id: string) {
 		const column = columns.find((candidate) => candidate.id === id);
 		column?.toggleVisibility(!column.getIsVisible());
+	}
+
+	/**
+	 * `table.initialState` is the caller's `initialState` merged with table-core's defaults, so a
+	 * column absent from its visibility map is visible by default.
+	 */
+	function isVisibleByDefault(id: string): boolean {
+		return table.initialState.columnVisibility[id] ?? true;
+	}
+
+	const isDefaultOrder = $derived.by(() => {
+		const initial = table.initialState.columnOrder;
+		const current = table.getState().columnOrder;
+		return current.length === initial.length && current.every((id, index) => id === initial[index]);
+	});
+
+	/**
+	 * A reset affordance only exists while there is something to reset — the rule
+	 * `DataTable.FacetedFilter` already applies to its "Clear filters" row. The order is only part
+	 * of the question when this list is what changes it: with `reorderable` off the popover neither
+	 * shows nor writes the column order, so it must not claim to restore it either.
+	 */
+	const canReset = $derived(
+		columns.some((column) => column.getIsVisible() !== isVisibleByDefault(column.id)) ||
+			(reorderable && !isDefaultOrder)
+	);
+
+	function onReset() {
+		table.resetColumnVisibility();
+		if (reorderable) table.resetColumnOrder();
 	}
 
 	/**
@@ -172,6 +206,24 @@
 						{/each}
 					{/if}
 				</Command.Group>
+				{#if canReset}
+					<Command.Separator />
+					<Command.Group>
+						<!--
+							The indicator is hidden rather than left transparent: `Command.Item` always
+							renders it with `ml-auto`, and an auto margin absorbs the free space before
+							`justify-content` is applied — an invisible tick would push this row's label
+							off centre.
+						-->
+						<Command.Item
+							value="reset-columns"
+							class="justify-center text-center [&_.cn-command-item-indicator]:hidden"
+							onSelect={onReset}
+						>
+							Reset columns
+						</Command.Item>
+					</Command.Group>
+				{/if}
 			</Command.List>
 		</Command.Root>
 	</Popover.Content>

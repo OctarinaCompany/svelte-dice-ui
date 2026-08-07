@@ -123,7 +123,12 @@
 					{#if values.length > 0}
 						<Command.Separator />
 						<Command.Group>
-							<Command.Item class="justify-center text-muted-foreground" onSelect={() => write([])}>
+							<!-- `ml-auto` on `Command.Item`'s own indicator would eat the free space this row
+								centres in, so it is hidden rather than left transparent. -->
+							<Command.Item
+								class="justify-center text-muted-foreground [&_.cn-command-item-indicator]:hidden"
+								onSelect={() => write([])}
+							>
 								Clear all
 							</Command.Item>
 						</Command.Group>

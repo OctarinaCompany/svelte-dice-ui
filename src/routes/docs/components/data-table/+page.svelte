@@ -551,7 +551,8 @@
 			prop: 'disabled, reorderable, align, open',
 			type: 'boolean, boolean, "start" | "center" | "end", boolean',
 			default: 'false, false, "end", false',
-			description: 'Column visibility list; `reorderable` adds drag-to-reorder.'
+			description:
+				'Column visibility list; `reorderable` adds drag-to-reorder. A "Reset columns" row appears at the foot of the list once the view differs from `initialState`.'
 		},
 		{
 			part: 'DataTable.Pagination',

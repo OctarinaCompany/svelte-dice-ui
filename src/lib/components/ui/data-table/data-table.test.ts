@@ -117,6 +117,30 @@ async function openFilterPopover(user: ReturnType<typeof setupUser>, title: stri
 	await waitFor(() => expect(popoverContent().contains(document.activeElement)).toBe(true));
 }
 
+/** jsdom performs no layout, so the geometry-dependent drag specs install their own boxes. */
+function stubRect(
+	element: Element,
+	left: number,
+	top: number,
+	width: number,
+	height: number
+): void {
+	const rect = { left, top, width, height, right: left + width, bottom: top + height };
+	const domRect = { ...rect, x: left, y: top, toJSON: () => rect } as DOMRect;
+	vi.spyOn(element, 'getBoundingClientRect').mockReturnValue(domRect);
+}
+
+/**
+ * The ancestor a drag measures itself against — `bits-ui`'s `Command.Item` interposes a
+ * `display: contents` wrapper, which generates no box. Mirrors `layoutParentOf` in `sortable`.
+ */
+function layoutParent(node: HTMLElement): HTMLElement {
+	let parent = node.parentElement;
+	while (parent && getComputedStyle(parent).display === 'contents') parent = parent.parentElement;
+	if (!parent) throw new Error('the item has no laid-out ancestor');
+	return parent;
+}
+
 type HarnessResult = {
 	/** The `DataTableState` the harness created, so a spec can read and write its slices. */
 	state: DataTableState<DataTableHarnessRow>;
@@ -542,6 +566,116 @@ describe('DataTable — uncontrolled', () => {
 		await user.click(screen.getByRole('combobox', { name: 'Toggle columns' }));
 		await user.click(layerItem('option', 'Notes'));
 		expect(state.columnVisibility.notes).toBe(true);
+	});
+
+	it('offers a column reset only once the view differs from the initial state', async () => {
+		const user = setupUser();
+		const { state } = renderHarness();
+
+		await user.click(screen.getByRole('combobox', { name: 'Toggle columns' }));
+		expect(findLayerItem('option', 'Reset columns')).toBeUndefined();
+
+		await user.click(layerItem('option', 'Notes'));
+		expect(state.columnVisibility.notes).toBe(false);
+
+		await user.click(layerItem('option', 'Reset columns'));
+		// Back to the seeded map itself, not to an all-`true` one: an absent key *is* visible, and
+		// writing one per column would defeat a later change of default.
+		expect(state.columnVisibility).toEqual({});
+		expect(within(screen.getByRole('table')).getByRole('button', { name: 'Notes' })).toBeVisible();
+		// Resetting is not dismissing: the row retires because there is nothing left to reset, and
+		// the popover stays open for the next toggle — the same contract as "Clear filters".
+		expect(popoverContent()).toBeInTheDocument();
+		await waitFor(() => expect(findLayerItem('option', 'Reset columns')).toBeUndefined());
+	});
+
+	it('resets the column list to initialState, not to every column visible', async () => {
+		const user = setupUser();
+		const { state } = renderHarness({ initialState: { columnVisibility: { notes: false } } });
+
+		await user.click(screen.getByRole('combobox', { name: 'Toggle columns' }));
+		expect(findLayerItem('option', 'Reset columns')).toBeUndefined();
+
+		await user.click(layerItem('option', 'Notes'));
+		expect(state.columnVisibility.notes).toBe(true);
+
+		await user.click(layerItem('option', 'Reset columns'));
+		expect(state.columnVisibility).toEqual({ notes: false });
+	});
+
+	it('restores the column order too when the list is reorderable', async () => {
+		const user = setupUser();
+		const { state } = renderHarness({ reorderable: true });
+
+		state.columnOrder = ['notes', 'title'];
+		await tick();
+
+		await user.click(screen.getByRole('combobox', { name: 'Toggle columns' }));
+		await user.click(layerItem('option', 'Reset columns'));
+
+		expect(state.columnOrder).toEqual([]);
+	});
+
+	it('lists the columns in the table order, not in the definition order', async () => {
+		const user = setupUser();
+		const { state } = renderHarness({ reorderable: true });
+
+		state.columnOrder = ['notes', 'title'];
+		await tick();
+
+		// A list in definition order would disagree with the table it describes, and would make a
+		// drag appear to snap back the instant it was written.
+		await user.click(screen.getByRole('combobox', { name: 'Toggle columns' }));
+		const labels = layerItems('option').map((item) => (item.textContent ?? '').trim());
+		expect(labels.slice(0, 2)).toEqual(['Notes', 'Title']);
+	});
+
+	it('reorders a dragged column without toggling its visibility', async () => {
+		const user = setupUser();
+		const { state } = renderHarness({ reorderable: true });
+
+		await user.click(screen.getByRole('combobox', { name: 'Toggle columns' }));
+		const rows = layerItems('option');
+		const [first, second] = rows;
+		const firstId = first.getAttribute('data-value') ?? '';
+		const secondId = second.getAttribute('data-value') ?? '';
+		const handle = first.querySelector<HTMLElement>('[data-slot="sortable-item-handle"]');
+		if (!handle) throw new Error('the reorderable list rendered no drag handle');
+
+		// jsdom lays nothing out, so the drag needs boxes to resolve a drop target against — the
+		// container included, or every transform is clamped back inside a zero rect.
+		stubRect(layoutParent(first), 0, 0, 160, 320);
+		stubRect(first, 0, 0, 160, 32);
+		stubRect(second, 0, 32, 160, 32);
+
+		await user.pointer({
+			keys: '[MouseLeft>]',
+			target: handle,
+			coords: { clientX: 8, clientY: 16 }
+		});
+		await user.pointer({ target: handle, coords: { clientX: 8, clientY: 26 } });
+		await user.pointer({ target: handle, coords: { clientX: 8, clientY: 56 } });
+		await user.pointer({ keys: '[/MouseLeft]', target: handle });
+
+		// The written order is the *full* leaf order — `select` and `actions` included — so the two
+		// dragged ids are compared to each other rather than to a fixed index.
+		expect(state.columnOrder.indexOf(firstId)).toBeGreaterThan(state.columnOrder.indexOf(secondId));
+		// The drop's synthesised click lands on the row, whose `onSelect` hides the column. Reordering
+		// must not carry that side effect.
+		expect(state.columnVisibility).toEqual({});
+	});
+
+	it('leaves a reordered list alone when the popover cannot reorder', async () => {
+		const user = setupUser();
+		const { state } = renderHarness();
+
+		state.columnOrder = ['notes', 'title'];
+		await tick();
+
+		// The popover neither shows nor writes the order unless `reorderable` is set, so it must not
+		// offer to restore it either.
+		await user.click(screen.getByRole('combobox', { name: 'Toggle columns' }));
+		expect(findLayerItem('option', 'Reset columns')).toBeUndefined();
 	});
 
 	it('pages, and clamps the page index when the page size grows', async () => {

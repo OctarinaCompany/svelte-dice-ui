@@ -8,6 +8,7 @@ import {
 	closestCenter,
 	closestCorners,
 	horizontalListSortingStrategy,
+	layoutParentOf,
 	rectSortingStrategy,
 	resolveKeyboardIndex,
 	restrictToHorizontalAxis,
@@ -321,6 +322,37 @@ describe('sortable-geometry: helpers (T005)', () => {
 
 	it('lists the three orientations in upstream order', () => {
 		expect(SORTABLE_ORIENTATIONS).toEqual(['vertical', 'horizontal', 'mixed']);
+	});
+
+	it('walks past a display:contents wrapper to find the laid-out parent', () => {
+		// `bits-ui`'s `Command.Item` interposes exactly this wrapper. It generates no box, so
+		// measuring it as the drag container clamped every transform to the viewport origin.
+		const container = document.createElement('div');
+		const wrapper = document.createElement('div');
+		wrapper.style.display = 'contents';
+		const item = document.createElement('div');
+		container.append(wrapper);
+		wrapper.append(item);
+		document.body.append(container);
+
+		try {
+			expect(layoutParentOf(item)).toBe(container);
+		} finally {
+			container.remove();
+		}
+	});
+
+	it('keeps a parent that generates a box of its own', () => {
+		const container = document.createElement('div');
+		const item = document.createElement('div');
+		container.append(item);
+		document.body.append(container);
+
+		try {
+			expect(layoutParentOf(item)).toBe(container);
+		} finally {
+			container.remove();
+		}
 	});
 });
 
@@ -1403,6 +1435,57 @@ describe('Sortable pointer dragging (T012)', () => {
 		expect(onValueChange).toHaveBeenCalledTimes(1);
 		expect(itemValues(container)).toEqual(['b', 'a', 'c', 'd']);
 		expect(itemFor(container, 'a')).not.toHaveAttribute('data-dragging');
+	});
+
+	it('swallows the click the browser synthesises when a drag releases', async () => {
+		const user = userEvent.setup();
+		const onClick = vi.fn();
+		const { container } = renderHarness();
+		stubVerticalLayout(container);
+		const item = itemFor(container, 'a');
+		item.addEventListener('click', onClick);
+
+		await press(user, item, 10, 25);
+		await movePointer(user, item, 10, 35);
+		await movePointer(user, item, 10, 75);
+		await release(user, item);
+
+		// Without this the drop also *activates* the row it moved — which is how dragging a column in
+		// the data table's `View` list used to toggle that column's visibility.
+		expect(onClick).not.toHaveBeenCalled();
+		expect(itemValues(container)).toEqual(['b', 'a', 'c', 'd']);
+	});
+
+	it('leaves an ordinary click on an item alone', async () => {
+		const user = userEvent.setup();
+		const onClick = vi.fn();
+		const { container } = renderHarness();
+		stubVerticalLayout(container);
+		const item = itemFor(container, 'a');
+		item.addEventListener('click', onClick);
+
+		// No movement, so no session is ever opened and nothing is armed to swallow.
+		await press(user, item, 10, 25);
+		await release(user, item);
+
+		expect(onClick).toHaveBeenCalledTimes(1);
+	});
+
+	it('leaves the click after a keyboard drag alone', async () => {
+		const user = userEvent.setup();
+		const onClick = vi.fn();
+		const { container } = renderHarness();
+		const item = itemFor(container, 'a');
+		item.addEventListener('click', onClick);
+
+		await grab(user, activatorFor(container, 'a'));
+		await user.keyboard('{ArrowDown}');
+		await user.keyboard(' ');
+
+		// A keyboard drop is not followed by a synthesised click, so arming the suppressor there
+		// would only strand it — ready to eat the user's next real click.
+		await user.click(item);
+		expect(onClick).toHaveBeenCalledTimes(1);
 	});
 
 	it('shows a dragging overlay for the duration of the drag only', async () => {

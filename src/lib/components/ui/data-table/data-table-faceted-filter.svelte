@@ -218,9 +218,14 @@
 					{#if selectedValues.length > 0}
 						<Command.Separator />
 						<Command.Group>
+							<!--
+								The indicator is hidden, not just left transparent: `Command.Item` always renders
+								it with `ml-auto`, and an auto margin absorbs the free space before
+								`justify-content` is applied, so the invisible tick pushed this label off centre.
+							-->
 							<Command.Item
 								value="clear-filters"
-								class="justify-center text-center"
+								class="justify-center text-center [&_.cn-command-item-indicator]:hidden"
 								onSelect={onReset}
 							>
 								Clear filters

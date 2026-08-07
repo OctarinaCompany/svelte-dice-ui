@@ -69,6 +69,26 @@ export function toClientRect(element: Element): ClientRect {
 	return { top, left, right, bottom, width, height };
 }
 
+/**
+ * The nearest ancestor that actually generates a layout box.
+ *
+ * A `display: contents` element produces no box, so `getBoundingClientRect()` answers a zero rect at
+ * the viewport origin. Measuring one as the drag container would clamp every transform to the
+ * top-left corner and make every collision test miss — which is exactly what happens when an item is
+ * rendered through `bits-ui`'s `Command.Item`, since it wraps each child in a `display: contents`
+ * div. Walking past those wrappers lands on the element the item is visually laid out in.
+ *
+ * Only `display: contents` is skipped, never a merely empty box: a container that is genuinely 0×0
+ * is a real constraint, and under jsdom — where nothing is laid out — every rect is 0×0.
+ */
+export function layoutParentOf(node: Element): HTMLElement | null {
+	let parent = node.parentElement;
+	while (parent && getComputedStyle(parent).display === 'contents') {
+		parent = parent.parentElement;
+	}
+	return parent;
+}
+
 /** Replaces `CSS.Translate.toString`. Returns `undefined` so it can be dropped from a style string. */
 export function translate3d(transform: Coordinates | null | undefined): string | undefined {
 	if (!transform) return undefined;

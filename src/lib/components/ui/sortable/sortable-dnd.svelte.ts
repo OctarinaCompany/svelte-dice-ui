@@ -8,6 +8,7 @@
  */
 
 import {
+	layoutParentOf,
 	toClientRect,
 	type ClientRect,
 	type Coordinates,
@@ -310,6 +311,7 @@ export class DndState {
 		const session = this.session;
 		if (!session) return;
 
+		if (session.source === 'pointer') this.#suppressNextClick();
 		this.#teardown();
 		this.session = null;
 		this.#props.onEnd?.(session);
@@ -320,10 +322,41 @@ export class DndState {
 		const session = this.session;
 		if (!session) return;
 
+		if (session.source === 'pointer') this.#suppressNextClick();
 		session.cancelled = true;
 		this.#teardown();
 		this.session = null;
 		this.#props.onCancel?.(session);
+	}
+
+	/**
+	 * Swallow the `click` the browser synthesises once a pointer drag releases.
+	 *
+	 * The browser fires it at the nearest common ancestor of the `pointerdown` and `pointerup`
+	 * targets, which for a handle inside a row that travels with the pointer is usually the row
+	 * itself — so a drop would also *activate* the row. That is not hypothetical: `bits-ui`'s
+	 * `Command.Item` selects on `click`, so dragging a row of the data table's `View` list toggled
+	 * the column it had just moved.
+	 *
+	 * The listener is on the document and in the capture phase because the target is the browser's
+	 * choice, not ours: it cannot be predicted from the dragged node, and stopping propagation on
+	 * the way down is the only way to reach every listener below it, delegated ones included.
+	 *
+	 * Only a real session gets here — a press that never passed the activation threshold opens none
+	 * — so an ordinary click on an item is untouched.
+	 */
+	#suppressNextClick(): void {
+		const onClick = (event: MouseEvent) => {
+			event.preventDefault();
+			event.stopPropagation();
+		};
+
+		document.addEventListener('click', onClick, { capture: true, once: true });
+		// The synthesised click is dispatched in the same task as the `pointerup`, so it always
+		// arrives before this timeout. The timeout is for the drops that are *not* followed by one —
+		// a pointer cancel, or a release whose targets share no ancestor — where a listener left
+		// armed would go on to eat an unrelated click.
+		setTimeout(() => document.removeEventListener('click', onClick, { capture: true }), 0);
 	}
 
 	/** Release every long-lived resource. Called from the root's `$effect` teardown. */
@@ -365,7 +398,9 @@ export class DndState {
 		initialCoordinates: Coordinates
 	): DragSession | null {
 		const activeRect = toClientRect(entry.node);
-		const parent = entry.node.parentElement;
+		// Not `parentElement`: the item's direct parent may be a `display: contents` wrapper, which
+		// has no box to clamp or collide against (see `layoutParentOf`).
+		const parent = layoutParentOf(entry.node);
 
 		// Every item is measured, disabled ones included: a disabled item is not a drop target but it
 		// still occupies a slot the sorting strategy has to shift around. The map is built once and
