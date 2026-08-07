@@ -314,11 +314,18 @@ module script is acceptable, but a Symbol key plus the throwing getter is the de
   | `bg-orange-500 text-white`       | `bg-warning text-warning-foreground`                   |
   | `border-blue-500/20`             | `border-info/20`                                       |
   | `bg-red-500/10 text-red-600`     | `bg-destructive/10 text-destructive` (already existed) |
+  | `bg-yellow-200 text-black`       | `bg-highlight text-highlight-foreground`               |
 
   They are declared in `src/app.css` for both `:root` and `.dark` and exposed through
   `@theme inline`, so they flip with the theme like every other token. If a port needs a status
   colour that is not one of these four, add the token to `src/app.css` **and** to this table —
   do not reach for the palette.
+
+  `highlight` is the odd one out: it is not a status but the yellow of `<mark>`'s UA default, for
+  marking the substring a search matched (data-table's search demo). It has its own token because
+  `warning` would claim a state the match does not have, and `accent` would make a matched cell
+  indistinguishable from a hovered row. Both themes are contrast-checked: the foreground clears
+  4.5:1 on the fill, and the fill clears 3:1 against the card.
 
 - **Decorative hues.** `violet`, `teal` and `rose` are theme tokens too, declared the same way, but
   they carry no meaning. They exist only so a demo can show several visually distinct colour

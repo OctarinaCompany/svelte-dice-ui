@@ -28,6 +28,14 @@
 	--info: oklch(0.623 0.214 259.815);
 	--info-foreground: oklch(0.985 0 0);
 	/*
+	 * Search-match highlighting, not a status: the yellow of `<mark>`'s UA default, which readers
+	 * already parse as "this is what you searched for". Kept as its own token because reusing
+	 * `warning` would claim a state the match does not have, and reusing `accent` would make a
+	 * matched cell indistinguishable from a hovered row.
+	 */
+	--highlight: oklch(0.924 0.12 95.746);
+	--highlight-foreground: oklch(0.145 0 0);
+	/*
 	 * Decorative hues, not statuses: the four status tokens above carry meaning, these only exist so
 	 * a demo can show several visually distinct colour treatments side by side. The base theme is
 	 * zinc, so nothing else in it supplies a hue.
@@ -76,6 +84,9 @@
 	--warning-foreground: oklch(0.145 0 0);
 	--info: oklch(0.707 0.165 254.624);
 	--info-foreground: oklch(0.145 0 0);
+	/* Darkened until the near-white foreground clears 4.5:1 on it and it clears 3:1 against the card. */
+	--highlight: oklch(0.539 0.107 84.625);
+	--highlight-foreground: oklch(0.985 0 0);
 	--violet: oklch(0.702 0.183 293.541);
 	--teal: oklch(0.704 0.14 182.503);
 	--rose: oklch(0.712 0.194 13.428);
@@ -122,6 +133,8 @@
 	--color-warning-foreground: var(--warning-foreground);
 	--color-info: var(--info);
 	--color-info-foreground: var(--info-foreground);
+	--color-highlight: var(--highlight);
+	--color-highlight-foreground: var(--highlight-foreground);
 	--color-violet: var(--violet);
 	--color-teal: var(--teal);
 	--color-rose: var(--rose);

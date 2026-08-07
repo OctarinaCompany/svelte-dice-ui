@@ -254,7 +254,82 @@
 		initialState: { pagination: { pageSize: 4 } }
 	});
 
-	// --- Example 4: range and date filters, pinning and reordering ---------------
+	// --- Example 4: search with match highlighting -------------------------------
+
+	// Upstream ships no highlighting demo. Composed in the page only — the toolbar's text input and
+	// the column's `filterFn` are untouched; the highlight is purely a `cell` snippet, so nothing
+	// about it needs to live in the component.
+	type Segment = { text: string; match: boolean };
+
+	/**
+	 * Splits `text` around every case-insensitive occurrence of `query`.
+	 *
+	 * An `indexOf` loop rather than a regex, so a query of `(` or `\` matches literally instead of
+	 * throwing out of `new RegExp()`. Segments are sliced from the original string, which keeps the
+	 * rendered casing; rendering them through the template rather than `{@html}` keeps cell data
+	 * inert.
+	 */
+	function splitOnQuery(text: string, query: string): Segment[] {
+		const needle = query.trim().toLowerCase();
+		if (!needle) return [{ text, match: false }];
+		const haystack = text.toLowerCase();
+		// `toLowerCase` is not length-preserving for every character ('İ' becomes 'i' + U+0307), and
+		// these are haystack indices sliced out of `text`. When the fold shifts them, no highlight
+		// beats a misplaced one.
+		if (haystack.length !== text.length) return [{ text, match: false }];
+		const segments: Segment[] = [];
+		let from = 0;
+		let at = haystack.indexOf(needle);
+		while (at !== -1) {
+			if (at > from) segments.push({ text: text.slice(from, at), match: false });
+			segments.push({ text: text.slice(at, at + needle.length), match: true });
+			from = at + needle.length;
+			at = haystack.indexOf(needle, from);
+		}
+		if (from < text.length) segments.push({ text: text.slice(from), match: false });
+		return segments;
+	}
+
+	const searchColumns: DataTableColumnDef<Project>[] = [
+		{
+			id: 'title',
+			accessorKey: 'title',
+			header: titleHeader,
+			cell: highlightedTitleCell,
+			enableColumnFilter: true,
+			meta: { label: 'Title', placeholder: 'Search titles...', variant: 'text' }
+		},
+		{
+			id: 'status',
+			accessorKey: 'status',
+			header: statusHeader,
+			cell: statusCell,
+			meta: { label: 'Status' }
+		},
+		{
+			id: 'budget',
+			accessorKey: 'budget',
+			header: budgetHeader,
+			cell: budgetCell,
+			meta: { label: 'Budget' }
+		}
+	];
+
+	const search = createDataTable<Project>({
+		data: () => projects,
+		columns: () => searchColumns,
+		getRowId: (row) => row.id,
+		initialState: { pagination: { pageSize: 4 } }
+	});
+
+	// The *applied* filter drives the highlight — the same value the column's `filterFn` reads — so
+	// the marks can never disagree with the rows that survived.
+	const searchQuery = $derived.by(() => {
+		const value = search.table.getColumn('title')?.getFilterValue();
+		return typeof value === 'string' ? value : '';
+	});
+
+	// --- Example 5: range and date filters, pinning and reordering ---------------
 
 	const advancedColumns: DataTableColumnDef<Project>[] = [
 		{
@@ -319,7 +394,7 @@
 		}
 	});
 
-	// --- Example 5: selectable rows with a numbered pager -------------------------
+	// --- Example 6: selectable rows with a numbered pager -------------------------
 
 	// Mirrors blocks.so's table-05 (github.com/ephraimduncan/blocks/blob/main/content/components/
 	// tables/table-05.tsx), minus its search input: checkbox selection, status badges, a row
@@ -631,6 +706,22 @@
 	</Button>
 {/snippet}
 
+<!--
+	`<mark>` rather than a styled span: it is the element the HTML spec defines for marking text of
+	special relevance to the reader, NVDA announces it, and Windows High Contrast maps it to the
+	Mark/MarkText system colours a span would lose. The class replaces its UA default (yellow on
+	black), which no theme survives.
+	Written on one line because whitespace between the blocks would land inside the cell text.
+-->
+{#snippet highlightedTitleCell(ctx: CellContext<Project, unknown>)}
+	{@const segments = splitOnQuery(String(ctx.getValue()), searchQuery)}
+	<!-- Keyed by index: the segments are derived from the query and regenerated whole on every
+		change, so position is the only identity they have. -->
+	{#each segments as segment, index (index)}{#if segment.match}<mark
+				class="rounded-sm bg-highlight text-highlight-foreground">{segment.text}</mark
+			>{:else}{segment.text}{/if}{/each}
+{/snippet}
+
 {#snippet statusCell(ctx: CellContext<Project, unknown>)}
 	{@const status = ctx.row.original.status}
 	{@const Icon = statusIcons[status]}
@@ -938,6 +1029,18 @@
 	>
 		<div class="w-full">
 			<DataTable.Root table={withToolbar.table} actionBar={selectionActionBar}>
+				<DataTable.Toolbar />
+			</DataTable.Root>
+		</div>
+	</ComponentPreview>
+
+	<ComponentPreview
+		title="Search with match highlighting"
+		description="A single text filter, with the matched substring marked in the column it searches. Upstream ships no such demo; the highlight is composed in the page as a cell snippet — the toolbar input and the column's filterFn are untouched — and reads the applied filter value, so the marks can never disagree with the rows that survived it."
+		class="items-start"
+	>
+		<div class="w-full">
+			<DataTable.Root table={search.table}>
 				<DataTable.Toolbar />
 			</DataTable.Root>
 		</div>
