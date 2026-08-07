@@ -59,7 +59,7 @@ const zIndexRe = new RegExp(
 );
 const sizePairRe = /\b([hw])-(\d+(?:\.\d+)?)((?:\s+[\w:/[\]-]+){0,2}\s+)([hw])-(\d+(?:\.\d+)?)\b/g;
 const solidRe = new RegExp(
-	String.raw`(?<![\w-])${VARIANT_PREFIX}bg-(primary|secondary|destructive|accent|success|warning|info)(?![\w/-])`,
+	String.raw`(?<![\w-])${VARIANT_PREFIX}bg-(primary|secondary|destructive|accent|success|warning|info|highlight)(?![\w/-])`,
 	'g'
 );
 

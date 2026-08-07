@@ -139,8 +139,9 @@ THE STANDARD you are auditing against is defined by two sources in this repo:
 
 CHECK EACH COMPONENT ON THESE DIMENSIONS:
 - color: every solid semantic fill must pair with its -foreground companion where a glyph renders
-  on it; status colours use success/warning/info tokens, never palette; muted/accent/destructive
-  used the way the primitives use them.
+  on it; status colours use success/warning/info tokens, never palette; highlight is a token too,
+  but it marks a search match rather than a state, so a status reading of it is a finding;
+  muted/accent/destructive used the way the primitives use them.
 - size: interactive control heights match the primitives (buttons h-8 for sm / h-9 default per
   buttonVariants; inputs match input.svelte), icons size-4 (or the primitive's own deviation),
   consistent gap steps.
